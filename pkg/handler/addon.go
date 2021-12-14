@@ -20,15 +20,13 @@ package handler
 
 import (
 	"net/http"
-	"regexp"
 
+	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 )
 
-var validAddonName = regexp.MustCompile(`^[a-z0-9_]+$`)
-
 func ValidAddonName(addon string) bool {
-	return validAddonName.MatchString(addon)
+	return com.IsAlphaNumericUnderscore(addon)
 }
 
 func AddonIndex(ctx echo.Context) error {

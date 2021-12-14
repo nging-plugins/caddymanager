@@ -24,7 +24,7 @@ require (
 	github.com/caddy-plugins/webdav v1.2.10
 	github.com/stretchr/testify v1.7.0
 	github.com/webx-top/client v0.3.9
-	github.com/webx-top/com v0.3.3
+	github.com/webx-top/com v0.3.5
 	github.com/webx-top/db v1.18.3
 	github.com/webx-top/echo v2.23.4+incompatible
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
