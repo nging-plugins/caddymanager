@@ -21,10 +21,13 @@ package handler
 import (
 	"os"
 
+	"github.com/webx-top/echo"
+
 	"github.com/admpub/nging/v4/application/handler"
 	"github.com/admpub/nging/v4/application/library/config"
 	"github.com/admpub/nging/v4/application/library/notice"
-	"github.com/webx-top/echo"
+
+	"github.com/nging-plugins/caddymanager/pkg/library/cmder"
 )
 
 func Restart(ctx echo.Context) error {
@@ -32,7 +35,7 @@ func Restart(ctx echo.Context) error {
 	if err != nil {
 		return ctx.String(err.Error())
 	}
-	if err := config.DefaultCLIConfig.CaddyRestart(wOut, wErr); err != nil {
+	if err := cmder.Get().Restart(wOut, wErr); err != nil {
 		return ctx.String(err.Error())
 	}
 	return ctx.String(ctx.T(`已经重启Web服务`))
@@ -65,7 +68,7 @@ func Log(ctx echo.Context) error {
 }
 
 func Stop(ctx echo.Context) error {
-	if err := config.DefaultCLIConfig.CaddyStop(); err != nil {
+	if err := cmder.Get().Stop(); err != nil {
 		return ctx.String(err.Error())
 	}
 	return ctx.String(ctx.T(`已经关闭Web服务`))

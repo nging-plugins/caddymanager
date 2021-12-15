@@ -24,6 +24,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	uploadClient "github.com/webx-top/client/upload"
+	uploadDropzone "github.com/webx-top/client/upload/driver/dropzone"
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
@@ -33,11 +35,9 @@ import (
 	"github.com/admpub/nging/v4/application/library/filemanager"
 	"github.com/admpub/nging/v4/application/library/notice"
 	"github.com/admpub/nging/v4/application/library/respond"
-	"github.com/admpub/nging/v4/application/model"
-
 	uploadChunk "github.com/admpub/nging/v4/application/registry/upload/chunk"
-	uploadClient "github.com/webx-top/client/upload"
-	uploadDropzone "github.com/webx-top/client/upload/driver/dropzone"
+
+	"github.com/nging-plugins/caddymanager/pkg/model"
 )
 
 func VhostFile(ctx echo.Context) error {

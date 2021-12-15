@@ -25,7 +25,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/webx-top/client v0.3.9
 	github.com/webx-top/com v0.3.5
-	github.com/webx-top/db v1.18.3
+	github.com/webx-top/db v1.18.4
 	github.com/webx-top/echo v2.23.4+incompatible
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
@@ -170,7 +170,7 @@ require (
 	github.com/webx-top/tagfast v0.0.0-20161020041435-9a2065ce3dd2 // indirect
 	github.com/webx-top/validation v0.0.3 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
-	golang.org/x/crypto v0.0.0-20211202192323-5770296d904e // indirect
+	golang.org/x/crypto v0.0.0-20211209193657-4570a0811e8b // indirect
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410 // indirect
 	golang.org/x/mod v0.5.1 // indirect
 	golang.org/x/net v0.0.0-20211208012354-db4efeb81f4b // indirect

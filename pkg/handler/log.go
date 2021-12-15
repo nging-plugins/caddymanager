@@ -16,7 +16,7 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package caddy
+package handler
 
 import (
 	"encoding/json"
@@ -24,17 +24,17 @@ import (
 	"strings"
 
 	"github.com/admpub/nging/v4/application/library/common"
-	"github.com/admpub/nging/v4/application/library/config"
 	"github.com/admpub/nging/v4/application/library/ip2region"
 	"github.com/admpub/tail"
 	ua "github.com/admpub/useragent"
+	"github.com/nging-plugins/caddymanager/pkg/library/cmder"
 	"github.com/nging-plugins/caddymanager/pkg/model"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 )
 
 func LogShow(ctx echo.Context) error {
-	return common.LogShow(ctx, config.DefaultConfig.Caddy.LogFile)
+	return common.LogShow(ctx, cmder.GetCaddyConfig().LogFile)
 }
 
 func VhostLog(ctx echo.Context) error {

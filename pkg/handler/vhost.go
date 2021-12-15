@@ -35,6 +35,7 @@ import (
 	"github.com/admpub/nging/v4/application/handler"
 	"github.com/admpub/nging/v4/application/library/config"
 	"github.com/nging-plugins/caddymanager/pkg/dbschema"
+	"github.com/nging-plugins/caddymanager/pkg/library/cmder"
 	"github.com/nging-plugins/caddymanager/pkg/model"
 )
 
@@ -107,7 +108,7 @@ func Vhostbuild(ctx echo.Context) error {
 			}
 		}
 	}
-	err = config.DefaultCLIConfig.CaddyReload()
+	err = cmder.Get().Reload()
 	if err != nil {
 		ctx.Logger().Error(err)
 	}
@@ -212,7 +213,7 @@ func saveVhostData(ctx echo.Context, m *dbschema.NgingVhost, values url.Values, 
 		err = saveVhostConf(ctx, saveFile, values)
 	}
 	if err == nil && restart {
-		err = config.DefaultCLIConfig.CaddyReload()
+		err = cmder.Get().Reload()
 	}
 	return
 }
@@ -242,7 +243,7 @@ func DeleteCaddyfileByID(id uint) error {
 		saveFile = filepath.Join(saveFile, fmt.Sprint(id)+`.conf`)
 		err = os.Remove(saveFile)
 		if err == nil {
-			err = config.DefaultCLIConfig.CaddyReload()
+			err = cmder.Get().Reload()
 		} else if os.IsNotExist(err) {
 			err = nil
 		}
