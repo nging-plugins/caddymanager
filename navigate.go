@@ -10,6 +10,6 @@ import (
 
 var LeftNavigate = handler.LeftNavigate
 
-func RegisterRoute(nc *navigate.Collection) {
+func RegisterNavigate(nc *navigate.Collection) {
 	nc.Backend.AddLeftItems(-1, LeftNavigate)
 }

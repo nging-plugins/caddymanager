@@ -27,7 +27,7 @@ var Module = module.Module{
 	AssetsPath:    []string{},
 	SQLCollection: setup.RegisterSQL,
 	Dashboard:     RegisterDashboard,
-	Navigate:      RegisterRoute,
+	Navigate:      RegisterNavigate,
 	Route:         handler.RegisterRoute,
 	LogParser: map[string]common.LogParser{
 		`access`: handler.ParseTailLine,
