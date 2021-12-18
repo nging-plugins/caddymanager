@@ -11,16 +11,18 @@ import (
 	"github.com/nging-plugins/caddymanager/pkg/library/setup"
 )
 
+const ID = `caddy`
+
 var Module = module.Module{
-	Startup: `caddy`,
+	Startup: ID,
 	Extend: map[string]extend.Initer{
-		`caddy`: pluginCmder.Initer,
+		ID: pluginCmder.Initer,
 	},
 	Cmder: map[string]cmder.Cmder{
-		`caddy`: pluginCmder.New(),
+		ID: pluginCmder.New(),
 	},
 	TemplatePath: map[string]string{
-		`caddy`: `caddymanager/template/backend`,
+		ID: `caddymanager/template/backend`,
 	},
 	AssetsPath:    []string{},
 	SQLCollection: setup.RegisterSQL,
