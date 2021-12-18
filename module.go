@@ -32,4 +32,5 @@ var Module = module.Module{
 	LogParser: map[string]common.LogParser{
 		`access`: handler.ParseTailLine,
 	},
+	DBSchemaVer: 0.0000,
 }
