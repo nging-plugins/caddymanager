@@ -25,7 +25,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/webx-top/client v0.5.0
 	github.com/webx-top/com v0.3.6
-	github.com/webx-top/db v1.20.3
+	github.com/webx-top/db v1.20.5
 	github.com/webx-top/echo v2.24.0+incompatible
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
