@@ -23,10 +23,10 @@ require (
 	github.com/caddy-plugins/nobots v0.2.0
 	github.com/caddy-plugins/webdav v1.2.10
 	github.com/stretchr/testify v1.7.0
-	github.com/webx-top/client v0.5.0
+	github.com/webx-top/client v0.6.6
 	github.com/webx-top/com v0.3.6
 	github.com/webx-top/db v1.20.5
-	github.com/webx-top/echo v2.24.0+incompatible
+	github.com/webx-top/echo v2.24.1+incompatible
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
 
@@ -111,6 +111,7 @@ require (
 	github.com/gorilla/css v1.0.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
+	github.com/h2non/filetype v1.1.3 // indirect
 	github.com/hashicorp/go-syslog v1.0.0 // indirect
 	github.com/jimstudt/http-authentication v0.0.0-20140401203705-3eca13d6893a // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
