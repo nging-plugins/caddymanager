@@ -1,18 +1,23 @@
 package embedwebserver
 
 import (
+	"fmt"
 	"io"
+	"net/url"
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"strings"
 	"sync"
 
 	"github.com/admpub/log"
 	"github.com/webx-top/com"
+	"github.com/webx-top/echo"
 
 	"github.com/admpub/nging/v4/application/library/config"
 
+	"github.com/nging-plugins/caddymanager/pkg/dbschema"
 	"github.com/nging-plugins/caddymanager/pkg/library/caddy"
 	scmder "github.com/nging-plugins/caddymanager/pkg/library/cmder"
 )
@@ -128,4 +133,73 @@ func (c *caddyCmd) LogFile() string {
 
 func (c *caddyCmd) RemoveCachedCert(domain string) error {
 	return c.CaddyConfig().RemoveCachedCert(domain)
+}
+
+func (c *caddyCmd) VhostConfigFile(id uint) (string, error) {
+	saveFile, err := c.ConfigDirectory()
+	if err != nil {
+		return saveFile, err
+	}
+	saveFile = filepath.Join(saveFile, fmt.Sprint(id)+`.conf`)
+	return saveFile, nil
+}
+
+func (c *caddyCmd) SaveVhostConfig(ctx echo.Context, m *dbschema.NgingVhost, values url.Values) (string, error) {
+	saveFile, err := c.VhostConfigFile(m.Id)
+	if err != nil {
+		return saveFile, err
+	}
+	ctx.Set(`values`, NewFormValues(values))
+	b, err := ctx.Fetch(`caddy/caddyfile`, nil)
+	if err != nil {
+		return saveFile, err
+	}
+	b = com.CleanSpaceLine(b)
+	log.Info(`Generate a Caddy configuration file: `, saveFile)
+	err = os.WriteFile(saveFile, b, os.ModePerm)
+	//jsonb, _ := caddyfile.ToJSON(b)
+	//err = os.WriteFile(saveFile+`.json`, jsonb, os.ModePerm)
+	return saveFile, err
+}
+
+func (c *caddyCmd) ConfigDirectory() (configDir string, err error) {
+	configDir, err = filepath.Abs(config.DefaultConfig.Sys.VhostsfileDir)
+	if err != nil {
+		return
+	}
+	err = com.MkdirAll(configDir, os.ModePerm)
+	return
+}
+
+func (c *caddyCmd) ClearVhostConfig() error {
+	saveFile, err := c.ConfigDirectory()
+	if err == nil {
+		err = filepath.Walk(saveFile, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if info.IsDir() {
+				return nil
+			}
+			if !strings.HasSuffix(path, `.conf`) {
+				return nil
+			}
+			log.Info(`Delete the Caddy configuration file: `, path)
+			return os.Remove(path)
+		})
+	}
+	return err
+}
+
+func (c *caddyCmd) RemoveVhostConfig(m *dbschema.NgingVhost) (err error) {
+	var saveFile string
+	saveFile, err = c.VhostConfigFile(m.Id)
+	if err != nil {
+		return
+	}
+	err = os.Remove(saveFile)
+	if os.IsNotExist(err) {
+		err = nil
+	}
+	return
 }

@@ -15,6 +15,7 @@
    You should have received a copy of the GNU Affero General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 package handler
 
 import (
@@ -23,14 +24,12 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/middleware/tplfunc"
 
-	"github.com/admpub/log"
 	"github.com/admpub/nging/v4/application/handler"
 	"github.com/admpub/nging/v4/application/library/config"
 	"github.com/nging-plugins/caddymanager/pkg/dbschema"
@@ -63,22 +62,7 @@ func VhostIndex(ctx echo.Context) error {
 }
 
 func Vhostbuild(ctx echo.Context) error {
-	saveFile, err := getSaveDir()
-	if err == nil {
-		err = filepath.Walk(saveFile, func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if info.IsDir() {
-				return nil
-			}
-			if !strings.HasSuffix(path, `.conf`) {
-				return nil
-			}
-			log.Info(`Delete the Caddy configuration file: `, path)
-			return os.Remove(path)
-		})
-	}
+	err := cmder.Get().ClearVhostConfig()
 	if err != nil {
 		handler.SendFail(ctx, err.Error())
 		return ctx.Redirect(handler.URLFor(`/caddy/vhost`))
@@ -98,8 +82,7 @@ func Vhostbuild(ctx echo.Context) error {
 			var formData url.Values
 			err := json.Unmarshal([]byte(m.Setting), &formData)
 			if err == nil {
-				file := filepath.Join(saveFile, fmt.Sprint(m.Id)+`.conf`)
-				err = saveVhostConf(ctx, file, formData)
+				_, err = cmder.Get().SaveVhostConfig(ctx, m, formData)
 			}
 			if err != nil {
 				handler.SendFail(ctx, err.Error())
@@ -182,34 +165,11 @@ func getSaveDir() (saveFile string, err error) {
 	return
 }
 
-func saveVhostConf(ctx echo.Context, saveFile string, values url.Values) error {
-	ctx.Set(`values`, NewFormValues(values))
-	b, err := ctx.Fetch(`caddy/caddyfile`, nil)
-	if err != nil {
-		return err
-	}
-	b = com.CleanSpaceLine(b)
-	log.Info(`Generate a Caddy configuration file: `, saveFile)
-	err = os.WriteFile(saveFile, b, os.ModePerm)
-	//jsonb, _ := caddyfile.ToJSON(b)
-	//err = os.WriteFile(saveFile+`.json`, jsonb, os.ModePerm)
-	return err
-}
-
 func saveVhostData(ctx echo.Context, m *dbschema.NgingVhost, values url.Values, restart bool) (err error) {
-	var saveFile string
-	saveFile, err = getSaveDir()
-	if err != nil {
-		return
-	}
-	saveFile = filepath.Join(saveFile, fmt.Sprint(m.Id)+`.conf`)
 	if m.Disabled == `Y` {
-		err = os.Remove(saveFile)
-		if os.IsNotExist(err) {
-			err = nil
-		}
+		err = cmder.Get().RemoveVhostConfig(m)
 	} else {
-		err = saveVhostConf(ctx, saveFile, values)
+		_, err = cmder.Get().SaveVhostConfig(ctx, m, values)
 	}
 	if err == nil && restart {
 		err = cmder.Get().Reload()
