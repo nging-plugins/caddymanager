@@ -43,7 +43,7 @@ type Vhost struct {
 }
 
 func (m *Vhost) RemoveCachedCert() {
-	caddyCfg := cmder.GetCaddyConfig()
+	caddyCfg := cmder.Get()
 	for _, domain := range strings.Split(m.Domain, ` `) {
 		domain = strings.TrimSpace(domain)
 		if len(domain) == 0 {

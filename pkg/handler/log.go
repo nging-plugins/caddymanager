@@ -34,7 +34,7 @@ import (
 )
 
 func LogShow(ctx echo.Context) error {
-	return common.LogShow(ctx, cmder.GetCaddyConfig().LogFile)
+	return common.LogShow(ctx, cmder.Get().LogFile())
 }
 
 func VhostLog(ctx echo.Context) error {

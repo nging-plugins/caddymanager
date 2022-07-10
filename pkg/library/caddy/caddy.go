@@ -175,13 +175,14 @@ func (c *Config) Start() error {
 	return nil
 }
 
-func (c *Config) RemoveCachedCert(domain string) {
+func (c *Config) RemoveCachedCert(domain string) error {
 	certKey := certmagic.StorageKeys.SiteCert(c.CAUrl, domain)
 	keyKey := certmagic.StorageKeys.SitePrivateKey(c.CAUrl, domain)
 	metaKey := certmagic.StorageKeys.SiteMeta(c.CAUrl, domain)
 	os.Remove(certKey)
 	os.Remove(keyKey)
 	os.Remove(metaKey)
+	return nil
 }
 
 // Listen to keypress of "return" and restart the app automatically

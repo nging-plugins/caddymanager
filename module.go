@@ -8,6 +8,7 @@ import (
 
 	"github.com/nging-plugins/caddymanager/pkg/handler"
 	pluginCmder "github.com/nging-plugins/caddymanager/pkg/library/cmder"
+	_ "github.com/nging-plugins/caddymanager/pkg/library/cmder/embedwebserver"
 	"github.com/nging-plugins/caddymanager/pkg/library/setup"
 )
 

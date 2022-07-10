@@ -79,6 +79,6 @@ func (oc *OutputConfig) sendEvent(event utils.LogEvent) (err error) {
 		return
 	}
 
-	_, err = data.Add()
+	_, err = data.Insert()
 	return
 }
