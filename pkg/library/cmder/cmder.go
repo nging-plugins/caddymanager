@@ -19,7 +19,7 @@ type ServerDef struct {
 }
 
 var serverCmders = map[string]*ServerDef{}
-var serverType = `embedwebserver`
+var serverType = `caddy`
 
 func SetServerType(ident string) {
 	serverType = ident
