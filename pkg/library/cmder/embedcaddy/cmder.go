@@ -1,4 +1,4 @@
-package embedwebserver
+package embedcaddy
 
 import (
 	"fmt"
@@ -22,7 +22,7 @@ import (
 	scmder "github.com/nging-plugins/caddymanager/pkg/library/cmder"
 )
 
-const Name = "embedwebserver"
+const Name = "caddy"
 
 func init() {
 	scmder.Register(Name, `Caddy(v1)`, New)
