@@ -37,7 +37,7 @@ import (
 	"github.com/admpub/nging/v4/application/library/respond"
 	uploadChunk "github.com/admpub/nging/v4/application/registry/upload/chunk"
 
-	"github.com/nging-plugins/caddymanager/pkg/model"
+	"github.com/nging-plugins/caddymanager/application/model"
 )
 
 func VhostFile(ctx echo.Context) error {

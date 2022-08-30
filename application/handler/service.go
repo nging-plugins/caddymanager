@@ -27,7 +27,7 @@ import (
 	"github.com/admpub/nging/v4/application/library/config"
 	"github.com/admpub/nging/v4/application/library/notice"
 
-	"github.com/nging-plugins/caddymanager/pkg/library/cmder"
+	"github.com/nging-plugins/caddymanager/application/library/cmder"
 )
 
 func Restart(ctx echo.Context) error {

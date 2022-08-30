@@ -20,7 +20,7 @@ package handler
 
 import (
 	"github.com/admpub/nging/v4/application/handler"
-	"github.com/nging-plugins/caddymanager/pkg/dbschema"
+	"github.com/nging-plugins/caddymanager/application/dbschema"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 )

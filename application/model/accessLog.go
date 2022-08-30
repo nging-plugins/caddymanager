@@ -24,7 +24,7 @@ import (
 
 	"github.com/webx-top/echo"
 
-	"github.com/nging-plugins/caddymanager/pkg/dbschema"
+	"github.com/nging-plugins/caddymanager/application/dbschema"
 )
 
 func NewAccessLog(ctx echo.Context) *AccessLog {

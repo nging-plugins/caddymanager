@@ -14,7 +14,7 @@ import (
 	"github.com/admpub/nging/v4/application/library/config"
 	"github.com/admpub/nging/v4/application/library/config/cmder"
 
-	"github.com/nging-plugins/caddymanager/pkg/library/caddy"
+	"github.com/nging-plugins/caddymanager/application/library/caddy"
 )
 
 func Initer() interface{} {

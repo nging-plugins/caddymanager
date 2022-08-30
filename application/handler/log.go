@@ -27,8 +27,8 @@ import (
 	"github.com/admpub/nging/v4/application/library/ip2region"
 	"github.com/admpub/tail"
 	ua "github.com/admpub/useragent"
-	"github.com/nging-plugins/caddymanager/pkg/library/cmder"
-	"github.com/nging-plugins/caddymanager/pkg/model"
+	"github.com/nging-plugins/caddymanager/application/library/cmder"
+	"github.com/nging-plugins/caddymanager/application/model"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 )

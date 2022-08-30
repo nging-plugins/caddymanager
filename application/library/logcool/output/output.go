@@ -16,51 +16,69 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package filter
+package output
 
 import (
+	"context"
+
 	"github.com/admpub/logcool/utils"
-	"github.com/nging-plugins/caddymanager/pkg/model"
+	"github.com/nging-plugins/caddymanager/application/model"
 )
 
 const (
 	ModuleName = "nging"
 )
 
-// FilterConfig define nging' config.
-type FilterConfig struct {
-	utils.FilterConfig
+// OutputConfig Define nging' config.
+type OutputConfig struct {
+	utils.OutputConfig
+	event chan utils.LogEvent
 }
 
 func init() {
-	utils.RegistFilterHandler(ModuleName, InitHandler)
+	utils.RegistOutputHandler(ModuleName, InitHandler)
 }
 
-// InitHandler Init nging Handler.
-func InitHandler(confraw *utils.ConfigRaw) (tfc utils.TypeFilterConfig, err error) {
-	conf := FilterConfig{
-		FilterConfig: utils.FilterConfig{
+// InitHandler Init outputstdout Handler.
+func InitHandler(confraw *utils.ConfigRaw) (retconf utils.TypeOutputConfig, err error) {
+	conf := OutputConfig{
+		OutputConfig: utils.OutputConfig{
 			CommonConfig: utils.CommonConfig{
 				Type: ModuleName,
 			},
 		},
+		event: make(chan utils.LogEvent),
 	}
-	// Reflect config from configraw.
 	if err = utils.ReflectConfig(confraw, &conf); err != nil {
 		return
 	}
 
-	tfc = &conf
+	go conf.loopEvent()
+
+	retconf = &conf
 	return
 }
 
-// Event Filter's event,and this is the main function of filter.
-func (fc *FilterConfig) Event(event utils.LogEvent) utils.LogEvent {
-	data := model.NewAccessLog(nil)
-	err := data.Parse(event.Message)
-	if err != nil {
-		return event
+// Event Input's event,and this is the main function of output.
+func (oc *OutputConfig) Event(ctx context.Context, event utils.LogEvent) (err error) {
+	oc.event <- event
+	return
+}
+
+func (oc *OutputConfig) loopEvent() (err error) {
+	for {
+		event := <-oc.event
+		oc.sendEvent(event)
 	}
-	event.Extra = data.ToMap()
-	return event
+}
+
+func (oc *OutputConfig) sendEvent(event utils.LogEvent) (err error) {
+	data := model.NewAccessLog(nil)
+	err = data.Parse(event.Message)
+	if err != nil {
+		return
+	}
+
+	_, err = data.Add()
+	return
 }

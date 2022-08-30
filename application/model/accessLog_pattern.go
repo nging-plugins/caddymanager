@@ -25,7 +25,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nging-plugins/caddymanager/pkg/library/logcool"
+	"github.com/nging-plugins/caddymanager/application/library/logcool"
 )
 
 var (
