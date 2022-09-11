@@ -25,7 +25,7 @@ require (
 	github.com/stretchr/testify v1.8.0
 	github.com/webx-top/client v0.7.1
 	github.com/webx-top/com v0.6.2
-	github.com/webx-top/db v1.22.2
+	github.com/webx-top/db v1.22.3
 	github.com/webx-top/echo v2.26.13+incompatible
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
@@ -129,7 +129,7 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.20 // indirect
 	github.com/miekg/dns v1.1.50 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.0.35 // indirect
+	github.com/minio/minio-go/v7 v7.0.36 // indirect
 	github.com/minio/sha256-simd v1.0.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
