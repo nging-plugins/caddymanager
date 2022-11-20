@@ -1,4 +1,4 @@
-{{$v := Get `values`}}
+{{$v := $.Get `values`}}
 {{$v.Get "domain"}} {
     {{$root := $v.Get "root"}}
     {{if $root}}
