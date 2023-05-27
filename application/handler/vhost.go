@@ -84,6 +84,9 @@ func Vhostbuild(ctx echo.Context) error {
 	m := model.NewVhost(ctx)
 	n := 100
 	cnt, err := m.ListByOffset(nil, nil, 0, n, `disabled`, `N`)
+	if err != nil {
+		return err
+	}
 	for i, j := 0, cnt(); int64(i) < j; i += n {
 		if i > 0 {
 			_, err = m.ListByOffset(nil, nil, i, n, `disabled`, `N`)
@@ -105,7 +108,7 @@ func Vhostbuild(ctx echo.Context) error {
 			}
 		}
 	}
-	err = cmder.Get().Reload()
+	err = cmder.GetCaddyCmd().ReloadServer()
 	if err != nil {
 		ctx.Logger().Error(err)
 	}
@@ -208,7 +211,7 @@ func saveVhostData(ctx echo.Context, m *dbschema.NgingVhost, values url.Values, 
 		err = saveVhostConf(ctx, saveFile, values)
 	}
 	if err == nil && restart {
-		err = cmder.Get().Reload()
+		err = cmder.GetCaddyCmd().ReloadServer()
 	}
 	return
 }
@@ -238,7 +241,7 @@ func DeleteCaddyfileByID(id uint) error {
 	saveFile := filepath.Join(saveDir, fmt.Sprint(id)+`.conf`)
 	err := os.Remove(saveFile)
 	if err == nil {
-		err = cmder.Get().Reload()
+		err = cmder.GetCaddyCmd().ReloadServer()
 	} else if os.IsNotExist(err) {
 		err = nil
 	}

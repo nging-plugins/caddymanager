@@ -164,6 +164,9 @@ func (c *Config) setDefaultCaddyfile() (err error) {
 }
 
 func (c *Config) fixedCaddyfile() error {
+	if len(c.caddyfileAbsPath) > 0 {
+		return nil
+	}
 	c.caddyfileAbsPath = c.Caddyfile
 	if len(c.caddyfileAbsPath) == 0 {
 		return c.setDefaultCaddyfile()
