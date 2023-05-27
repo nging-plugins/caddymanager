@@ -31,7 +31,6 @@ import (
 
 	"github.com/admpub/log"
 	"github.com/admpub/nging/v5/application/handler"
-	"github.com/admpub/nging/v5/application/library/config"
 	"github.com/nging-plugins/caddymanager/application/dbschema"
 	"github.com/nging-plugins/caddymanager/application/library/cmder"
 	"github.com/nging-plugins/caddymanager/application/model"
@@ -62,9 +61,9 @@ func VhostIndex(ctx echo.Context) error {
 }
 
 func Vhostbuild(ctx echo.Context) error {
-	saveFile, err := getSaveDir()
+	saveDir, err := getSaveDir()
 	if err == nil {
-		err = filepath.Walk(saveFile, func(path string, info os.FileInfo, err error) error {
+		err = filepath.Walk(saveDir, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
@@ -97,7 +96,7 @@ func Vhostbuild(ctx echo.Context) error {
 			var formData url.Values
 			err := json.Unmarshal([]byte(m.Setting), &formData)
 			if err == nil {
-				file := filepath.Join(saveFile, fmt.Sprint(m.Id)+`.conf`)
+				file := filepath.Join(saveDir, fmt.Sprint(m.Id)+`.conf`)
 				err = saveVhostConf(ctx, file, formData)
 			}
 			if err != nil {
@@ -172,12 +171,10 @@ func VhostAdd(ctx echo.Context) error {
 	return ctx.Render(`caddy/vhost_edit`, err)
 }
 
-func getSaveDir() (saveFile string, err error) {
-	saveFile, err = filepath.Abs(config.FromFile().Sys.VhostsfileDir)
-	if err != nil {
-		return
-	}
-	err = com.MkdirAll(saveFile, os.ModePerm)
+func getSaveDir() (saveDir string, err error) {
+	cfg := cmder.GetCaddyConfig()
+	saveDir = cfg.GetVhostConfigDirAbsPath()
+	err = com.MkdirAll(saveDir, os.ModePerm)
 	return
 }
 
@@ -196,12 +193,12 @@ func saveVhostConf(ctx echo.Context, saveFile string, values url.Values) error {
 }
 
 func saveVhostData(ctx echo.Context, m *dbschema.NgingVhost, values url.Values, restart bool) (err error) {
-	var saveFile string
-	saveFile, err = getSaveDir()
+	var saveDir string
+	saveDir, err = getSaveDir()
 	if err != nil {
 		return
 	}
-	saveFile = filepath.Join(saveFile, fmt.Sprint(m.Id)+`.conf`)
+	saveFile := filepath.Join(saveDir, fmt.Sprint(m.Id)+`.conf`)
 	if m.Disabled == `Y` {
 		err = os.Remove(saveFile)
 		if os.IsNotExist(err) {
@@ -236,15 +233,14 @@ func VhostDelete(ctx echo.Context) error {
 }
 
 func DeleteCaddyfileByID(id uint) error {
-	saveFile, err := filepath.Abs(config.FromFile().Sys.VhostsfileDir)
+	cfg := cmder.GetCaddyConfig()
+	saveDir := cfg.GetVhostConfigDirAbsPath()
+	saveFile := filepath.Join(saveDir, fmt.Sprint(id)+`.conf`)
+	err := os.Remove(saveFile)
 	if err == nil {
-		saveFile = filepath.Join(saveFile, fmt.Sprint(id)+`.conf`)
-		err = os.Remove(saveFile)
-		if err == nil {
-			err = cmder.Get().Reload()
-		} else if os.IsNotExist(err) {
-			err = nil
-		}
+		err = cmder.Get().Reload()
+	} else if os.IsNotExist(err) {
+		err = nil
 	}
 	return err
 }
