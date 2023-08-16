@@ -65,7 +65,8 @@
 							<td>
 								{{- "监听地址"|$.T}}: 
 								{{range $k, $v := call $.Func.generateHostURL $v.Domain -}}
-								{{- $v }}
+								{{- $v -}} 
+								&nbsp;
 								{{- end -}}
 								<br />
 								{{- "物理路径"|$.T}}: {{$v.Root -}}
