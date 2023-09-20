@@ -1,0 +1,88 @@
+package cmder
+
+import (
+	"context"
+	"io"
+
+	"github.com/admpub/once"
+
+	"github.com/admpub/nging/v5/application/library/config"
+	"github.com/admpub/nging/v5/application/library/config/cmder"
+
+	nginxConfig "github.com/nging-plugins/caddymanager/application/library/thirdparty/nginx/config"
+)
+
+const Name = `nginx`
+
+func Initer() interface{} {
+	return &nginxConfig.Config{}
+}
+
+func Get() cmder.Cmder {
+	return cmder.Get(Name)
+}
+
+func GetNginxConfig() *nginxConfig.Config {
+	return GetNginxCmd().NginxConfig()
+}
+
+func GetNginxCmd() *nginxCmd {
+	cm := cmder.Get(Name).(*nginxCmd)
+	return cm
+}
+
+func New() cmder.Cmder {
+	return &nginxCmd{
+		CLIConfig: config.FromCLI(),
+		once:      once.Once{},
+	}
+}
+
+type nginxCmd struct {
+	CLIConfig   *config.CLIConfig
+	nginxConfig *nginxConfig.Config
+	once        once.Once
+}
+
+func (c *nginxCmd) Boot() error {
+	return c.NginxConfig().Init()
+}
+
+func (c *nginxCmd) getConfig() *config.Config {
+	if config.FromFile() == nil {
+		c.CLIConfig.ParseConfig()
+	}
+	return config.FromFile()
+}
+
+func (c *nginxCmd) parseConfig() {
+	c.nginxConfig, _ = c.getConfig().Extend.Get(Name).(*nginxConfig.Config)
+	if c.nginxConfig == nil {
+		c.nginxConfig = &nginxConfig.Config{}
+	}
+}
+
+func (c *nginxCmd) NginxConfig() *nginxConfig.Config {
+	c.once.Do(c.parseConfig)
+	return c.nginxConfig
+}
+
+func (c *nginxCmd) StopHistory(_ ...string) error {
+	return nil
+}
+
+func (c *nginxCmd) Start(writer ...io.Writer) error {
+	return nil
+}
+
+func (c *nginxCmd) Stop() error {
+	return nil
+}
+
+func (c *nginxCmd) Reload() error {
+	return c.NginxConfig().Reload(context.Background())
+}
+
+func (c *nginxCmd) Restart(writer ...io.Writer) error {
+	return nil
+}
