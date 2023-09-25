@@ -27,9 +27,9 @@ require (
 	github.com/caddy-plugins/webdav v1.2.10
 	github.com/stretchr/testify v1.8.4
 	github.com/webx-top/client v0.8.9
-	github.com/webx-top/com v1.0.1
+	github.com/webx-top/com v1.0.2
 	github.com/webx-top/db v1.27.0
-	github.com/webx-top/echo v2.38.4+incompatible
+	github.com/webx-top/echo v2.39.2+incompatible
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
@@ -85,7 +85,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/codegangsta/inject v0.0.0-20150114235600-33e0aa1cb7c0 // indirect
-	github.com/coscms/forms v1.12.1 // indirect
+	github.com/coscms/forms v1.12.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/disintegration/imaging v1.6.2 // indirect
 	github.com/dsoprea/go-logging v0.0.0-20200710184922-b02d349568dd // indirect
