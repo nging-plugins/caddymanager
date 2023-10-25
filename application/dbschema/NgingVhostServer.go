@@ -15,9 +15,9 @@ import (
 	"github.com/webx-top/echo/param"
 )
 
-type Slice_NgingVhost []*NgingVhost
+type Slice_NgingVhostServer []*NgingVhostServer
 
-func (s Slice_NgingVhost) Range(fn func(m factory.Model) error) error {
+func (s Slice_NgingVhostServer) Range(fn func(m factory.Model) error) error {
 	for _, v := range s {
 		if err := fn(v); err != nil {
 			return err
@@ -26,7 +26,7 @@ func (s Slice_NgingVhost) Range(fn func(m factory.Model) error) error {
 	return nil
 }
 
-func (s Slice_NgingVhost) RangeRaw(fn func(m *NgingVhost) error) error {
+func (s Slice_NgingVhostServer) RangeRaw(fn func(m *NgingVhostServer) error) error {
 	for _, v := range s {
 		if err := fn(v); err != nil {
 			return err
@@ -35,21 +35,21 @@ func (s Slice_NgingVhost) RangeRaw(fn func(m *NgingVhost) error) error {
 	return nil
 }
 
-func (s Slice_NgingVhost) GroupBy(keyField string) map[string][]*NgingVhost {
-	r := map[string][]*NgingVhost{}
+func (s Slice_NgingVhostServer) GroupBy(keyField string) map[string][]*NgingVhostServer {
+	r := map[string][]*NgingVhostServer{}
 	for _, row := range s {
 		dmap := row.AsMap()
 		vkey := fmt.Sprint(dmap[keyField])
 		if _, y := r[vkey]; !y {
-			r[vkey] = []*NgingVhost{}
+			r[vkey] = []*NgingVhostServer{}
 		}
 		r[vkey] = append(r[vkey], row)
 	}
 	return r
 }
 
-func (s Slice_NgingVhost) KeyBy(keyField string) map[string]*NgingVhost {
-	r := map[string]*NgingVhost{}
+func (s Slice_NgingVhostServer) KeyBy(keyField string) map[string]*NgingVhostServer {
+	r := map[string]*NgingVhostServer{}
 	for _, row := range s {
 		dmap := row.AsMap()
 		vkey := fmt.Sprint(dmap[keyField])
@@ -58,7 +58,7 @@ func (s Slice_NgingVhost) KeyBy(keyField string) map[string]*NgingVhost {
 	return r
 }
 
-func (s Slice_NgingVhost) AsKV(keyField string, valueField string) param.Store {
+func (s Slice_NgingVhostServer) AsKV(keyField string, valueField string) param.Store {
 	r := param.Store{}
 	for _, row := range s {
 		dmap := row.AsMap()
@@ -68,7 +68,7 @@ func (s Slice_NgingVhost) AsKV(keyField string, valueField string) param.Store {
 	return r
 }
 
-func (s Slice_NgingVhost) Transform(transfers map[string]param.Transfer) []param.Store {
+func (s Slice_NgingVhostServer) Transform(transfers map[string]param.Transfer) []param.Store {
 	r := make([]param.Store, len(s))
 	for idx, row := range s {
 		r[idx] = row.AsMap().Transform(transfers)
@@ -76,11 +76,11 @@ func (s Slice_NgingVhost) Transform(transfers map[string]param.Transfer) []param
 	return r
 }
 
-func (s Slice_NgingVhost) FromList(data interface{}) Slice_NgingVhost {
-	values, ok := data.([]*NgingVhost)
+func (s Slice_NgingVhostServer) FromList(data interface{}) Slice_NgingVhostServer {
+	values, ok := data.([]*NgingVhostServer)
 	if !ok {
 		for _, value := range data.([]interface{}) {
-			row := &NgingVhost{}
+			row := &NgingVhostServer{}
 			row.FromRow(value.(map[string]interface{}))
 			s = append(s, row)
 		}
@@ -91,146 +91,145 @@ func (s Slice_NgingVhost) FromList(data interface{}) Slice_NgingVhost {
 	return s
 }
 
-func NewNgingVhost(ctx echo.Context) *NgingVhost {
-	m := &NgingVhost{}
+func NewNgingVhostServer(ctx echo.Context) *NgingVhostServer {
+	m := &NgingVhostServer{}
 	m.SetContext(ctx)
 	return m
 }
 
-// NgingVhost 虚拟主机
-type NgingVhost struct {
+// NgingVhostServer
+type NgingVhostServer struct {
 	base    factory.Base
-	objects []*NgingVhost
+	objects []*NgingVhostServer
 
-	Id          uint   `db:"id,omitempty,pk" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
-	Name        string `db:"name" bson:"name" comment:"网站名称" json:"name" xml:"name"`
-	GroupId     uint   `db:"group_id" bson:"group_id" comment:"组" json:"group_id" xml:"group_id"`
-	ServerIdent string `db:"server_ident" bson:"server_ident" comment:"服务器标识" json:"server_ident" xml:"server_ident"`
-	Domain      string `db:"domain" bson:"domain" comment:"域名" json:"domain" xml:"domain"`
-	Root        string `db:"root" bson:"root" comment:"网站物理路径" json:"root" xml:"root"`
-	Created     uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
-	Updated     uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
-	Setting     string `db:"setting" bson:"setting" comment:"设置" json:"setting" xml:"setting"`
-	Disabled    string `db:"disabled" bson:"disabled" comment:"是否停用" json:"disabled" xml:"disabled"`
+	Id             uint   `db:"id,omitempty,pk" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
+	Ident          string `db:"ident" bson:"ident" comment:"唯一标识" json:"ident" xml:"ident"`
+	Name           string `db:"name" bson:"name" comment:"服务引擎名称" json:"name" xml:"name"`
+	ExecutableFile string `db:"executable_file" bson:"executable_file" comment:"可执行文件路径(支持容器)" json:"executable_file" xml:"executable_file"`
+	ConfigFile     string `db:"config_file" bson:"config_file" comment:"配置文件路径" json:"config_file" xml:"config_file"`
+	WorkDir        string `db:"work_dir" bson:"work_dir" comment:"工作目录" json:"work_dir" xml:"work_dir"`
+	Disabled       string `db:"disabled" bson:"disabled" comment:"是否(Y/N)禁用" json:"disabled" xml:"disabled"`
+	Created        uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
+	Updated        uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
 }
 
 // - base function
 
-func (a *NgingVhost) Trans() factory.Transactioner {
+func (a *NgingVhostServer) Trans() factory.Transactioner {
 	return a.base.Trans()
 }
 
-func (a *NgingVhost) Use(trans factory.Transactioner) factory.Model {
+func (a *NgingVhostServer) Use(trans factory.Transactioner) factory.Model {
 	a.base.Use(trans)
 	return a
 }
 
-func (a *NgingVhost) SetContext(ctx echo.Context) factory.Model {
+func (a *NgingVhostServer) SetContext(ctx echo.Context) factory.Model {
 	a.base.SetContext(ctx)
 	return a
 }
 
-func (a *NgingVhost) EventON(on ...bool) factory.Model {
+func (a *NgingVhostServer) EventON(on ...bool) factory.Model {
 	a.base.EventON(on...)
 	return a
 }
 
-func (a *NgingVhost) EventOFF(off ...bool) factory.Model {
+func (a *NgingVhostServer) EventOFF(off ...bool) factory.Model {
 	a.base.EventOFF(off...)
 	return a
 }
 
-func (a *NgingVhost) Context() echo.Context {
+func (a *NgingVhostServer) Context() echo.Context {
 	return a.base.Context()
 }
 
-func (a *NgingVhost) SetConnID(connID int) factory.Model {
+func (a *NgingVhostServer) SetConnID(connID int) factory.Model {
 	a.base.SetConnID(connID)
 	return a
 }
 
-func (a *NgingVhost) ConnID() int {
+func (a *NgingVhostServer) ConnID() int {
 	return a.base.ConnID()
 }
 
-func (a *NgingVhost) SetNamer(namer func(factory.Model) string) factory.Model {
+func (a *NgingVhostServer) SetNamer(namer func(factory.Model) string) factory.Model {
 	a.base.SetNamer(namer)
 	return a
 }
 
-func (a *NgingVhost) Namer() func(factory.Model) string {
+func (a *NgingVhostServer) Namer() func(factory.Model) string {
 	return a.base.Namer()
 }
 
-func (a *NgingVhost) SetParam(param *factory.Param) factory.Model {
+func (a *NgingVhostServer) SetParam(param *factory.Param) factory.Model {
 	a.base.SetParam(param)
 	return a
 }
 
-func (a *NgingVhost) Param(mw func(db.Result) db.Result, args ...interface{}) *factory.Param {
+func (a *NgingVhostServer) Param(mw func(db.Result) db.Result, args ...interface{}) *factory.Param {
 	if a.base.Param() == nil {
 		return a.NewParam().SetMiddleware(mw).SetArgs(args...)
 	}
 	return a.base.Param().SetMiddleware(mw).SetArgs(args...)
 }
 
-func (a *NgingVhost) New(structName string, connID ...int) factory.Model {
+func (a *NgingVhostServer) New(structName string, connID ...int) factory.Model {
 	return a.base.New(structName, connID...)
 }
 
-func (a *NgingVhost) Base_() factory.Baser {
+func (a *NgingVhostServer) Base_() factory.Baser {
 	return &a.base
 }
 
 // - current function
 
-func (a *NgingVhost) Objects() []*NgingVhost {
+func (a *NgingVhostServer) Objects() []*NgingVhostServer {
 	if a.objects == nil {
 		return nil
 	}
 	return a.objects[:]
 }
 
-func (a *NgingVhost) XObjects() Slice_NgingVhost {
-	return Slice_NgingVhost(a.Objects())
+func (a *NgingVhostServer) XObjects() Slice_NgingVhostServer {
+	return Slice_NgingVhostServer(a.Objects())
 }
 
-func (a *NgingVhost) NewObjects() factory.Ranger {
-	return &Slice_NgingVhost{}
+func (a *NgingVhostServer) NewObjects() factory.Ranger {
+	return &Slice_NgingVhostServer{}
 }
 
-func (a *NgingVhost) InitObjects() *[]*NgingVhost {
-	a.objects = []*NgingVhost{}
+func (a *NgingVhostServer) InitObjects() *[]*NgingVhostServer {
+	a.objects = []*NgingVhostServer{}
 	return &a.objects
 }
 
-func (a *NgingVhost) NewParam() *factory.Param {
+func (a *NgingVhostServer) NewParam() *factory.Param {
 	return factory.NewParam(factory.DefaultFactory).SetIndex(a.base.ConnID()).SetTrans(a.base.Trans()).SetCollection(a.Name_()).SetModel(a)
 }
 
-func (a *NgingVhost) Short_() string {
-	return "nging_vhost"
+func (a *NgingVhostServer) Short_() string {
+	return "nging_vhost_server"
 }
 
-func (a *NgingVhost) Struct_() string {
-	return "NgingVhost"
+func (a *NgingVhostServer) Struct_() string {
+	return "NgingVhostServer"
 }
 
-func (a *NgingVhost) Name_() string {
+func (a *NgingVhostServer) Name_() string {
 	if a.base.Namer() != nil {
 		return WithPrefix(a.base.Namer()(a))
 	}
 	return WithPrefix(factory.TableNamerGet(a.Short_())(a))
 }
 
-func (a *NgingVhost) CPAFrom(source factory.Model) factory.Model {
+func (a *NgingVhostServer) CPAFrom(source factory.Model) factory.Model {
 	a.SetContext(source.Context())
 	a.SetConnID(source.ConnID())
 	a.SetNamer(source.Namer())
 	return a
 }
 
-func (a *NgingVhost) Get(mw func(db.Result) db.Result, args ...interface{}) (err error) {
+func (a *NgingVhostServer) Get(mw func(db.Result) db.Result, args ...interface{}) (err error) {
 	base := a.base
 	if !a.base.Eventable() {
 		err = a.Param(mw, args...).SetRecv(a).One()
@@ -249,7 +248,7 @@ func (a *NgingVhost) Get(mw func(db.Result) db.Result, args ...interface{}) (err
 	return
 }
 
-func (a *NgingVhost) List(recv interface{}, mw func(db.Result) db.Result, page, size int, args ...interface{}) (func() int64, error) {
+func (a *NgingVhostServer) List(recv interface{}, mw func(db.Result) db.Result, page, size int, args ...interface{}) (func() int64, error) {
 	if recv == nil {
 		recv = a.InitObjects()
 	}
@@ -263,10 +262,10 @@ func (a *NgingVhost) List(recv interface{}, mw func(db.Result) db.Result, page, 
 	cnt, err := queryParam.List()
 	if err == nil {
 		switch v := recv.(type) {
-		case *[]*NgingVhost:
-			err = DBI.FireReaded(a, queryParam, Slice_NgingVhost(*v))
-		case []*NgingVhost:
-			err = DBI.FireReaded(a, queryParam, Slice_NgingVhost(v))
+		case *[]*NgingVhostServer:
+			err = DBI.FireReaded(a, queryParam, Slice_NgingVhostServer(*v))
+		case []*NgingVhostServer:
+			err = DBI.FireReaded(a, queryParam, Slice_NgingVhostServer(v))
 		case factory.Ranger:
 			err = DBI.FireReaded(a, queryParam, v)
 		}
@@ -274,37 +273,37 @@ func (a *NgingVhost) List(recv interface{}, mw func(db.Result) db.Result, page, 
 	return cnt, err
 }
 
-func (a *NgingVhost) GroupBy(keyField string, inputRows ...[]*NgingVhost) map[string][]*NgingVhost {
-	var rows Slice_NgingVhost
+func (a *NgingVhostServer) GroupBy(keyField string, inputRows ...[]*NgingVhostServer) map[string][]*NgingVhostServer {
+	var rows Slice_NgingVhostServer
 	if len(inputRows) > 0 {
-		rows = Slice_NgingVhost(inputRows[0])
+		rows = Slice_NgingVhostServer(inputRows[0])
 	} else {
-		rows = Slice_NgingVhost(a.Objects())
+		rows = Slice_NgingVhostServer(a.Objects())
 	}
 	return rows.GroupBy(keyField)
 }
 
-func (a *NgingVhost) KeyBy(keyField string, inputRows ...[]*NgingVhost) map[string]*NgingVhost {
-	var rows Slice_NgingVhost
+func (a *NgingVhostServer) KeyBy(keyField string, inputRows ...[]*NgingVhostServer) map[string]*NgingVhostServer {
+	var rows Slice_NgingVhostServer
 	if len(inputRows) > 0 {
-		rows = Slice_NgingVhost(inputRows[0])
+		rows = Slice_NgingVhostServer(inputRows[0])
 	} else {
-		rows = Slice_NgingVhost(a.Objects())
+		rows = Slice_NgingVhostServer(a.Objects())
 	}
 	return rows.KeyBy(keyField)
 }
 
-func (a *NgingVhost) AsKV(keyField string, valueField string, inputRows ...[]*NgingVhost) param.Store {
-	var rows Slice_NgingVhost
+func (a *NgingVhostServer) AsKV(keyField string, valueField string, inputRows ...[]*NgingVhostServer) param.Store {
+	var rows Slice_NgingVhostServer
 	if len(inputRows) > 0 {
-		rows = Slice_NgingVhost(inputRows[0])
+		rows = Slice_NgingVhostServer(inputRows[0])
 	} else {
-		rows = Slice_NgingVhost(a.Objects())
+		rows = Slice_NgingVhostServer(a.Objects())
 	}
 	return rows.AsKV(keyField, valueField)
 }
 
-func (a *NgingVhost) ListByOffset(recv interface{}, mw func(db.Result) db.Result, offset, size int, args ...interface{}) (func() int64, error) {
+func (a *NgingVhostServer) ListByOffset(recv interface{}, mw func(db.Result) db.Result, offset, size int, args ...interface{}) (func() int64, error) {
 	if recv == nil {
 		recv = a.InitObjects()
 	}
@@ -318,10 +317,10 @@ func (a *NgingVhost) ListByOffset(recv interface{}, mw func(db.Result) db.Result
 	cnt, err := queryParam.List()
 	if err == nil {
 		switch v := recv.(type) {
-		case *[]*NgingVhost:
-			err = DBI.FireReaded(a, queryParam, Slice_NgingVhost(*v))
-		case []*NgingVhost:
-			err = DBI.FireReaded(a, queryParam, Slice_NgingVhost(v))
+		case *[]*NgingVhostServer:
+			err = DBI.FireReaded(a, queryParam, Slice_NgingVhostServer(*v))
+		case []*NgingVhostServer:
+			err = DBI.FireReaded(a, queryParam, Slice_NgingVhostServer(v))
 		case factory.Ranger:
 			err = DBI.FireReaded(a, queryParam, v)
 		}
@@ -329,7 +328,7 @@ func (a *NgingVhost) ListByOffset(recv interface{}, mw func(db.Result) db.Result
 	return cnt, err
 }
 
-func (a *NgingVhost) Insert() (pk interface{}, err error) {
+func (a *NgingVhostServer) Insert() (pk interface{}, err error) {
 	a.Created = uint(time.Now().Unix())
 	a.Id = 0
 	if len(a.Disabled) == 0 {
@@ -355,7 +354,7 @@ func (a *NgingVhost) Insert() (pk interface{}, err error) {
 	return
 }
 
-func (a *NgingVhost) Update(mw func(db.Result) db.Result, args ...interface{}) (err error) {
+func (a *NgingVhostServer) Update(mw func(db.Result) db.Result, args ...interface{}) (err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
@@ -372,7 +371,7 @@ func (a *NgingVhost) Update(mw func(db.Result) db.Result, args ...interface{}) (
 	return DBI.Fire("updated", a, mw, args...)
 }
 
-func (a *NgingVhost) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
+func (a *NgingVhostServer) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
@@ -390,7 +389,7 @@ func (a *NgingVhost) Updatex(mw func(db.Result) db.Result, args ...interface{}) 
 	return
 }
 
-func (a *NgingVhost) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {
+func (a *NgingVhostServer) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
@@ -412,7 +411,7 @@ func (a *NgingVhost) UpdateByFields(mw func(db.Result) db.Result, fields []strin
 	return
 }
 
-func (a *NgingVhost) UpdatexByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (affected int64, err error) {
+func (a *NgingVhostServer) UpdatexByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
@@ -434,19 +433,19 @@ func (a *NgingVhost) UpdatexByFields(mw func(db.Result) db.Result, fields []stri
 	return
 }
 
-func (a *NgingVhost) UpdateField(mw func(db.Result) db.Result, field string, value interface{}, args ...interface{}) (err error) {
+func (a *NgingVhostServer) UpdateField(mw func(db.Result) db.Result, field string, value interface{}, args ...interface{}) (err error) {
 	return a.UpdateFields(mw, map[string]interface{}{
 		field: value,
 	}, args...)
 }
 
-func (a *NgingVhost) UpdatexField(mw func(db.Result) db.Result, field string, value interface{}, args ...interface{}) (affected int64, err error) {
+func (a *NgingVhostServer) UpdatexField(mw func(db.Result) db.Result, field string, value interface{}, args ...interface{}) (affected int64, err error) {
 	return a.UpdatexFields(mw, map[string]interface{}{
 		field: value,
 	}, args...)
 }
 
-func (a *NgingVhost) UpdateFields(mw func(db.Result) db.Result, kvset map[string]interface{}, args ...interface{}) (err error) {
+func (a *NgingVhostServer) UpdateFields(mw func(db.Result) db.Result, kvset map[string]interface{}, args ...interface{}) (err error) {
 
 	if val, ok := kvset["disabled"]; ok && val != nil {
 		if v, ok := val.(string); ok && len(v) == 0 {
@@ -471,7 +470,7 @@ func (a *NgingVhost) UpdateFields(mw func(db.Result) db.Result, kvset map[string
 	return DBI.FireUpdate("updated", &m, editColumns, mw, args...)
 }
 
-func (a *NgingVhost) UpdatexFields(mw func(db.Result) db.Result, kvset map[string]interface{}, args ...interface{}) (affected int64, err error) {
+func (a *NgingVhostServer) UpdatexFields(mw func(db.Result) db.Result, kvset map[string]interface{}, args ...interface{}) (affected int64, err error) {
 
 	if val, ok := kvset["disabled"]; ok && val != nil {
 		if v, ok := val.(string); ok && len(v) == 0 {
@@ -497,7 +496,7 @@ func (a *NgingVhost) UpdatexFields(mw func(db.Result) db.Result, kvset map[strin
 	return
 }
 
-func (a *NgingVhost) UpdateValues(mw func(db.Result) db.Result, keysValues *db.KeysValues, args ...interface{}) (err error) {
+func (a *NgingVhostServer) UpdateValues(mw func(db.Result) db.Result, keysValues *db.KeysValues, args ...interface{}) (err error) {
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).SetSend(keysValues).Update()
 	}
@@ -512,7 +511,7 @@ func (a *NgingVhost) UpdateValues(mw func(db.Result) db.Result, keysValues *db.K
 	return DBI.FireUpdate("updated", &m, keysValues.Keys(), mw, args...)
 }
 
-func (a *NgingVhost) Upsert(mw func(db.Result) db.Result, args ...interface{}) (pk interface{}, err error) {
+func (a *NgingVhostServer) Upsert(mw func(db.Result) db.Result, args ...interface{}) (pk interface{}, err error) {
 	pk, err = a.Param(mw, args...).SetSend(a).Upsert(func() error {
 		a.Updated = uint(time.Now().Unix())
 		if len(a.Disabled) == 0 {
@@ -550,7 +549,7 @@ func (a *NgingVhost) Upsert(mw func(db.Result) db.Result, args ...interface{}) (
 	return
 }
 
-func (a *NgingVhost) Delete(mw func(db.Result) db.Result, args ...interface{}) (err error) {
+func (a *NgingVhostServer) Delete(mw func(db.Result) db.Result, args ...interface{}) (err error) {
 
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).Delete()
@@ -564,7 +563,7 @@ func (a *NgingVhost) Delete(mw func(db.Result) db.Result, args ...interface{}) (
 	return DBI.Fire("deleted", a, mw, args...)
 }
 
-func (a *NgingVhost) Deletex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
+func (a *NgingVhostServer) Deletex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).Deletex()
@@ -579,98 +578,92 @@ func (a *NgingVhost) Deletex(mw func(db.Result) db.Result, args ...interface{}) 
 	return
 }
 
-func (a *NgingVhost) Count(mw func(db.Result) db.Result, args ...interface{}) (int64, error) {
+func (a *NgingVhostServer) Count(mw func(db.Result) db.Result, args ...interface{}) (int64, error) {
 	return a.Param(mw, args...).Count()
 }
 
-func (a *NgingVhost) Exists(mw func(db.Result) db.Result, args ...interface{}) (bool, error) {
+func (a *NgingVhostServer) Exists(mw func(db.Result) db.Result, args ...interface{}) (bool, error) {
 	return a.Param(mw, args...).Exists()
 }
 
-func (a *NgingVhost) Reset() *NgingVhost {
+func (a *NgingVhostServer) Reset() *NgingVhostServer {
 	a.Id = 0
+	a.Ident = ``
 	a.Name = ``
-	a.GroupId = 0
-	a.ServerIdent = ``
-	a.Domain = ``
-	a.Root = ``
+	a.ExecutableFile = ``
+	a.ConfigFile = ``
+	a.WorkDir = ``
+	a.Disabled = ``
 	a.Created = 0
 	a.Updated = 0
-	a.Setting = ``
-	a.Disabled = ``
 	return a
 }
 
-func (a *NgingVhost) AsMap(onlyFields ...string) param.Store {
+func (a *NgingVhostServer) AsMap(onlyFields ...string) param.Store {
 	r := param.Store{}
 	if len(onlyFields) == 0 {
 		r["Id"] = a.Id
+		r["Ident"] = a.Ident
 		r["Name"] = a.Name
-		r["GroupId"] = a.GroupId
-		r["ServerIdent"] = a.ServerIdent
-		r["Domain"] = a.Domain
-		r["Root"] = a.Root
+		r["ExecutableFile"] = a.ExecutableFile
+		r["ConfigFile"] = a.ConfigFile
+		r["WorkDir"] = a.WorkDir
+		r["Disabled"] = a.Disabled
 		r["Created"] = a.Created
 		r["Updated"] = a.Updated
-		r["Setting"] = a.Setting
-		r["Disabled"] = a.Disabled
 		return r
 	}
 	for _, field := range onlyFields {
 		switch field {
 		case "Id":
 			r["Id"] = a.Id
+		case "Ident":
+			r["Ident"] = a.Ident
 		case "Name":
 			r["Name"] = a.Name
-		case "GroupId":
-			r["GroupId"] = a.GroupId
-		case "ServerIdent":
-			r["ServerIdent"] = a.ServerIdent
-		case "Domain":
-			r["Domain"] = a.Domain
-		case "Root":
-			r["Root"] = a.Root
+		case "ExecutableFile":
+			r["ExecutableFile"] = a.ExecutableFile
+		case "ConfigFile":
+			r["ConfigFile"] = a.ConfigFile
+		case "WorkDir":
+			r["WorkDir"] = a.WorkDir
+		case "Disabled":
+			r["Disabled"] = a.Disabled
 		case "Created":
 			r["Created"] = a.Created
 		case "Updated":
 			r["Updated"] = a.Updated
-		case "Setting":
-			r["Setting"] = a.Setting
-		case "Disabled":
-			r["Disabled"] = a.Disabled
 		}
 	}
 	return r
 }
 
-func (a *NgingVhost) FromRow(row map[string]interface{}) {
+func (a *NgingVhostServer) FromRow(row map[string]interface{}) {
 	for key, value := range row {
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
+		case "ident":
+			a.Ident = param.AsString(value)
 		case "name":
 			a.Name = param.AsString(value)
-		case "group_id":
-			a.GroupId = param.AsUint(value)
-		case "server_ident":
-			a.ServerIdent = param.AsString(value)
-		case "domain":
-			a.Domain = param.AsString(value)
-		case "root":
-			a.Root = param.AsString(value)
+		case "executable_file":
+			a.ExecutableFile = param.AsString(value)
+		case "config_file":
+			a.ConfigFile = param.AsString(value)
+		case "work_dir":
+			a.WorkDir = param.AsString(value)
+		case "disabled":
+			a.Disabled = param.AsString(value)
 		case "created":
 			a.Created = param.AsUint(value)
 		case "updated":
 			a.Updated = param.AsUint(value)
-		case "setting":
-			a.Setting = param.AsString(value)
-		case "disabled":
-			a.Disabled = param.AsString(value)
 		}
 	}
 }
 
-func (a *NgingVhost) Set(key interface{}, value ...interface{}) {
+func (a *NgingVhostServer) Set(key interface{}, value ...interface{}) {
 	switch k := key.(type) {
 	case map[string]interface{}:
 		for kk, vv := range k {
@@ -692,91 +685,86 @@ func (a *NgingVhost) Set(key interface{}, value ...interface{}) {
 		switch kk {
 		case "Id":
 			a.Id = param.AsUint(vv)
+		case "Ident":
+			a.Ident = param.AsString(vv)
 		case "Name":
 			a.Name = param.AsString(vv)
-		case "GroupId":
-			a.GroupId = param.AsUint(vv)
-		case "ServerIdent":
-			a.ServerIdent = param.AsString(vv)
-		case "Domain":
-			a.Domain = param.AsString(vv)
-		case "Root":
-			a.Root = param.AsString(vv)
+		case "ExecutableFile":
+			a.ExecutableFile = param.AsString(vv)
+		case "ConfigFile":
+			a.ConfigFile = param.AsString(vv)
+		case "WorkDir":
+			a.WorkDir = param.AsString(vv)
+		case "Disabled":
+			a.Disabled = param.AsString(vv)
 		case "Created":
 			a.Created = param.AsUint(vv)
 		case "Updated":
 			a.Updated = param.AsUint(vv)
-		case "Setting":
-			a.Setting = param.AsString(vv)
-		case "Disabled":
-			a.Disabled = param.AsString(vv)
 		}
 	}
 }
 
-func (a *NgingVhost) AsRow(onlyFields ...string) param.Store {
+func (a *NgingVhostServer) AsRow(onlyFields ...string) param.Store {
 	r := param.Store{}
 	if len(onlyFields) == 0 {
 		r["id"] = a.Id
+		r["ident"] = a.Ident
 		r["name"] = a.Name
-		r["group_id"] = a.GroupId
-		r["server_ident"] = a.ServerIdent
-		r["domain"] = a.Domain
-		r["root"] = a.Root
+		r["executable_file"] = a.ExecutableFile
+		r["config_file"] = a.ConfigFile
+		r["work_dir"] = a.WorkDir
+		r["disabled"] = a.Disabled
 		r["created"] = a.Created
 		r["updated"] = a.Updated
-		r["setting"] = a.Setting
-		r["disabled"] = a.Disabled
 		return r
 	}
 	for _, field := range onlyFields {
 		switch field {
 		case "id":
 			r["id"] = a.Id
+		case "ident":
+			r["ident"] = a.Ident
 		case "name":
 			r["name"] = a.Name
-		case "group_id":
-			r["group_id"] = a.GroupId
-		case "server_ident":
-			r["server_ident"] = a.ServerIdent
-		case "domain":
-			r["domain"] = a.Domain
-		case "root":
-			r["root"] = a.Root
+		case "executable_file":
+			r["executable_file"] = a.ExecutableFile
+		case "config_file":
+			r["config_file"] = a.ConfigFile
+		case "work_dir":
+			r["work_dir"] = a.WorkDir
+		case "disabled":
+			r["disabled"] = a.Disabled
 		case "created":
 			r["created"] = a.Created
 		case "updated":
 			r["updated"] = a.Updated
-		case "setting":
-			r["setting"] = a.Setting
-		case "disabled":
-			r["disabled"] = a.Disabled
 		}
 	}
 	return r
 }
 
-func (a *NgingVhost) ListPage(cond *db.Compounds, sorts ...interface{}) error {
+func (a *NgingVhostServer) ListPage(cond *db.Compounds, sorts ...interface{}) error {
 	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
 		return r.OrderBy(sorts...)
 	}, cond.And()).Paging(a.Context())
 	return err
 }
 
-func (a *NgingVhost) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+func (a *NgingVhostServer) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
 	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
 		return r.OrderBy(sorts...)
 	}, cond.And()).Paging(a.Context())
 	return err
 }
 
-func (a *NgingVhost) BatchValidate(kvset map[string]interface{}) error {
+func (a *NgingVhostServer) BatchValidate(kvset map[string]interface{}) error {
 	if kvset == nil {
 		kvset = a.AsRow()
 	}
 	return DBI.Fields.BatchValidate(a.Short_(), kvset)
 }
 
-func (a *NgingVhost) Validate(field string, value interface{}) error {
+func (a *NgingVhostServer) Validate(field string, value interface{}) error {
 	return DBI.Fields.Validate(a.Short_(), field, value)
 }

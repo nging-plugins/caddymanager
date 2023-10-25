@@ -1,0 +1,70 @@
+{{Strip}}{{Extend "layout"}}
+{{Block "title"}}{{"Web服务配置"|$.T}}{{/Block}}
+{{Block "breadcrumb"}}
+{{Super}}
+<li class="active">{{"Web服务配置"|$.T}}</li>
+{{/Block}}
+{{Block "main"}}
+<div class="row">
+	<div class="col-md-12">
+		<div class="block-flat">
+			<div class="header">
+				<a href="{{BackendURL}}/caddy/server_add" class="btn btn-success pull-right">
+					<i class="fa fa-plus"></i>
+					{{"添加Web服务配置"|$.T}}
+				</a>
+				<h3>{{"Web服务配置"|$.T}}</h3>
+			</div>
+			<div class="content">
+				<div class="table-responsive">
+				<table class="table no-border hover">
+					<thead class="no-border">
+						<tr>
+							<th style="width:55px"><strong>ID</strong></th>
+                            <th style="width:60px"><strong>{{"状态"|$.T}}</strong></th>
+							<th><strong>{{"名称"|$.T}}</strong></th>
+							<th><strong>{{"唯一标识"|$.T}}</strong></th>
+							<th><strong>{{"文件路径"|$.T}}</strong></th>
+							<th style="width:80px" class="text-center"><strong>{{"操作"|$.T}}</strong></th>
+						</tr>
+					</thead>
+					<tbody class="no-border-y">
+                        {{- range $k,$v := $.Stored.listData -}}
+						<tr>
+							<td>{{$v.Id}}</td>
+                            <td>
+                                <div class="checkbox checkbox-success no-margin-y">
+                                    <input id="checkbox-{{$k}}" class="styled switch-disabled" type="checkbox" data-id="{{$v.Id}}"{{if eq $v.Disabled `N`}} checked="checked"{{end}} value="N" /><label for="checkbox-{{$k}}">{{"启用"|$.T}}</label>
+                                </div>
+                            </td>
+							<td>{{$v.Name}}</td>
+							<td>{{$v.Ident}}</td>
+							<td>
+                                <div class="label-group xs-margin-top wrap">
+                                    <span class="label label-success">{{`执行文件`|$.T}}</span>{{$v.ExecutableFile}}<br />
+                                    <span class="label label-info">{{`配置文件`|$.T}}</span>{{$v.ConfigFile}}
+                                </div>
+                            </td>
+							<td class="text-center">
+							<a class="label label-success" href="{{BackendURL}}/caddy/server_edit?id={{$v.Id}}"><i class="fa fa-pencil" data-toggle="tooltip" title="{{`编辑`|$.T}}"></i></a> 
+							<a class="label label-danger" href="{{BackendURL}}/caddy/server_delete?id={{$v.Id}}" onclick="return confirm('{{`真的要删除吗？`|$.T}}');" data-toggle="tooltip" title="{{`删除`|$.T}}"><i class="fa fa-times"></i></a>
+							</td>
+						</tr>
+                        {{- end -}}
+					</tbody>
+				</table>		
+				</div>
+				{{$.Stored.pagination.Render}}
+			</div>
+		</div>				
+	</div>
+</div>
+{{/Block}}
+{{Block "footer"}}
+<script>
+$(function(){
+	App.bindSwitch('input.switch-disabled','click','caddy/server_edit');
+});
+</script>
+{{/Block}}
+{{/Strip}}
