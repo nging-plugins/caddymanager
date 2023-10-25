@@ -9,8 +9,9 @@ import (
 )
 
 type Config struct {
-	Command  string
-	Endpoint string
+	Command   string
+	Endpoint  string
+	Caddyfile string
 }
 
 func (c *Config) Init() error {
@@ -18,29 +19,18 @@ func (c *Config) Init() error {
 	return err
 }
 
-func (c *Config) Start() error {
-	return nil
+func (c *Config) Start(ctx context.Context) error {
+	_, err := c.exec(ctx, `run`, `--config`, c.Caddyfile)
+	return err
 }
 
 func (c *Config) Reload(ctx context.Context) error {
-	return c.sendSignal(ctx, `reload`)
+	_, err := c.exec(ctx, `reload`, `--config`, c.Caddyfile)
+	return err
 }
 
 func (c *Config) Stop(ctx context.Context) error {
-	return c.sendSignal(ctx, `stop`)
-}
-
-func (c *Config) Quit(ctx context.Context) error {
-	return c.sendSignal(ctx, `quit`)
-}
-
-func (c *Config) Reopen(ctx context.Context) error {
-	return c.sendSignal(ctx, `reopen`)
-}
-
-// signal: stop, quit, reopen, reload
-func (c *Config) sendSignal(ctx context.Context, signal string) error {
-	_, err := c.exec(ctx, `-s`, signal)
+	_, err := c.exec(ctx, `stop`)
 	return err
 }
 

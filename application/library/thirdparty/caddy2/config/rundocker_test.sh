@@ -1,4 +1,4 @@
-image="test-ubuntu-nginx"
+image="test-ubuntu-caddy"
 if [ "$1" != "" ]; then
     image="$1"
 fi
@@ -7,4 +7,4 @@ docker run --rm -it\
  --privileged --network=host\
  --entrypoint go\
  -v "$GOPATH/src:/root/go/src" $image\
- test -v --count=1 ./application/library/thirdparty/nginx/config
+ test -v --count=1 ./application/library/thirdparty/caddy2/config

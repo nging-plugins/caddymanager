@@ -13,5 +13,12 @@ func TestConfig(t *testing.T) {
 	var err error
 	assert.NoError(t, err)
 
+	r, err := c.exec(ctx, `version`)
+	assert.NoError(t, err)
+	t.Log(string(r))
+
+	r, err = c.exec(ctx, `help`)
+	assert.NoError(t, err)
+	t.Log(string(r))
 	_, _ = c, ctx
 }

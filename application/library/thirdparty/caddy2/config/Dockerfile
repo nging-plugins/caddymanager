@@ -1,15 +1,23 @@
 FROM ubuntu:latest
 ARG GO_VERSION
 
-ENV GO_VERSION ${GO_VERSION:-1.21.1}
+ENV GO_VERSION ${GO_VERSION:-1.21.3}
 ENV FIREWALL ${FIREWALL:-iptables}
 ENV GO_INSTALL_FILE go${GO_VERSION}.linux-amd64.tar.gz
 ENV PATH "$PATH:/root/go/bin"
 ENV GOPATH "/root/go"
 
+RUN apt update
+RUN apt install -y debian-keyring debian-archive-keyring apt-transport-https
+RUN apt install curl -y
+RUN curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+RUN curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
+
 RUN apt update 
 #RUN apt upgrade -y
-RUN apt install wget nginx telnet -y
+RUN apt install wget telnet -y
+RUN apt install caddy -y
+
 
 #RUN wget -c https://studygolang.com/dl/golang/${GO_INSTALL_FILE}
 RUN wget -c https://golang.google.cn/dl/${GO_INSTALL_FILE}
@@ -30,4 +38,4 @@ ENTRYPOINT ["/root/go/bin/tower"]
 # ENTRYPOINT ["/usr/local/bin/go"]
 # CMD ["env"]
 
-# docker build . -t "test-ubuntu-nginx"
+# docker build . -t "test-ubuntu-caddy"
