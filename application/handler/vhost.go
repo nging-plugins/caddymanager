@@ -296,7 +296,7 @@ func saveVhostConf(ctx echo.Context, cfg engine.Configer, id uint, values url.Va
 		cfg = cmder.GetCaddyConfig()
 	}
 	ctx.Set(`values`, form.NewValues(values))
-	b, err := ctx.Fetch(`caddy/`+cfg.TemplateFile(), nil)
+	b, err := ctx.Fetch(`caddy/makeconfig/`+cfg.TemplateFile(), nil)
 	if err != nil {
 		return err
 	}

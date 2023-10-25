@@ -39,7 +39,7 @@ func (c *Config) GetVhostConfigDirAbsPath() (string, error) {
 }
 
 func (c *Config) TemplateFile() string {
-	return `nginx`
+	return `caddy2`
 }
 
 func (c *Config) Ident() string {
