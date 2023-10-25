@@ -9,6 +9,7 @@ import (
 	"github.com/admpub/nging/v5/application/library/config"
 	"github.com/admpub/nging/v5/application/library/config/cmder"
 
+	"github.com/nging-plugins/caddymanager/application/library/thirdparty"
 	caddy2Config "github.com/nging-plugins/caddymanager/application/library/thirdparty/caddy2/config"
 )
 
@@ -23,7 +24,7 @@ func Get() cmder.Cmder {
 }
 
 func GetNginxConfig() *caddy2Config.Config {
-	return GetNginxCmd().NginxConfig()
+	return GetNginxCmd().CaddyConfig()
 }
 
 func GetNginxCmd() *caddy2Cmd {
@@ -45,7 +46,7 @@ type caddy2Cmd struct {
 }
 
 func (c *caddy2Cmd) Boot() error {
-	return c.NginxConfig().Init()
+	return c.CaddyConfig().Init().Start(context.Background())
 }
 
 func (c *caddy2Cmd) getConfig() *config.Config {
@@ -62,27 +63,27 @@ func (c *caddy2Cmd) parseConfig() {
 	}
 }
 
-func (c *caddy2Cmd) NginxConfig() *caddy2Config.Config {
+func (c *caddy2Cmd) CaddyConfig() *caddy2Config.Config {
 	c.once.Do(c.parseConfig)
 	return c.caddy2Config
 }
 
 func (c *caddy2Cmd) StopHistory(_ ...string) error {
-	return nil
+	return c.Reload()
 }
 
 func (c *caddy2Cmd) Start(writer ...io.Writer) error {
-	return nil
+	return c.CaddyConfig().Start(thirdparty.WithStdoutStderr(context.Background(), writer...))
 }
 
 func (c *caddy2Cmd) Stop() error {
-	return nil
+	return c.CaddyConfig().Stop(context.Background())
 }
 
 func (c *caddy2Cmd) Reload() error {
-	return c.NginxConfig().Reload(context.Background())
+	return c.CaddyConfig().Reload(context.Background())
 }
 
 func (c *caddy2Cmd) Restart(writer ...io.Writer) error {
-	return nil
+	return c.CaddyConfig().Reload(thirdparty.WithStdoutStderr(context.Background(), writer...))
 }

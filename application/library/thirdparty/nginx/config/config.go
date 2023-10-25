@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/nging-plugins/caddymanager/application/library/thirdparty"
 	"github.com/webx-top/com"
 )
 
@@ -45,10 +46,10 @@ func (c *Config) Init() error {
 	return err
 }
 
-func (c *Config) Start() error {
+func (c *Config) Start(ctx context.Context) error {
 	_, err := c.exec(
-		context.Background(),
-		//`-c`, `/config/nginx/nginx.conf`,
+		ctx,
+		`-c`, c.ConfigPath,
 	)
 	return err
 }
@@ -138,9 +139,19 @@ func (c *Config) exec(ctx context.Context, args ...string) ([]byte, error) {
 		}
 	}
 	cmd := exec.CommandContext(ctx, c.Command, args...)
-	result, err := cmd.CombinedOutput()
-	if err != nil {
-		err = fmt.Errorf(`%w: %s`, err, cmd.String())
+	if stderr := thirdparty.GetCtxStderr(ctx); stderr != nil {
+		cmd.Stderr = stderr
 	}
-	return result, err
+	if stdout := thirdparty.GetCtxStdout(ctx); stdout != nil {
+		cmd.Stdout = stdout
+	}
+	if cmd.Stderr == nil && cmd.Stdout == nil {
+		result, err := cmd.CombinedOutput()
+		if err != nil {
+			err = fmt.Errorf(`%w: %s`, err, cmd.String())
+		}
+		return result, err
+	}
+	err := cmd.Run()
+	return nil, err
 }

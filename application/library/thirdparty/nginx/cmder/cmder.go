@@ -9,6 +9,7 @@ import (
 	"github.com/admpub/nging/v5/application/library/config"
 	"github.com/admpub/nging/v5/application/library/config/cmder"
 
+	"github.com/nging-plugins/caddymanager/application/library/thirdparty"
 	nginxConfig "github.com/nging-plugins/caddymanager/application/library/thirdparty/nginx/config"
 )
 
@@ -45,7 +46,11 @@ type nginxCmd struct {
 }
 
 func (c *nginxCmd) Boot() error {
-	return c.NginxConfig().Init()
+	err := c.NginxConfig().Init()
+	if err != nil {
+		return err
+	}
+	return c.NginxConfig().Start(context.Background())
 }
 
 func (c *nginxCmd) getConfig() *config.Config {
@@ -68,15 +73,15 @@ func (c *nginxCmd) NginxConfig() *nginxConfig.Config {
 }
 
 func (c *nginxCmd) StopHistory(_ ...string) error {
-	return nil
+	return c.Reload()
 }
 
 func (c *nginxCmd) Start(writer ...io.Writer) error {
-	return nil
+	return c.NginxConfig().Start(thirdparty.WithStdoutStderr(context.Background(), writer...))
 }
 
 func (c *nginxCmd) Stop() error {
-	return nil
+	return c.NginxConfig().Stop(context.Background())
 }
 
 func (c *nginxCmd) Reload() error {
@@ -84,5 +89,5 @@ func (c *nginxCmd) Reload() error {
 }
 
 func (c *nginxCmd) Restart(writer ...io.Writer) error {
-	return nil
+	return c.NginxConfig().Reload(thirdparty.WithStdoutStderr(context.Background(), writer...))
 }
