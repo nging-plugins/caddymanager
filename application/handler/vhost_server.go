@@ -21,6 +21,7 @@ package handler
 import (
 	"github.com/admpub/nging/v5/application/handler"
 	"github.com/admpub/nging/v5/application/library/common"
+	"github.com/nging-plugins/caddymanager/application/library/engine"
 	"github.com/nging-plugins/caddymanager/application/model"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
@@ -29,11 +30,10 @@ import (
 
 func ServerIndex(ctx echo.Context) error {
 	m := model.NewVhostServer(ctx)
-	user := handler.User(ctx)
 	cond := db.NewCompounds()
-	cond.Add(db.Cond{`uid`: user.Id})
 	err := m.ListPage(cond)
 	ctx.Set(`listData`, m.Objects())
+	ctx.SetFunc(`engineName`, engine.Engines.Get)
 	return ctx.Render(`caddy/server`, handler.Err(ctx, err))
 }
 
@@ -41,7 +41,7 @@ func ServerAdd(ctx echo.Context) error {
 	var err error
 	m := model.NewVhostServer(ctx)
 	if ctx.IsPost() {
-		err = ctx.MustBind(m.NgingVhostServer)
+		err = ctx.MustBind(m.NgingVhostServer, echo.ExcludeFieldName(`created`, `updated`))
 		if err == nil {
 			_, err = m.Add()
 		}
@@ -59,6 +59,8 @@ func ServerAdd(ctx echo.Context) error {
 		}
 	}
 	ctx.Set(`activeURL`, `/caddy/server`)
+	ctx.Set(`engineList`, engine.Thirdparty())
+	ctx.Set(`isAdd`, true)
 	return ctx.Render(`caddy/server_edit`, handler.Err(ctx, err))
 }
 
@@ -71,7 +73,7 @@ func ServerEdit(ctx echo.Context) error {
 		return ctx.Redirect(handler.URLFor(`/caddy/server`))
 	}
 	if ctx.IsPost() {
-		err = ctx.MustBind(m.NgingVhostServer)
+		err = ctx.MustBind(m.NgingVhostServer, echo.ExcludeFieldName(`created`, `updated`, `ident`))
 		if err == nil {
 			m.Id = id
 			err = m.Edit(nil, `id`, id)
@@ -109,6 +111,8 @@ func ServerEdit(ctx echo.Context) error {
 		echo.StructToForm(ctx, m.NgingVhostServer, ``, echo.LowerCaseFirstLetter)
 	}
 	ctx.Set(`activeURL`, `/caddy/server`)
+	ctx.Set(`engineList`, engine.Thirdparty())
+	ctx.Set(`isAdd`, false)
 	return ctx.Render(`caddy/server_edit`, handler.Err(ctx, err))
 }
 

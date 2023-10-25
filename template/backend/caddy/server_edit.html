@@ -1,27 +1,39 @@
 {{Extend "layout"}}
-{{Block "title"}}{{if HasSuffix $.URL.Path "_add"}}{{"添加Web服务配置"|$.T}}{{else}}{{"修改Web服务配置"|$.T}}{{end}}{{/Block}}
+{{Block "title"}}{{if $.Stored.isAdd}}{{"添加引擎配置"|$.T}}{{else}}{{"修改引擎配置"|$.T}}{{end}}{{/Block}}
 {{Block "breadcrumb"}}
 {{Super}}
-<li><a href="{{BackendURL}}/caddy/server">{{"Web服务配置"|$.T}}</a></li>
-<li class="active">{{if HasSuffix $.URL.Path "_add"}}{{"添加"|$.T}}{{else}}{{"修改"|$.T}}{{end}}</li>
+<li><a href="{{BackendURL}}/caddy/server">{{"引擎配置"|$.T}}</a></li>
+<li class="active">{{if $.Stored.isAdd}}{{"添加"|$.T}}{{else}}{{"修改"|$.T}}{{end}}</li>
 {{/Block}}
 {{Block "main"}}
 <div class="row">
     <div class="col-md-12">
         <div class="block-flat">
           <div class="header">							
-            <h3>{{if HasSuffix $.URL.Path "_add"}}{{"添加Web服务配置"|$.T}}{{else}}{{"修改Web服务配置"|$.T}}{{end}}</h3>
+            <h3>{{if $.Stored.isAdd}}{{"添加引擎配置"|$.T}}{{else}}{{"修改引擎配置"|$.T}}{{end}}</h3>
           </div>
           <div class="content">
               <form class="form-horizontal group-border-dashed" method="POST" action="">
               <div class="form-group">
+                <label class="col-sm-2 control-label required">{{"引擎"|$.T}}</label>
+                <div class="col-sm-8">{{$engine := $.Form "engine" "nginx"}}
+                  {{- range $k, $v := $.Stored.engineList -}}
+                  <div class="radio radio-success radio-inline"> 
+                    <input type="radio" value="{{$v.K}}" id="engine-{{$v.K}}" name="engine"{{if eq $v.K $engine}} checked{{end}}><label for="engine-{{$v.K}}">{{$v.V|$.T}}</label> 
+                  </div>
+                  {{- end -}}
+                </div>
+              </div>
+              <div class="form-group">
                 <label class="col-sm-2 control-label">{{"名称"|$.T}}</label>
                 <div class="col-sm-3">
                     <input type="text" class="form-control" required name="name" value="{{$.Form `name`}}">
+                    <div class="help-block">{{`中文名称描述`|$.T}}</div>
                 </div>
                 <label class="col-sm-2 control-label">{{"唯一标识"|$.T}}</label>
                 <div class="col-sm-3">
-                    <input type="text" class="form-control" required name="ident" value="{{$.Form `ident`}}">
+                    <input type="text" class="form-control" required name="ident" value="{{$.Form `ident`}}" placeholder="nginx" pattern="^[a-zA-Z0-9_-]+$"{{if not $.Stored.isAdd}} disabled{{end}}>
+                    <div class="help-block">{{`唯一标识只能包含字母、数字、下划线或短横。设置后不可更改`|$.T}}</div>
                 </div>
               </div>
               <div class="form-group">
@@ -47,7 +59,7 @@
                   </div>
                 </div>
               </div>
-              <div class="form-group form-submit-group">
+          <div class="form-group form-submit-group">
 					<div class="col-sm-9 col-sm-offset-2">
 						<button type="submit" class="btn btn-primary btn-lg"><i class="fa fa-save"></i> {{"保存"|$.T}}</button>
 						<button type="reset" class="btn btn-default btn-lg"><i class="fa fa-refresh"></i> {{"重置"|$.T}}</button>

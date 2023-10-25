@@ -142,23 +142,37 @@ func now() string {
 	return time.Now().Format(`2006-01-02 15:04:05`)
 }
 
-func (c *Config) GetVhostConfigDirAbsPath() string {
+func (c *Config) GetVhostConfigDirAbsPath() (string, error) {
+	var err error
 	if len(c.vhostConfigDirAbsPath) == 0 {
 		if len(c.VhostConfigDir) > 0 {
-			var err error
 			c.vhostConfigDirAbsPath, err = filepath.Abs(c.VhostConfigDir)
-			if err != nil {
-				panic(err)
-			}
 		} else {
 			c.vhostConfigDirAbsPath = filepath.Join(config.FromCLI().ConfDir(), `vhosts`)
 		}
 	}
-	return c.vhostConfigDirAbsPath
+	return c.vhostConfigDirAbsPath, err
+}
+
+func (c *Config) TemplateFile() string {
+	return `caddyfile`
+}
+
+func (c *Config) Ident() string {
+	return `default`
+}
+
+func (c *Config) Engine() string {
+	return `default`
 }
 
 func (c *Config) setDefaultCaddyfile() (err error) {
-	importPattern := c.GetVhostConfigDirAbsPath() + echo.FilePathSeparator + `*.conf`
+	var saveDir string
+	saveDir, err = c.GetVhostConfigDirAbsPath()
+	if err != nil {
+		return err
+	}
+	importPattern := saveDir + echo.FilePathSeparator + `*.conf`
 	c.caddyfileAbsPath, err = filepath.Abs(importPattern)
 	return
 }
@@ -192,7 +206,11 @@ func (c *Config) fixedCaddyfile() error {
 	}
 	b = bytes.TrimSpace(b)
 	if bytes.Equal(b, []byte(`import ./config/vhosts/*.conf`)) {
-		actualDir := c.GetVhostConfigDirAbsPath()
+		var actualDir string
+		actualDir, err = c.GetVhostConfigDirAbsPath()
+		if err != nil {
+			return err
+		}
 		expectedDir, _ := filepath.Abs(`./config/vhosts`)
 		if actualDir != expectedDir {
 			err = c.setDefaultCaddyfile()

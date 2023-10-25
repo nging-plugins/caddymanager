@@ -6,9 +6,9 @@
 {{/Block}}
 {{Block "headEnd"}}
 <style type="text/css">
-  .extra-page-remove{position:absolute;display:none;border-radius:0 0 50px 0;z-index:2;}
-  .fieldset:hover .extra-page-remove{display:block;}
-  </style>
+.extra-page-remove{position:absolute;display:none;border-radius:0 0 50px 0;z-index:2;}
+.fieldset:hover .extra-page-remove{display:block;}
+</style>
 {{/Block}}
 {{Block "main"}}
 <div class="row">
@@ -21,12 +21,21 @@
               <form class="form-horizontal group-border-dashed" method="POST" action="">
               <div class="form-group">
                   <label class="col-sm-2 control-label">{{"分组"|$.T}}</label>
-                  <div class="col-sm-8">
+                  <div class="col-sm-3">
                       {{$v := $.Form "groupId"}}
                       <select class="form-control" name="groupId">
                           <option value="">{{"<无>"|$.T}}</option>
                           {{range $k,$g:=$.Stored.Get "groupList"}}
-                          <option value="{{$g.Id}}" {{if eq $v (Str $g.Id)}} selected{{end}}>{{$g.Name}}</option>
+                          <option value="{{$g.Id}}"{{if eq $v (Str $g.Id)}} selected{{end}}>{{$g.Name}}</option>
+                          {{end}}
+                      </select>
+                  </div>
+                  <label class="col-sm-2 control-label">{{"引擎配置"|$.T}}</label>
+                  <div class="col-sm-3">{{$v := $.Form "serverIdent"}}
+                      <select class="form-control" name="serverIdent">
+                          <option value="default">{{"<默认>"|$.T}}</option>
+                          {{range $k,$g:=$.Stored.Get "serverList"}}
+                          <option value="{{$g.Ident}}"{{if eq $v $g.Ident}} selected{{end}}>{{$g.Name}}</option>
                           {{end}}
                       </select>
                   </div>

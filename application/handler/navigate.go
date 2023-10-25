@@ -100,5 +100,29 @@ var LeftNavigate = &navigate.Item{
 			Action:  `group_delete`,
 			Icon:    ``,
 		},
+
+		{
+			Display: true,
+			Name:    `引擎配置`,
+			Action:  `server`,
+		},
+		{
+			Display: false,
+			Name:    `添加引擎配置`,
+			Action:  `server_add`,
+			Icon:    `plus`,
+		},
+		{
+			Display: false,
+			Name:    `修改引擎配置`,
+			Action:  `server_edit`,
+			Icon:    ``,
+		},
+		{
+			Display: false,
+			Name:    `删除引擎配置`,
+			Action:  `server_delete`,
+			Icon:    ``,
+		},
 	},
 }

@@ -103,8 +103,9 @@ type NgingVhostServer struct {
 	objects []*NgingVhostServer
 
 	Id             uint   `db:"id,omitempty,pk" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
+	Engine         string `db:"engine" bson:"engine" comment:"引擎类型" json:"engine" xml:"engine"`
 	Ident          string `db:"ident" bson:"ident" comment:"唯一标识" json:"ident" xml:"ident"`
-	Name           string `db:"name" bson:"name" comment:"服务引擎名称" json:"name" xml:"name"`
+	Name           string `db:"name" bson:"name" comment:"引擎名称" json:"name" xml:"name"`
 	ExecutableFile string `db:"executable_file" bson:"executable_file" comment:"可执行文件路径(支持容器)" json:"executable_file" xml:"executable_file"`
 	ConfigFile     string `db:"config_file" bson:"config_file" comment:"配置文件路径" json:"config_file" xml:"config_file"`
 	WorkDir        string `db:"work_dir" bson:"work_dir" comment:"工作目录" json:"work_dir" xml:"work_dir"`
@@ -331,6 +332,9 @@ func (a *NgingVhostServer) ListByOffset(recv interface{}, mw func(db.Result) db.
 func (a *NgingVhostServer) Insert() (pk interface{}, err error) {
 	a.Created = uint(time.Now().Unix())
 	a.Id = 0
+	if len(a.Engine) == 0 {
+		a.Engine = "nginx"
+	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
 	}
@@ -356,6 +360,9 @@ func (a *NgingVhostServer) Insert() (pk interface{}, err error) {
 
 func (a *NgingVhostServer) Update(mw func(db.Result) db.Result, args ...interface{}) (err error) {
 	a.Updated = uint(time.Now().Unix())
+	if len(a.Engine) == 0 {
+		a.Engine = "nginx"
+	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
 	}
@@ -373,6 +380,9 @@ func (a *NgingVhostServer) Update(mw func(db.Result) db.Result, args ...interfac
 
 func (a *NgingVhostServer) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
+	if len(a.Engine) == 0 {
+		a.Engine = "nginx"
+	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
 	}
@@ -391,6 +401,9 @@ func (a *NgingVhostServer) Updatex(mw func(db.Result) db.Result, args ...interfa
 
 func (a *NgingVhostServer) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {
 	a.Updated = uint(time.Now().Unix())
+	if len(a.Engine) == 0 {
+		a.Engine = "nginx"
+	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
 	}
@@ -413,6 +426,9 @@ func (a *NgingVhostServer) UpdateByFields(mw func(db.Result) db.Result, fields [
 
 func (a *NgingVhostServer) UpdatexByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
+	if len(a.Engine) == 0 {
+		a.Engine = "nginx"
+	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
 	}
@@ -447,6 +463,11 @@ func (a *NgingVhostServer) UpdatexField(mw func(db.Result) db.Result, field stri
 
 func (a *NgingVhostServer) UpdateFields(mw func(db.Result) db.Result, kvset map[string]interface{}, args ...interface{}) (err error) {
 
+	if val, ok := kvset["engine"]; ok && val != nil {
+		if v, ok := val.(string); ok && len(v) == 0 {
+			kvset["engine"] = "nginx"
+		}
+	}
 	if val, ok := kvset["disabled"]; ok && val != nil {
 		if v, ok := val.(string); ok && len(v) == 0 {
 			kvset["disabled"] = "N"
@@ -472,6 +493,11 @@ func (a *NgingVhostServer) UpdateFields(mw func(db.Result) db.Result, kvset map[
 
 func (a *NgingVhostServer) UpdatexFields(mw func(db.Result) db.Result, kvset map[string]interface{}, args ...interface{}) (affected int64, err error) {
 
+	if val, ok := kvset["engine"]; ok && val != nil {
+		if v, ok := val.(string); ok && len(v) == 0 {
+			kvset["engine"] = "nginx"
+		}
+	}
 	if val, ok := kvset["disabled"]; ok && val != nil {
 		if v, ok := val.(string); ok && len(v) == 0 {
 			kvset["disabled"] = "N"
@@ -514,6 +540,9 @@ func (a *NgingVhostServer) UpdateValues(mw func(db.Result) db.Result, keysValues
 func (a *NgingVhostServer) Upsert(mw func(db.Result) db.Result, args ...interface{}) (pk interface{}, err error) {
 	pk, err = a.Param(mw, args...).SetSend(a).Upsert(func() error {
 		a.Updated = uint(time.Now().Unix())
+		if len(a.Engine) == 0 {
+			a.Engine = "nginx"
+		}
 		if len(a.Disabled) == 0 {
 			a.Disabled = "N"
 		}
@@ -524,6 +553,9 @@ func (a *NgingVhostServer) Upsert(mw func(db.Result) db.Result, args ...interfac
 	}, func() error {
 		a.Created = uint(time.Now().Unix())
 		a.Id = 0
+		if len(a.Engine) == 0 {
+			a.Engine = "nginx"
+		}
 		if len(a.Disabled) == 0 {
 			a.Disabled = "N"
 		}
@@ -588,6 +620,7 @@ func (a *NgingVhostServer) Exists(mw func(db.Result) db.Result, args ...interfac
 
 func (a *NgingVhostServer) Reset() *NgingVhostServer {
 	a.Id = 0
+	a.Engine = ``
 	a.Ident = ``
 	a.Name = ``
 	a.ExecutableFile = ``
@@ -603,6 +636,7 @@ func (a *NgingVhostServer) AsMap(onlyFields ...string) param.Store {
 	r := param.Store{}
 	if len(onlyFields) == 0 {
 		r["Id"] = a.Id
+		r["Engine"] = a.Engine
 		r["Ident"] = a.Ident
 		r["Name"] = a.Name
 		r["ExecutableFile"] = a.ExecutableFile
@@ -617,6 +651,8 @@ func (a *NgingVhostServer) AsMap(onlyFields ...string) param.Store {
 		switch field {
 		case "Id":
 			r["Id"] = a.Id
+		case "Engine":
+			r["Engine"] = a.Engine
 		case "Ident":
 			r["Ident"] = a.Ident
 		case "Name":
@@ -643,6 +679,8 @@ func (a *NgingVhostServer) FromRow(row map[string]interface{}) {
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
+		case "engine":
+			a.Engine = param.AsString(value)
 		case "ident":
 			a.Ident = param.AsString(value)
 		case "name":
@@ -685,6 +723,8 @@ func (a *NgingVhostServer) Set(key interface{}, value ...interface{}) {
 		switch kk {
 		case "Id":
 			a.Id = param.AsUint(vv)
+		case "Engine":
+			a.Engine = param.AsString(vv)
 		case "Ident":
 			a.Ident = param.AsString(vv)
 		case "Name":
@@ -709,6 +749,7 @@ func (a *NgingVhostServer) AsRow(onlyFields ...string) param.Store {
 	r := param.Store{}
 	if len(onlyFields) == 0 {
 		r["id"] = a.Id
+		r["engine"] = a.Engine
 		r["ident"] = a.Ident
 		r["name"] = a.Name
 		r["executable_file"] = a.ExecutableFile
@@ -723,6 +764,8 @@ func (a *NgingVhostServer) AsRow(onlyFields ...string) param.Store {
 		switch field {
 		case "id":
 			r["id"] = a.Id
+		case "engine":
+			r["engine"] = a.Engine
 		case "ident":
 			r["ident"] = a.Ident
 		case "name":

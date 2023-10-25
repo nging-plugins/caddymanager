@@ -6,9 +6,12 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strings"
 
+	"github.com/admpub/log"
+	"github.com/admpub/nging/v5/application/library/config"
 	"github.com/nging-plugins/caddymanager/application/library/thirdparty"
 	"github.com/webx-top/com"
 )
@@ -23,6 +26,7 @@ type Config struct {
 	Version       string
 	ConfigPath    string
 	ConfigInclude string
+	ID            string
 }
 
 func (c *Config) Init() error {
@@ -44,6 +48,31 @@ func (c *Config) Init() error {
 		c.ConfigInclude, err = c.getConfigIncludePath(c.ConfigPath)
 	}
 	return err
+}
+
+func (c *Config) GetVhostConfigDirAbsPath() (string, error) {
+	var err error
+	if len(c.ConfigInclude) == 0 {
+		if err = c.Init(); err != nil {
+			log.Error(err)
+			if len(c.ConfigInclude) == 0 {
+				c.ConfigInclude = filepath.Join(config.FromCLI().ConfDir(), `vhosts-nginx`)
+			}
+		}
+	}
+	return c.ConfigInclude, err
+}
+
+func (c *Config) TemplateFile() string {
+	return `nginx`
+}
+
+func (c *Config) Ident() string {
+	return c.ID
+}
+
+func (c *Config) Engine() string {
+	return `nginx`
 }
 
 func (c *Config) Start(ctx context.Context) error {

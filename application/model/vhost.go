@@ -20,6 +20,7 @@ package model
 import (
 	"strings"
 
+	"github.com/admpub/null"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 
@@ -35,7 +36,9 @@ func NewVhost(ctx echo.Context) *Vhost {
 
 type VhostAndGroup struct {
 	*dbschema.NgingVhost
-	Group *dbschema.NgingVhostGroup `db:"-,relation=id:group_id|gtZero"`
+	Group        *dbschema.NgingVhostGroup `db:"-,relation=id:group_id|gtZero"`
+	ServerName   null.String               `db:"serverName" json:",omitempty" xml:",omitempty"`
+	ServerEngine null.String               `db:"serverEngine" json:",omitempty" xml:",omitempty"`
 }
 
 type Vhost struct {
@@ -43,6 +46,9 @@ type Vhost struct {
 }
 
 func (m *Vhost) RemoveCachedCert() {
+	if m.ServerIdent != `default` {
+		return
+	}
 	caddyCfg := cmder.GetCaddyConfig()
 	for _, domain := range strings.Split(m.Domain, ` `) {
 		domain = strings.TrimSpace(domain)

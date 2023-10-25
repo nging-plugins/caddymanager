@@ -16,7 +16,7 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package handler
+package form
 
 import (
 	"html/template"
@@ -28,32 +28,32 @@ import (
 	"github.com/nging-plugins/caddymanager/application/library/webdav"
 )
 
-func NewFormValues(values url.Values) *FormValues {
-	return &FormValues{Values: values}
+func NewValues(values url.Values) *Values {
+	return &Values{Values: values}
 }
 
-type FormValues struct {
+type Values struct {
 	url.Values
 }
 
-func (v FormValues) GetWebdavGlobal() []*webdav.WebdavPerm {
+func (v Values) GetWebdavGlobal() []*webdav.WebdavPerm {
 	return webdav.ParseGlobalForm(v.Values)
 }
 
-func (v FormValues) GetWebdavUser() []*webdav.WebdavUser {
+func (v Values) GetWebdavUser() []*webdav.WebdavUser {
 	return webdav.ParseUserForm(v.Values)
 }
 
-func (v FormValues) GetSlice(key string) param.StringSlice {
+func (v Values) GetSlice(key string) param.StringSlice {
 	values, _ := v.Values[key]
 	return param.StringSlice(values)
 }
 
-func (v FormValues) AddSlashes(val string) string {
+func (v Values) AddSlashes(val string) string {
 	return com.AddCSlashes(val, '"')
 }
 
-func (v FormValues) IteratorKV(addon string, item string, prefix string, withQuotes ...bool) interface{} {
+func (v Values) IteratorKV(addon string, item string, prefix string, withQuotes ...bool) interface{} {
 	if len(addon) > 0 && len(item) > 0 {
 		addon += `_`
 	}
@@ -85,7 +85,7 @@ func (v FormValues) IteratorKV(addon string, item string, prefix string, withQuo
 	return r
 }
 
-func (v FormValues) GetAttrVal(addon string, item string, defaults ...string) string {
+func (v Values) GetAttrVal(addon string, item string, defaults ...string) string {
 	if len(addon) > 0 {
 		addon += `_`
 	}
@@ -100,7 +100,7 @@ func (v FormValues) GetAttrVal(addon string, item string, defaults ...string) st
 	return val
 }
 
-func (v FormValues) AddonAttr(addon string, item string, defaults ...string) string {
+func (v Values) AddonAttr(addon string, item string, defaults ...string) string {
 	if len(addon) > 0 {
 		addon += `_`
 	}
@@ -115,7 +115,7 @@ func (v FormValues) AddonAttr(addon string, item string, defaults ...string) str
 	return item + `   ` + val
 }
 
-func (v FormValues) Iterator(addon string, item string, prefix string, withQuotes ...bool) interface{} {
+func (v Values) Iterator(addon string, item string, prefix string, withQuotes ...bool) interface{} {
 	if len(addon) > 0 {
 		addon += `_`
 	}

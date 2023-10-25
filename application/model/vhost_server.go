@@ -1,7 +1,11 @@
 package model
 
 import (
+	"strings"
+
 	"github.com/nging-plugins/caddymanager/application/dbschema"
+	"github.com/nging-plugins/caddymanager/application/library/engine"
+	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
@@ -24,6 +28,18 @@ func (f *VhostServer) check() error {
 	}
 	if len(f.Ident) == 0 {
 		return ctx.NewError(code.InvalidParameter, `唯一标识不能为空`).SetZone(`ident`)
+	}
+	if strings.ToLower(f.Ident) == `default` {
+		return ctx.NewError(code.InvalidParameter, `唯一标识“default”是系统内保留标识，不可使用，请修改`).SetZone(`ident`)
+	}
+	if !com.IsAlphaNumericUnderscoreHyphen(f.Ident) {
+		return ctx.NewError(code.InvalidParameter, `唯一标识只能包含字母、数字、下划线或短横`).SetZone(`ident`)
+	}
+	if len(f.Engine) == 0 {
+		return ctx.NewError(code.InvalidParameter, `引擎必选`).SetZone(`engine`)
+	}
+	if f.Engine == `default` || !engine.Engines.Has(f.Engine) {
+		return ctx.NewError(code.InvalidParameter, `引擎无效`).SetZone(`engine`)
 	}
 	var exists bool
 	var err error

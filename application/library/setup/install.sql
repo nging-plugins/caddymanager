@@ -103,8 +103,9 @@ DROP TABLE IF EXISTS `nging_vhost_server`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `nging_vhost_server` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `engine` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'nginx' COMMENT '引擎类型',
   `ident` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '唯一标识',
-  `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '服务引擎名称',
+  `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '引擎名称',
   `executable_file` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '可执行文件路径(支持容器)',
   `config_file` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '配置文件路径',
   `work_dir` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '工作目录',
@@ -112,8 +113,10 @@ CREATE TABLE `nging_vhost_server` (
   `created` int unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   `updated` int unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `vhost_server_ident_key` (`ident`),
   KEY `vhost_server_disabled_ident` (`disabled`,`ident`),
-  KEY `vhost_server_updated` (`updated` DESC)
+  KEY `vhost_server_updated` (`updated` DESC),
+  KEY `vhost_server_engine` (`engine`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -126,4 +129,4 @@ CREATE TABLE `nging_vhost_server` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-10-25 16:15:01
+-- Dump completed on 2023-10-25 19:45:30
