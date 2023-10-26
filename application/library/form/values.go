@@ -25,15 +25,17 @@ import (
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo/param"
 
+	"github.com/nging-plugins/caddymanager/application/library/engine"
 	"github.com/nging-plugins/caddymanager/application/library/webdav"
 )
 
-func NewValues(values url.Values) *Values {
-	return &Values{Values: values}
+func NewValues(values url.Values, cfg engine.Configer) *Values {
+	return &Values{Values: values, cfg: cfg}
 }
 
 type Values struct {
 	url.Values
+	cfg engine.Configer
 }
 
 func (v Values) GetWebdavGlobal() []*webdav.WebdavPerm {
@@ -42,6 +44,11 @@ func (v Values) GetWebdavGlobal() []*webdav.WebdavPerm {
 
 func (v Values) GetWebdavUser() []*webdav.WebdavUser {
 	return webdav.ParseUserForm(v.Values)
+}
+
+func (v Values) GetDomainList() []string {
+	domain := v.Values.Get(`domain`)
+	return SplitBySpace(domain)
 }
 
 func (v Values) GetSlice(key string) param.StringSlice {
@@ -69,13 +76,17 @@ func (v Values) IteratorKV(addon string, item string, prefix string, withQuotes 
 		withQuote = withQuotes[0]
 	}
 	l := len(values)
+	var suffix string
+	if v.cfg.Engine() == `nginx` {
+		suffix = `;`
+	}
 	for i, k := range keys {
 		if i < l {
 			v := values[i]
 			if withQuote {
 				v = `"` + com.AddCSlashes(v, '"') + `"`
 			}
-			r += t + prefix + k + `   ` + v
+			r += t + prefix + k + `   ` + v + suffix
 			t = "\n"
 		}
 	}

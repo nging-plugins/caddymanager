@@ -13,14 +13,12 @@ import (
 	caddy2Config "github.com/nging-plugins/caddymanager/application/library/thirdparty/caddy2/config"
 )
 
-const Name = `caddy2`
-
 func Initer() interface{} {
 	return &caddy2Config.Config{}
 }
 
 func Get() cmder.Cmder {
-	return cmder.Get(Name)
+	return cmder.Get(caddy2Config.Name)
 }
 
 func GetNginxConfig() *caddy2Config.Config {
@@ -28,7 +26,7 @@ func GetNginxConfig() *caddy2Config.Config {
 }
 
 func GetNginxCmd() *caddy2Cmd {
-	cm := cmder.Get(Name).(*caddy2Cmd)
+	cm := cmder.Get(caddy2Config.Name).(*caddy2Cmd)
 	return cm
 }
 
@@ -57,7 +55,7 @@ func (c *caddy2Cmd) getConfig() *config.Config {
 }
 
 func (c *caddy2Cmd) parseConfig() {
-	c.caddy2Config, _ = c.getConfig().Extend.Get(Name).(*caddy2Config.Config)
+	c.caddy2Config, _ = c.getConfig().Extend.Get(caddy2Config.Name).(*caddy2Config.Config)
 	if c.caddy2Config == nil {
 		c.caddy2Config = &caddy2Config.Config{}
 	}

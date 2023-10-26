@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	engine.Engines.Add(Name, `Caddy2`, echo.KVOptX(newEngine()))
+	engine.Engines.Add(caddy2ConfigPkg.Name, `Caddy2`, echo.KVOptX(newEngine()))
 }
 
 func newEngine() engine.Enginer {
@@ -22,7 +22,7 @@ func newEngine() engine.Enginer {
 type Engine struct{}
 
 func (b *Engine) Name() string {
-	return Name
+	return caddy2ConfigPkg.Name
 }
 
 func (b *Engine) ListConfig(ctx echo.Context) ([]engine.Configer, error) {
@@ -30,7 +30,7 @@ func (b *Engine) ListConfig(ctx echo.Context) ([]engine.Configer, error) {
 	m := dbschema.NewNgingVhostServer(ctx)
 	cond := db.NewCompounds()
 	cond.AddKV(`disabled`, common.BoolN)
-	cond.AddKV(`engine`, Name)
+	cond.AddKV(`engine`, caddy2ConfigPkg.Name)
 	if len(ident) > 0 {
 		cond.AddKV(`ident`, ident)
 	}

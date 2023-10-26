@@ -170,7 +170,9 @@ func getSaveDir(cfg engine.Configer) (saveDir string, err error) {
 }
 
 func saveVhostConf(ctx echo.Context, cfg engine.Configer, id uint, values url.Values) error {
-	ctx.Set(`values`, form.NewValues(values))
+	ctx.Set(`values`, form.NewValues(values, cfg))
+	ctx.Set(`id`, id)
+	ctx.Set(`engine`, cfg.Engine())
 	b, err := ctx.Fetch(`caddy/makeconfig/`+cfg.TemplateFile(), nil)
 	if err != nil {
 		return err

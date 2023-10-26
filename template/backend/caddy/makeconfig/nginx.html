@@ -1,1 +1,166 @@
-nginx
+{{$v := $.Get `values`}}
+{{- range $key,$val := $v.GetNginxDomainList}}
+
+{{if eq ($v.Get "fastcgi") "1"}}
+{{$upstream := $v.Get "fastcgi_upstream"}}
+    {{if $upstream}}
+upstream nging_fastcgi_{{$.Get `id`}}{
+    #ip_hash;
+    server {{$v.Get "fastcgi_endpoint"}};
+    {{range $v.SplitBySpace $upstream}}
+    server {{.}};
+    {{end}}
+}
+    {{end}}
+{{end}}
+
+
+{{if eq ($v.Get "proxy") "1"}}
+{{$upstream := $v.Get "proxy_upstream"}}
+    {{if $upstream}}
+    {{$serverGroup := $v.ServerGroup "proxy_to" (printf `nging_proxy_%d` ($.Get `id`))}}
+    {{$.Set `proxyServerGroup` $serverGroup}}
+upstream nging_proxy_{{$.Get `id`}}{
+    #ip_hash;
+    server {{$serverGroup.Host}};
+    {{range $v.SplitBySpace $upstream}}
+    server {{.}};
+    {{end}}
+}
+    {{end}}
+{{end}}
+
+server {
+    listen {{$val.Port}} {{- range $val.Args}} {{.}}{{end}};
+    listen [::]:{{$val.Port}} {{- range $val.Args}} {{.}}{{end}};
+    server_name {{Join $val.Domains `,`}};
+
+    {{$root := $v.Get "root"}}
+    {{if $root}}
+    root "{{$root|$v.AddSlashes|ToHTML}}";
+    {{end}}
+
+    {{if $v.Get "index"}}
+    index {{$v.Get "index"}};
+    {{else}}
+    index {{$v.Get "fastcgi_index"}} index.html index.htm index.txt default.html default.htm default.txt;
+    {{end}}
+    
+    {{if eq ($v.Get "gzip") "1"}}
+    gzip            on;
+    gzip_vary       on;
+    gzip_proxied    any;
+    gzip_comp_level {{$v.Get "gzip_level"}};
+    gzip_types      {{Join ($v.ExtensionsToMime ($v.Get "gzip_ext")) ` `}};
+        {{$minLen := $v.Get "gzip_min_length"}}
+        {{if $minLen}}
+    gzip_min_length {{$minLen}};
+        {{end}}
+    # gzip_disable "MSIE [1-6]\.";
+    {{end}}
+
+    {{if eq ($v.Get "fastcgi") "1"}}
+        {{$fastCgiPath := $v.Get "fastcgi_path"}}
+        {{if $fastCgiPath}}
+    location ~ ^{{$fastCgiPath}}.*\{{$v.Get "fastcgi_ext"}}$ {
+        {{else}}
+    location ~ \{{$v.Get "fastcgi_ext"}}$ {
+        {{end}}
+        {{if $v.Get "fastcgi_upstream"}}
+        fastcgi_pass nging_fastcgi_{{$.Get `id`}};
+        {{else}}
+        fastcgi_pass {{$v.Get "fastcgi_endpoint"}};
+        {{end}}
+
+        fastcgi_index {{$v.Get "fastcgi_index"}};
+
+        {{$fastCgiRoot := $v.Get "fastcgi_root"}}
+        {{if $fastCgiRoot}}
+        fastcgi_param SCRIPT_FILENAME {{$fastCgiRoot}}/$fastcgi_script_name;
+        {{else if $root}}
+        fastcgi_param SCRIPT_FILENAME {{$root}}/$fastcgi_script_name;
+        {{else}}
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        {{end}}
+
+        {{$fastCgiSplit := $v.Get "fastcgi_split"}}
+        #fastcgi_split_path_info ^((?U).+\{{$fastCgiSplit}})(/?.+)$; # 非贪婪模式
+        fastcgi_split_path_info ^(.+\{{$fastCgiSplit}})(/.*)$; # 贪婪模式
+        fastcgi_param PATH_INFO $fastcgi_path_info;
+
+        {{$v.IteratorKV "fastcgi" "env" "        fastcgi_param "}}
+
+        {{if $v.Get "fastcgi_connect_timeout"}}
+        fastcgi_connect_timeout {{$v.Get "fastcgi_connect_timeout"}};
+        {{end}}
+
+        {{if $v.Get "fastcgi_read_timeout"}}
+        fastcgi_read_timeout {{$v.Get "fastcgi_read_timeout"}};
+        {{end}}
+
+        {{if $v.Get "fastcgi_send_timeout"}}
+        fastcgi_send_timeout {{$v.Get "fastcgi_send_timeout"}};
+        {{end}}
+        
+        include fastcgi_params;
+    }
+    {{end}}
+    
+
+    {{if eq ($v.Get "proxy") "1"}}
+    location {{$v.Get "proxy_from"}} {
+        {{if $v.Get "proxy_upstream"}}
+        proxy_pass {{$.Get `proxyServerGroup`}};
+        {{else}}
+        proxy_pass {{$v.ServerGroup "proxy_to" ""}};
+        {{end}}
+
+        {{if $v.Get "proxy_fail_timeout"}}
+        proxy_connect_timeout {{$v.Get "proxy_fail_timeout"}};
+        {{end}}
+
+        {{if $v.Get "proxy_max_fails"}}
+        proxy_next_upstream_tries {{$v.Get "proxy_max_fails"}};
+        {{end}}
+
+        {{if $v.Get "proxy_try_duration"}}
+        proxy_next_upstream_timeout {{$v.Get "proxy_try_duration"}};
+        {{end}}
+
+        {{$v.IteratorHeaderKV "proxy" "header_upstream" "        proxy_set_header    " "" true}}
+        {{$v.IteratorHeaderKV "proxy" "header_downstream" "        proxy_pass_header    " "        proxy_hide_header    "}}
+
+        #proxy_socket_keepalive on;
+
+        {{range $v.Values.proxy_preset}}
+            {{if eq . "insecure_skip_verify"}}
+        proxy_ssl_verify off;
+            {{else if eq . "websocket"}}
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+            {{else if eq . "transparent"}}
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $remote_addr; 
+        #proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+            {{end}}
+        {{end}}
+
+        #proxy_limit_rate 0;
+    }
+    {{end}}
+
+    location ~* /[^/]*\.(bak|inc|lib|sh|tpl|lbi|dwt|dhp) {
+        deny all;
+     }
+     location ~ /\#[^/]*\.[^.]+ {
+        deny all;
+     }
+     location ~ /\#[^/]*/ {
+        deny all;
+     }
+    {{$v.Get "rewrite_rule"|ToHTML}}
+}
+{{end}}

@@ -16,6 +16,8 @@ import (
 	"github.com/webx-top/com"
 )
 
+const Name = `nginx`
+
 var (
 	regexConfigFile    = regexp.MustCompile(`[\s]+configuration file (.+\.conf)[\s]+`)
 	regexConfigInclude = regexp.MustCompile(`[\s]+include[\s]+(.+\.conf)[\s]*;[\s]*` + "\n")
@@ -69,7 +71,7 @@ func (c *Config) GetVhostConfigDirAbsPath() (string, error) {
 }
 
 func (c *Config) TemplateFile() string {
-	return `nginx`
+	return Name
 }
 
 func (c *Config) Ident() string {
@@ -77,7 +79,7 @@ func (c *Config) Ident() string {
 }
 
 func (c *Config) Engine() string {
-	return `nginx`
+	return Name
 }
 
 func (c *Config) Start(ctx context.Context) error {
@@ -86,6 +88,17 @@ func (c *Config) Start(ctx context.Context) error {
 		args = append(args, `-c`, c.ConfigPath)
 	}
 	_, err := c.exec(ctx)
+	return err
+}
+
+func (c *Config) TestConfig(ctx context.Context) error {
+	args := []string{`-t`}
+	if c.CmdWithConfig && len(c.ConfigPath) > 0 {
+		args = append(args, `-c`, c.ConfigPath)
+	}
+	//nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+	//nginx: configuration file /etc/nginx/nginx.conf test is successful
+	_, err := c.exec(ctx, args...)
 	return err
 }
 
@@ -196,7 +209,7 @@ func (c *Config) exec(ctx context.Context, args ...string) ([]byte, error) {
 	if cmd.Stderr == nil && cmd.Stdout == nil {
 		result, err := cmd.CombinedOutput()
 		if err != nil {
-			err = fmt.Errorf(`%w: %s`, err, cmd.String())
+			err = fmt.Errorf(`%s: %w`, result, err)
 		}
 		return result, err
 	}

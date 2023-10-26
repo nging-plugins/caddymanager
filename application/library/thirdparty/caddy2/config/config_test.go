@@ -18,5 +18,13 @@ func TestConfig(t *testing.T) {
 
 	err = c.exec(ctx, `help`)
 	assert.NoError(t, err)
+
+	err = c.TestConfig(ctx)
+	assert.NoError(t, err)
+
+	c.CmdWithConfig = true
+	c.Caddyfile = `/not-exists.conf`
+	err = c.TestConfig(ctx)
+	assert.Error(t, err)
 	_, _ = c, ctx
 }

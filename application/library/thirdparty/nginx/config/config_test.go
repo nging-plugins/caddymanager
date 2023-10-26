@@ -20,7 +20,7 @@ func TestParseConfigFilePath(t *testing.T) {
 
 func TestConfig(t *testing.T) {
 	c := &Config{
-		Command: `docker exec nginx nginx`,
+		//Command: `docker exec nginx nginx`,
 	}
 	ctx := context.Background()
 	var err error
@@ -34,6 +34,14 @@ func TestConfig(t *testing.T) {
 	c.ConfigInclude, err = c.getConfigIncludePath(c.ConfigPath)
 	assert.NoError(t, err)
 	assert.Equal(t, `/etc/nginx/modules-enabled/`, c.ConfigInclude)
+
+	err = c.TestConfig(ctx)
+	assert.NoError(t, err)
+
+	c.CmdWithConfig = true
+	c.ConfigPath = `/not-exists.conf`
+	err = c.TestConfig(ctx)
+	assert.Error(t, err)
 }
 
 func _TestConfig2(t *testing.T) {
