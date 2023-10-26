@@ -141,7 +141,7 @@ func generateHostURL(currentHost string, hosts string) []template.HTML {
 
 func removeAllConf(cfg engine.Configer, rootDir string) error {
 	isDefaultEngine := cfg.Engine() == `default`
-	return filepath.Walk(rootDir, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(rootDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -154,12 +154,13 @@ func removeAllConf(cfg engine.Configer, rootDir string) error {
 		log.Info(`Delete the WebServer configuration file: `, path)
 		return os.Remove(path)
 	})
+	if err != nil && os.IsNotExist(err) {
+		return nil
+	}
+	return err
 }
 
 func getSaveDir(cfg engine.Configer) (saveDir string, err error) {
-	if cfg == nil {
-		cfg = cmder.GetCaddyConfig()
-	}
 	saveDir, err = cfg.GetVhostConfigDirAbsPath()
 	if err != nil {
 		return
@@ -169,9 +170,6 @@ func getSaveDir(cfg engine.Configer) (saveDir string, err error) {
 }
 
 func saveVhostConf(ctx echo.Context, cfg engine.Configer, id uint, values url.Values) error {
-	if cfg == nil {
-		cfg = cmder.GetCaddyConfig()
-	}
 	ctx.Set(`values`, form.NewValues(values))
 	b, err := ctx.Fetch(`caddy/makeconfig/`+cfg.TemplateFile(), nil)
 	if err != nil {
@@ -210,7 +208,7 @@ func getServerConfig(ctx echo.Context, serverIdent string, serverM ...*dbschema.
 		}
 		item := engine.Engines.GetItem(svrM.Engine)
 		if item == nil {
-			return cfg, nil
+			return cfg, fmt.Errorf(`unsupported engine: %v`, serverIdent)
 		}
 		cfg = item.X.(engine.Enginer).BuildConfig(ctx, svrM)
 	}
@@ -260,8 +258,15 @@ func vhostbuild(ctx echo.Context, groupID uint, serverIdent string, engineType s
 	if groupID > 0 {
 		cond.AddKV(`a.group_id`, groupID)
 	}
+	if len(serverM) > 0 {
+		engineType = serverM[0].Engine
+		serverIdent = serverM[0].Ident
+	}
 	var hasEngine, hasIdent bool
-	if len(serverM) == 0 {
+	if len(serverIdent) > 0 {
+		hasIdent = true
+		cond.AddKV(`a.server_ident`, serverIdent)
+	} else if len(serverM) == 0 {
 		if len(engineType) > 0 {
 			if engineType == `default` {
 				serverIdent = engineType
@@ -270,17 +275,15 @@ func vhostbuild(ctx echo.Context, groupID uint, serverIdent string, engineType s
 				hasEngine = true
 			}
 		}
-	} else {
-		serverIdent = serverM[0].Ident
-	}
-	if len(serverIdent) > 0 {
-		hasIdent = true
-		cond.AddKV(`a.server_ident`, serverIdent)
+		if len(serverIdent) > 0 {
+			hasIdent = true
+			cond.AddKV(`a.server_ident`, serverIdent)
+		}
 	}
 	var err error
 	configs := map[string]engine.Configer{}
 	for _, v := range engine.Engines.Slice() {
-		if hasEngine && v.K != engineType {
+		if len(engineType) > 0 && v.K != engineType {
 			continue
 		}
 		eng := v.X.(engine.Enginer)
@@ -291,7 +294,7 @@ func vhostbuild(ctx echo.Context, groupID uint, serverIdent string, engineType s
 			var rows []engine.Configer
 			rows, err = eng.ListConfig(ctx)
 			if err != nil {
-				return err
+				return fmt.Errorf(`failed to ListConfig: %w`, err)
 			}
 			for _, cfg := range rows {
 				if hasIdent && cfg.Ident() != serverIdent {
@@ -301,11 +304,11 @@ func vhostbuild(ctx echo.Context, groupID uint, serverIdent string, engineType s
 					var saveDir string
 					saveDir, err = cfg.GetVhostConfigDirAbsPath()
 					if err != nil {
-						break
+						return fmt.Errorf(`failed to GetVhostConfigDirAbsPath: %w`, err)
 					}
 					err = removeAllConf(cfg, saveDir)
 					if err != nil {
-						break
+						return fmt.Errorf(`failed to removeAllConf: %w`, err)
 					}
 					os.Remove(saveDir)
 				}
@@ -317,19 +320,16 @@ func vhostbuild(ctx echo.Context, groupID uint, serverIdent string, engineType s
 				var saveDir string
 				saveDir, err = cfg.GetVhostConfigDirAbsPath()
 				if err != nil {
-					break
+					return fmt.Errorf(`failed to GetVhostConfigDirAbsPath: %w`, err)
 				}
 				err = removeAllConf(cfg, saveDir)
 				if err != nil {
-					break
+					return fmt.Errorf(`failed to removeAllConf: %w`, err)
 				}
 				os.Remove(saveDir)
 			}
 			configs[cfg.Ident()] = cfg
 		}
-	}
-	if err != nil {
-		return err
 	}
 	m := model.NewVhost(ctx)
 	n := 100
@@ -344,7 +344,8 @@ func vhostbuild(ctx echo.Context, groupID uint, serverIdent string, engineType s
 		}
 		return p.SetAlias(`a`).SetRecv(&rowAndGroup).AddArgs(cond.And())
 	}
-	cnt, err := makeQuerier().SetOffset(0).SetSize(n).List()
+	var cnt func() int64
+	cnt, err = makeQuerier().SetOffset(0).SetSize(n).List()
 	if err != nil {
 		return err
 	}
@@ -359,7 +360,7 @@ func vhostbuild(ctx echo.Context, groupID uint, serverIdent string, engineType s
 		}
 		for _, m := range rowAndGroup {
 			var formData url.Values
-			err := json.Unmarshal([]byte(m.Setting), &formData)
+			err = json.Unmarshal([]byte(m.Setting), &formData)
 			if err == nil {
 				cfg, ok := configs[m.ServerIdent]
 				if ok {

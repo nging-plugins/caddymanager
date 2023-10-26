@@ -83,15 +83,28 @@ func ServerEdit(ctx echo.Context) error {
 		return ctx.Redirect(handler.URLFor(`/caddy/server`))
 	}
 	if ctx.IsPost() {
+		oldStatus := m.Disabled
 		err = ctx.MustBind(m.NgingVhostServer, echo.ExcludeFieldName(`created`, `updated`, `ident`))
-		if err == nil {
-			m.Id = id
-			err = m.Edit(nil, `id`, id)
+		if err != nil {
+			goto END
 		}
-		if err == nil {
-			handler.SendOk(ctx, ctx.T(`修改成功`))
-			return ctx.Redirect(handler.URLFor(`/caddy/server`))
+		m.Id = id
+		err = m.Edit(nil, `id`, id)
+		if err != nil {
+			goto END
 		}
+		if oldStatus != m.Disabled {
+			if m.Disabled == `Y` {
+				err = deleteCaddyfileByServer(ctx, m.NgingVhostServer, true)
+			} else {
+				err = vhostbuild(ctx, 0, ``, ``, m.NgingVhostServer)
+			}
+			if err != nil {
+				ctx.Logger().Error(err)
+			}
+		}
+		handler.SendOk(ctx, ctx.T(`修改成功`))
+		return ctx.Redirect(handler.URLFor(`/caddy/server`))
 	} else if ctx.IsAjax() {
 		data := ctx.Data()
 		disabled := ctx.Query(`disabled`)
@@ -108,7 +121,7 @@ func ServerEdit(ctx echo.Context) error {
 			if m.Disabled == `Y` {
 				err = deleteCaddyfileByServer(ctx, m.NgingVhostServer, true)
 			} else {
-				err = vhostbuild(ctx, 0, m.Ident, ``, m.NgingVhostServer)
+				err = vhostbuild(ctx, 0, ``, ``, m.NgingVhostServer)
 			}
 			if err != nil {
 				data.SetError(err)
@@ -117,9 +130,10 @@ func ServerEdit(ctx echo.Context) error {
 			data.SetInfo(ctx.T(`操作成功`))
 		}
 		return ctx.JSON(data)
-	} else {
-		echo.StructToForm(ctx, m.NgingVhostServer, ``, echo.LowerCaseFirstLetter)
 	}
+	echo.StructToForm(ctx, m.NgingVhostServer, ``, echo.LowerCaseFirstLetter)
+
+END:
 	ctx.Set(`activeURL`, `/caddy/server`)
 	ctx.Set(`isAdd`, false)
 	setServerForm(ctx)
