@@ -54,6 +54,7 @@ func (b *Engine) BuildConfig(ctx echo.Context, m *dbschema.NgingVhostServer) eng
 		ConfigInclude: m.VhostConfigDir,
 		CmdWithConfig: m.CmdWithConfig == common.BoolY,
 		ID:            m.Ident,
+		WorkDir:       m.WorkDir,
 	}
 	return cfg
 }

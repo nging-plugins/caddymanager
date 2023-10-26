@@ -28,6 +28,7 @@ type Config struct {
 	ConfigPath    string
 	ConfigInclude string
 	ID            string
+	WorkDir       string
 }
 
 func (c *Config) Init() error {
@@ -185,6 +186,7 @@ func (c *Config) exec(ctx context.Context, args ...string) ([]byte, error) {
 		args = append(rootArgs[1:], args...)
 	}
 	cmd := exec.CommandContext(ctx, command, args...)
+	cmd.Dir = c.WorkDir
 	if stderr := thirdparty.GetCtxStderr(ctx); stderr != nil {
 		cmd.Stderr = stderr
 	}
