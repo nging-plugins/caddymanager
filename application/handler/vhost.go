@@ -102,7 +102,7 @@ func VhostAdd(ctx echo.Context) error {
 		switch {
 		case err == nil:
 			m.Setting = string(b)
-			_, err = m.Insert()
+			_, err = m.Add()
 			if err != nil {
 				break
 			}
@@ -160,7 +160,14 @@ func VhostDelete(ctx echo.Context) error {
 		return ctx.Redirect(handler.URLFor(`/caddy/vhost`))
 	}
 	m := model.NewVhost(ctx)
-	err := m.Delete(nil, db.Cond{`id`: id})
+	err := m.Get(func(r db.Result) db.Result {
+		return r.Select(`server_ident`)
+	}, `id`, id)
+	if err != nil {
+		handler.SendFail(ctx, err.Error())
+		return ctx.Redirect(handler.URLFor(`/caddy/vhost`))
+	}
+	err = m.Delete(nil, db.Cond{`id`: id})
 	if err != nil {
 		handler.SendFail(ctx, err.Error())
 	} else {
@@ -193,7 +200,7 @@ func VhostEdit(ctx echo.Context) error {
 		switch {
 		case err == nil:
 			m.Setting = string(b)
-			err = m.Update(nil, db.Cond{`id`: id})
+			err = m.Edit(nil, db.Cond{`id`: id})
 			if err != nil {
 				break
 			}
