@@ -10,6 +10,7 @@ type Enginer interface {
 	ListConfig(ctx echo.Context) ([]Configer, error)
 	BuildConfig(ctx echo.Context, m *dbschema.NgingVhostServer) Configer
 	ReloadServer(ctx echo.Context, cfg Configer) error
+	DefaultConfigDir() string
 }
 
 var Engines = echo.NewKVData()

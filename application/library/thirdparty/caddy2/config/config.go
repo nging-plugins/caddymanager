@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os/exec"
 	"path/filepath"
-	"strings"
 
 	"github.com/admpub/log"
 	"github.com/admpub/nging/v5/application/library/config"
@@ -15,8 +14,10 @@ import (
 
 type Config struct {
 	Command               string
+	CmdWithConfig         bool
 	Endpoint              string
 	Caddyfile             string
+	ConfigInclude         string
 	ID                    string
 	vhostConfigDirAbsPath string
 }
@@ -25,17 +26,15 @@ func (c *Config) Init() *Config {
 	return c
 }
 
+func DefaultConfigDir() string {
+	return filepath.Join(config.FromCLI().ConfDir(), `vhosts-caddy2`)
+}
+
 func (c *Config) GetVhostConfigDirAbsPath() (string, error) {
-	ext := filepath.Ext(c.Caddyfile)
-	ext = strings.ToLower(ext)
-	switch ext {
-	case `.json`:
-	default:
+	if len(c.ConfigInclude) == 0 {
+		c.ConfigInclude = filepath.Join(DefaultConfigDir(), c.ID)
 	}
-	if len(c.vhostConfigDirAbsPath) == 0 {
-		c.vhostConfigDirAbsPath = filepath.Join(config.FromCLI().ConfDir(), `vhosts-caddy2`)
-	}
-	return c.vhostConfigDirAbsPath, nil
+	return c.ConfigInclude, nil
 }
 
 func (c *Config) TemplateFile() string {
@@ -51,12 +50,20 @@ func (c *Config) Engine() string {
 }
 
 func (c *Config) Start(ctx context.Context) error {
-	err := c.exec(ctx, `start`, `--config`, c.Caddyfile)
+	args := []string{`start`}
+	if c.CmdWithConfig && len(c.Caddyfile) > 0 && com.IsFile(c.Caddyfile) {
+		args = append(args, `--config`, c.Caddyfile)
+	}
+	err := c.exec(ctx, args...)
 	return err
 }
 
 func (c *Config) Reload(ctx context.Context) error {
-	err := c.exec(ctx, `reload`, `--config`, c.Caddyfile)
+	args := []string{`reload`}
+	if c.CmdWithConfig && len(c.Caddyfile) > 0 && com.IsFile(c.Caddyfile) {
+		args = append(args, `--config`, c.Caddyfile)
+	}
+	err := c.exec(ctx, args...)
 	return err
 }
 

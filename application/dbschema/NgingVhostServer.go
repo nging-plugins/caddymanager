@@ -108,7 +108,9 @@ type NgingVhostServer struct {
 	Name           string `db:"name" bson:"name" comment:"引擎名称" json:"name" xml:"name"`
 	ExecutableFile string `db:"executable_file" bson:"executable_file" comment:"可执行文件路径(支持容器)" json:"executable_file" xml:"executable_file"`
 	ConfigFile     string `db:"config_file" bson:"config_file" comment:"配置文件路径" json:"config_file" xml:"config_file"`
+	VhostConfigDir string `db:"vhost_config_dir" bson:"vhost_config_dir" comment:"网站配置文件保存目录" json:"vhost_config_dir" xml:"vhost_config_dir"`
 	WorkDir        string `db:"work_dir" bson:"work_dir" comment:"工作目录" json:"work_dir" xml:"work_dir"`
+	CmdWithConfig  string `db:"cmd_with_config" bson:"cmd_with_config" comment:"命令是否(Y/N)带配置文件参数" json:"cmd_with_config" xml:"cmd_with_config"`
 	Disabled       string `db:"disabled" bson:"disabled" comment:"是否(Y/N)禁用" json:"disabled" xml:"disabled"`
 	Created        uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
 	Updated        uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
@@ -335,6 +337,9 @@ func (a *NgingVhostServer) Insert() (pk interface{}, err error) {
 	if len(a.Engine) == 0 {
 		a.Engine = "nginx"
 	}
+	if len(a.CmdWithConfig) == 0 {
+		a.CmdWithConfig = "N"
+	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
 	}
@@ -363,6 +368,9 @@ func (a *NgingVhostServer) Update(mw func(db.Result) db.Result, args ...interfac
 	if len(a.Engine) == 0 {
 		a.Engine = "nginx"
 	}
+	if len(a.CmdWithConfig) == 0 {
+		a.CmdWithConfig = "N"
+	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
 	}
@@ -382,6 +390,9 @@ func (a *NgingVhostServer) Updatex(mw func(db.Result) db.Result, args ...interfa
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Engine) == 0 {
 		a.Engine = "nginx"
+	}
+	if len(a.CmdWithConfig) == 0 {
+		a.CmdWithConfig = "N"
 	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
@@ -403,6 +414,9 @@ func (a *NgingVhostServer) UpdateByFields(mw func(db.Result) db.Result, fields [
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Engine) == 0 {
 		a.Engine = "nginx"
+	}
+	if len(a.CmdWithConfig) == 0 {
+		a.CmdWithConfig = "N"
 	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
@@ -428,6 +442,9 @@ func (a *NgingVhostServer) UpdatexByFields(mw func(db.Result) db.Result, fields 
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Engine) == 0 {
 		a.Engine = "nginx"
+	}
+	if len(a.CmdWithConfig) == 0 {
+		a.CmdWithConfig = "N"
 	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
@@ -468,6 +485,11 @@ func (a *NgingVhostServer) UpdateFields(mw func(db.Result) db.Result, kvset map[
 			kvset["engine"] = "nginx"
 		}
 	}
+	if val, ok := kvset["cmd_with_config"]; ok && val != nil {
+		if v, ok := val.(string); ok && len(v) == 0 {
+			kvset["cmd_with_config"] = "N"
+		}
+	}
 	if val, ok := kvset["disabled"]; ok && val != nil {
 		if v, ok := val.(string); ok && len(v) == 0 {
 			kvset["disabled"] = "N"
@@ -496,6 +518,11 @@ func (a *NgingVhostServer) UpdatexFields(mw func(db.Result) db.Result, kvset map
 	if val, ok := kvset["engine"]; ok && val != nil {
 		if v, ok := val.(string); ok && len(v) == 0 {
 			kvset["engine"] = "nginx"
+		}
+	}
+	if val, ok := kvset["cmd_with_config"]; ok && val != nil {
+		if v, ok := val.(string); ok && len(v) == 0 {
+			kvset["cmd_with_config"] = "N"
 		}
 	}
 	if val, ok := kvset["disabled"]; ok && val != nil {
@@ -543,6 +570,9 @@ func (a *NgingVhostServer) Upsert(mw func(db.Result) db.Result, args ...interfac
 		if len(a.Engine) == 0 {
 			a.Engine = "nginx"
 		}
+		if len(a.CmdWithConfig) == 0 {
+			a.CmdWithConfig = "N"
+		}
 		if len(a.Disabled) == 0 {
 			a.Disabled = "N"
 		}
@@ -555,6 +585,9 @@ func (a *NgingVhostServer) Upsert(mw func(db.Result) db.Result, args ...interfac
 		a.Id = 0
 		if len(a.Engine) == 0 {
 			a.Engine = "nginx"
+		}
+		if len(a.CmdWithConfig) == 0 {
+			a.CmdWithConfig = "N"
 		}
 		if len(a.Disabled) == 0 {
 			a.Disabled = "N"
@@ -625,7 +658,9 @@ func (a *NgingVhostServer) Reset() *NgingVhostServer {
 	a.Name = ``
 	a.ExecutableFile = ``
 	a.ConfigFile = ``
+	a.VhostConfigDir = ``
 	a.WorkDir = ``
+	a.CmdWithConfig = ``
 	a.Disabled = ``
 	a.Created = 0
 	a.Updated = 0
@@ -641,7 +676,9 @@ func (a *NgingVhostServer) AsMap(onlyFields ...string) param.Store {
 		r["Name"] = a.Name
 		r["ExecutableFile"] = a.ExecutableFile
 		r["ConfigFile"] = a.ConfigFile
+		r["VhostConfigDir"] = a.VhostConfigDir
 		r["WorkDir"] = a.WorkDir
+		r["CmdWithConfig"] = a.CmdWithConfig
 		r["Disabled"] = a.Disabled
 		r["Created"] = a.Created
 		r["Updated"] = a.Updated
@@ -661,8 +698,12 @@ func (a *NgingVhostServer) AsMap(onlyFields ...string) param.Store {
 			r["ExecutableFile"] = a.ExecutableFile
 		case "ConfigFile":
 			r["ConfigFile"] = a.ConfigFile
+		case "VhostConfigDir":
+			r["VhostConfigDir"] = a.VhostConfigDir
 		case "WorkDir":
 			r["WorkDir"] = a.WorkDir
+		case "CmdWithConfig":
+			r["CmdWithConfig"] = a.CmdWithConfig
 		case "Disabled":
 			r["Disabled"] = a.Disabled
 		case "Created":
@@ -689,8 +730,12 @@ func (a *NgingVhostServer) FromRow(row map[string]interface{}) {
 			a.ExecutableFile = param.AsString(value)
 		case "config_file":
 			a.ConfigFile = param.AsString(value)
+		case "vhost_config_dir":
+			a.VhostConfigDir = param.AsString(value)
 		case "work_dir":
 			a.WorkDir = param.AsString(value)
+		case "cmd_with_config":
+			a.CmdWithConfig = param.AsString(value)
 		case "disabled":
 			a.Disabled = param.AsString(value)
 		case "created":
@@ -733,8 +778,12 @@ func (a *NgingVhostServer) Set(key interface{}, value ...interface{}) {
 			a.ExecutableFile = param.AsString(vv)
 		case "ConfigFile":
 			a.ConfigFile = param.AsString(vv)
+		case "VhostConfigDir":
+			a.VhostConfigDir = param.AsString(vv)
 		case "WorkDir":
 			a.WorkDir = param.AsString(vv)
+		case "CmdWithConfig":
+			a.CmdWithConfig = param.AsString(vv)
 		case "Disabled":
 			a.Disabled = param.AsString(vv)
 		case "Created":
@@ -754,7 +803,9 @@ func (a *NgingVhostServer) AsRow(onlyFields ...string) param.Store {
 		r["name"] = a.Name
 		r["executable_file"] = a.ExecutableFile
 		r["config_file"] = a.ConfigFile
+		r["vhost_config_dir"] = a.VhostConfigDir
 		r["work_dir"] = a.WorkDir
+		r["cmd_with_config"] = a.CmdWithConfig
 		r["disabled"] = a.Disabled
 		r["created"] = a.Created
 		r["updated"] = a.Updated
@@ -774,8 +825,12 @@ func (a *NgingVhostServer) AsRow(onlyFields ...string) param.Store {
 			r["executable_file"] = a.ExecutableFile
 		case "config_file":
 			r["config_file"] = a.ConfigFile
+		case "vhost_config_dir":
+			r["vhost_config_dir"] = a.VhostConfigDir
 		case "work_dir":
 			r["work_dir"] = a.WorkDir
+		case "cmd_with_config":
+			r["cmd_with_config"] = a.CmdWithConfig
 		case "disabled":
 			r["disabled"] = a.Disabled
 		case "created":

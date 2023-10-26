@@ -42,23 +42,26 @@ func (b *Engine) ListConfig(ctx echo.Context) ([]engine.Configer, error) {
 	rows := m.Objects()
 	result := make([]engine.Configer, len(rows))
 	for idx, row := range rows {
-		result[idx] = &nginxConfigPkg.Config{
-			Command:    row.ExecutableFile,
-			ConfigPath: row.ConfigFile,
-			ID:         row.Ident,
-		}
+		result[idx] = b.BuildConfig(ctx, row)
 	}
 	return result, err
 }
 
 func (b *Engine) BuildConfig(ctx echo.Context, m *dbschema.NgingVhostServer) engine.Configer {
-	return &nginxConfigPkg.Config{
-		Command:    m.ExecutableFile,
-		ConfigPath: m.ConfigFile,
-		ID:         m.Ident,
+	cfg := &nginxConfigPkg.Config{
+		Command:       m.ExecutableFile,
+		ConfigPath:    m.ConfigFile,
+		ConfigInclude: m.VhostConfigDir,
+		CmdWithConfig: m.CmdWithConfig == common.BoolY,
+		ID:            m.Ident,
 	}
+	return cfg
 }
 
 func (b *Engine) ReloadServer(ctx echo.Context, cfg engine.Configer) error {
 	return cfg.(*nginxConfigPkg.Config).Reload(ctx)
+}
+
+func (b *Engine) DefaultConfigDir() string {
+	return nginxConfigPkg.DefaultConfigDir()
 }

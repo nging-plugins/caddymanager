@@ -15,30 +15,23 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"html/template"
 	"net/url"
-	"os"
-	"path/filepath"
-	"regexp"
-	"strings"
 
-	"github.com/webx-top/com"
 	"github.com/webx-top/db"
+	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
 
-	"github.com/admpub/log"
 	"github.com/admpub/nging/v5/application/handler"
 	"github.com/admpub/nging/v5/application/library/common"
 	"github.com/nging-plugins/caddymanager/application/dbschema"
-	"github.com/nging-plugins/caddymanager/application/library/cmder"
 	"github.com/nging-plugins/caddymanager/application/library/engine"
-	"github.com/nging-plugins/caddymanager/application/library/form"
 	"github.com/nging-plugins/caddymanager/application/model"
 )
 
@@ -87,64 +80,34 @@ func VhostIndex(ctx echo.Context) error {
 	return ctx.Render(`caddy/vhost`, handler.Err(ctx, err))
 }
 
-var reSplitRegexp = regexp.MustCompile(`[\s]+`)
-
-func hasEnvVar(v string) bool {
-	for _, r := range v {
-		if r == '$' || r == '%' {
-			return true
-		}
-	}
-	return false
-}
-
-func generateHostURL(currentHost string, hosts string) []template.HTML {
-	hosts = strings.TrimSpace(hosts)
-	hostsSlice := reSplitRegexp.Split(hosts, -1)
-	urls := make([]template.HTML, 0, len(hostsSlice))
-	for _, v := range hostsSlice {
-		v = strings.TrimSpace(v)
-		if len(v) == 0 {
-			continue
-		}
-		parsedValue := com.ParseEnvVar(v)
-		if len(parsedValue) > 0 {
-			switch {
-			case parsedValue[0] == ':':
-				v = `<a href="http://` + currentHost + parsedValue + `" target="_blank" rel="noopener noreferrer">` + v + `</a>`
-			case strings.HasPrefix(parsedValue, `0.0.0.0:`):
-				v = `<a href="http://` + currentHost + strings.TrimPrefix(parsedValue, `0.0.0.0`) + `" target="_blank" rel="noopener noreferrer">` + v + `</a>`
-			case !strings.Contains(parsedValue, `//`):
-				v = `<a href="http://` + parsedValue + `" target="_blank" rel="noopener noreferrer">` + v + `</a>`
-			default:
-				v = `<a href="` + strings.ReplaceAll(parsedValue, `*`, `test`) + `" target="_blank" rel="noopener noreferrer">` + v + `</a>`
-			}
-		}
-		urls = append(urls, template.HTML(v))
-	}
-	return urls
-}
-
-func removeAllConf(rootDir string) error {
-	return filepath.Walk(rootDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if info.IsDir() {
-			return nil
-		}
-		if !strings.HasSuffix(path, `.conf`) {
-			return nil
-		}
-		log.Info(`Delete the Caddy configuration file: `, path)
-		return os.Remove(path)
-	})
-}
-
 func Vhostbuild(ctx echo.Context) error {
+	groupID := ctx.Formx(`groupId`).Uint()
+	serverIdent := ctx.Formx(`serverIdent`).String()
+	engineType := ctx.Formx(`engine`).String()
+	cond := db.NewCompounds()
+	cond.AddKV(`a.disabled`, `N`)
+	if groupID > 0 {
+		cond.AddKV(`a.group_id`, groupID)
+	}
+	var hasEngine, hasIdent bool
+	if len(engineType) > 0 {
+		if engineType == `default` {
+			serverIdent = engineType
+		} else {
+			cond.AddKV(`b.engine`, engineType)
+			hasEngine = true
+		}
+	}
+	if len(serverIdent) > 0 {
+		hasIdent = true
+		cond.AddKV(`a.server_ident`, serverIdent)
+	}
 	var err error
 	configs := map[string]engine.Configer{}
 	for _, v := range engine.Engines.Slice() {
+		if hasEngine && v.K != engineType {
+			continue
+		}
 		eng := v.X.(engine.Enginer)
 		if eng == nil {
 			continue
@@ -155,14 +118,19 @@ func Vhostbuild(ctx echo.Context) error {
 			return err
 		}
 		for _, cfg := range rows {
-			var saveDir string
-			saveDir, err = getSaveDir(cfg)
-			if err != nil {
-				break
+			if hasIdent && cfg.Ident() != serverIdent {
+				continue
 			}
-			err = removeAllConf(saveDir)
-			if err != nil {
-				break
+			if groupID == 0 {
+				var saveDir string
+				saveDir, err = getSaveDir(cfg)
+				if err != nil {
+					break
+				}
+				err = removeAllConf(saveDir)
+				if err != nil {
+					break
+				}
 			}
 			configs[cfg.Ident()] = cfg
 		}
@@ -173,19 +141,31 @@ func Vhostbuild(ctx echo.Context) error {
 	}
 	m := model.NewVhost(ctx)
 	n := 100
-	cnt, err := m.ListByOffset(nil, nil, 0, n, `disabled`, `N`)
+	serverTable := dbschema.NewNgingVhostServer(ctx).Short_()
+	var rowAndGroup []*model.VhostAndGroup
+	var makeQuerier = func() *factory.Param {
+		p := m.NewParam()
+		if hasEngine {
+			p.SetCols(`a.*`, `b.name AS serverName`, `b.engine AS serverEngine`).AddJoin(`LEFT`, serverTable, `b`, `b.ident=a.server_ident`)
+		} else {
+			p.SetCols(`a.*`)
+		}
+		return p.SetAlias(`a`).SetRecv(&rowAndGroup).AddArgs(cond.And())
+	}
+	cnt, err := makeQuerier().SetOffset(0).SetSize(n).List()
 	if err != nil {
 		return err
 	}
 	for i, j := 0, cnt(); int64(i) < j; i += n {
 		if i > 0 {
-			_, err = m.ListByOffset(nil, nil, i, n, `disabled`, `N`)
+			rowAndGroup = rowAndGroup[0:0]
+			_, err = makeQuerier().SetOffset(i).SetSize(n).List()
 			if err != nil {
 				handler.SendFail(ctx, err.Error())
 				return ctx.Redirect(handler.URLFor(`/caddy/vhost`))
 			}
 		}
-		for _, m := range m.Objects() {
+		for _, m := range rowAndGroup {
 			var formData url.Values
 			err := json.Unmarshal([]byte(m.Setting), &formData)
 			if err == nil {
@@ -218,11 +198,7 @@ func VhostAdd(ctx echo.Context) error {
 	var err error
 	m := model.NewVhost(ctx)
 	if ctx.IsPost() {
-		m.Domain = ctx.Form(`domain`)
-		m.Disabled = ctx.Form(`disabled`)
-		m.Root = ctx.Form(`root`)
-		m.Name = ctx.Form(`name`)
-		m.GroupId = ctx.Formx(`groupId`).Uint()
+		receiveFormData(ctx, m.NgingVhost)
 		var b []byte
 		b, err = json.Marshal(ctx.Forms())
 		switch {
@@ -279,81 +255,6 @@ func setVhostForm(ctx echo.Context) {
 	ctx.Set(`serverList`, svr.Objects())
 }
 
-func getSaveDir(cfg engine.Configer) (saveDir string, err error) {
-	if cfg == nil {
-		cfg = cmder.GetCaddyConfig()
-	}
-	saveDir, err = cfg.GetVhostConfigDirAbsPath()
-	if err != nil {
-		return
-	}
-	err = com.MkdirAll(saveDir, os.ModePerm)
-	return
-}
-
-func saveVhostConf(ctx echo.Context, cfg engine.Configer, id uint, values url.Values) error {
-	if cfg == nil {
-		cfg = cmder.GetCaddyConfig()
-	}
-	ctx.Set(`values`, form.NewValues(values))
-	b, err := ctx.Fetch(`caddy/makeconfig/`+cfg.TemplateFile(), nil)
-	if err != nil {
-		return err
-	}
-	b = com.CleanSpaceLine(b)
-	saveFile, err := cfg.GetVhostConfigDirAbsPath()
-	if err != nil {
-		return err
-	}
-	saveFile = filepath.Join(saveFile, fmt.Sprint(id)+`.conf`)
-	log.Info(`Generate a Caddy configuration file: `, saveFile)
-	err = os.WriteFile(saveFile, b, os.ModePerm)
-	//jsonb, _ := caddyfile.ToJSON(b)
-	//err = os.WriteFile(saveFile+`.json`, jsonb, os.ModePerm)
-	return err
-}
-
-func saveVhostData(ctx echo.Context, m *dbschema.NgingVhost, values url.Values, restart bool) (err error) {
-	var saveDir string
-	var cfg engine.Configer
-	if m.ServerIdent == `default` {
-		cfg = cmder.GetCaddyConfig()
-	} else {
-		svrM := model.NewVhostServer(ctx)
-		err = svrM.Get(nil, `ident`, m.ServerIdent)
-		if err != nil {
-			return
-		}
-		item := engine.Engines.GetItem(svrM.Engine)
-		if item == nil {
-			return
-		}
-		cfg = item.X.(engine.Enginer).BuildConfig(ctx, svrM.NgingVhostServer)
-		if cfg == nil {
-			return
-		}
-	}
-	saveDir, err = getSaveDir(cfg)
-	if err != nil {
-		return
-	}
-	if m.Disabled == `Y` {
-		saveFile := filepath.Join(saveDir, fmt.Sprint(m.Id)+`.conf`)
-		if err = os.Remove(saveFile); os.IsNotExist(err) {
-			err = nil
-		}
-	} else {
-		err = saveVhostConf(ctx, cfg, m.Id, values)
-	}
-	if err == nil && restart {
-		item := engine.Engines.GetItem(cfg.Engine())
-		if item != nil {
-			err = item.X.(engine.Enginer).ReloadServer(ctx, cfg)
-		}
-	}
-	return
-}
-
 func VhostDelete(ctx echo.Context) error {
 	id := ctx.Formx(`id`).Uint()
 	if id < 1 {
@@ -365,31 +266,12 @@ func VhostDelete(ctx echo.Context) error {
 	if err != nil {
 		handler.SendFail(ctx, err.Error())
 	} else {
-		err = DeleteCaddyfileByID(ctx, id)
+		err = DeleteCaddyfileByID(ctx, m.ServerIdent, id)
 		if err == nil {
 			handler.SendOk(ctx, ctx.T(`操作成功`))
 		}
 	}
 	return ctx.Redirect(handler.URLFor(`/caddy/vhost`))
-}
-
-func DeleteCaddyfileByID(ctx echo.Context, id uint) error {
-	cfg := cmder.GetCaddyConfig()
-	saveDir, err := cfg.GetVhostConfigDirAbsPath()
-	if err != nil {
-		return err
-	}
-	saveFile := filepath.Join(saveDir, fmt.Sprint(id)+`.conf`)
-	err = os.Remove(saveFile)
-	if err == nil {
-		item := engine.Engines.GetItem(cfg.Engine())
-		if item != nil {
-			err = item.X.(engine.Enginer).ReloadServer(ctx, cfg)
-		}
-	} else if os.IsNotExist(err) {
-		err = nil
-	}
-	return err
 }
 
 func VhostEdit(ctx echo.Context) error {
@@ -407,11 +289,7 @@ func VhostEdit(ctx echo.Context) error {
 		return ctx.Redirect(handler.URLFor(`/caddy/vhost`))
 	}
 	if ctx.IsPost() {
-		m.Domain = ctx.Form(`domain`)
-		m.Disabled = ctx.Form(`disabled`)
-		m.Root = ctx.Form(`root`)
-		m.Name = ctx.Form(`name`)
-		m.GroupId = ctx.Formx(`groupId`).Uint()
+		receiveFormData(ctx, m.NgingVhost)
 		var b []byte
 		b, err = json.Marshal(ctx.Forms())
 		switch {
@@ -447,7 +325,7 @@ func VhostEdit(ctx echo.Context) error {
 				return ctx.JSON(data)
 			}
 			if m.Disabled == `Y` {
-				err = DeleteCaddyfileByID(ctx, id)
+				err = DeleteCaddyfileByID(ctx, m.ServerIdent, id)
 			} else {
 				var formData url.Values
 				err = json.Unmarshal([]byte(m.Setting), &formData)

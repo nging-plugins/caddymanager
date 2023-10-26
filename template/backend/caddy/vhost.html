@@ -39,7 +39,7 @@
 					<i class="fa fa-plus"></i>
 					{{"添加网站"|$.T}}
 				</a>
-				<a href="{{BackendURL}}/caddy/vhost_build" class="pull-right btn btn-warning">
+				<a href="{{BackendURL}}/caddy/vhost_build?engine={{$engine}}&groupId={{$groupId}}" class="pull-right btn btn-warning">
                     <i class="fa fa-refresh"></i>
                     {{"应用配置"|$.T}}
                 </a>
@@ -86,7 +86,8 @@
 								{{- if eq $v.ServerIdent `default` -}}
 								<span class="label label-default label-xs">{{call $.Func.engineName `default`}}</span>
 								{{- else -}}
-								<span class="label label-primary label-xs">{{call $.Func.engineName $v.ServerEngine.String}}</span>{{$v.ServerName.String}}
+								<span class="label label-primary label-xs">{{call $.Func.engineName $v.ServerEngine.String}}</span>
+								{{$v.ServerName.String}}
 								{{- end -}}
 								</div>
 							</td>

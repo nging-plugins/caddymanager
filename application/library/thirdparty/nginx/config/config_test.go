@@ -19,7 +19,9 @@ func TestParseConfigFilePath(t *testing.T) {
 }
 
 func TestConfig(t *testing.T) {
-	c := &Config{}
+	c := &Config{
+		Command: `docker exec nginx nginx`,
+	}
 	ctx := context.Background()
 	var err error
 	c.Version, err = c.getVersion(ctx)

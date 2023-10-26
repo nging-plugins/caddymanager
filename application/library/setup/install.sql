@@ -61,7 +61,7 @@ CREATE TABLE `nging_vhost` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '网站名称',
   `group_id` int unsigned NOT NULL DEFAULT '0' COMMENT '组',
-  `server_ident` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '服务器标识',
+  `server_ident` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'default' COMMENT '服务器标识',
   `domain` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '域名',
   `root` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '网站物理路径',
   `created` int unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
@@ -108,7 +108,9 @@ CREATE TABLE `nging_vhost_server` (
   `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '引擎名称',
   `executable_file` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '可执行文件路径(支持容器)',
   `config_file` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '配置文件路径',
+  `vhost_config_dir` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '网站配置文件保存目录',
   `work_dir` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '工作目录',
+  `cmd_with_config` enum('Y','N') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'N' COMMENT '命令是否(Y/N)带配置文件参数',
   `disabled` enum('Y','N') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'N' COMMENT '是否(Y/N)禁用',
   `created` int unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   `updated` int unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
@@ -129,4 +131,4 @@ CREATE TABLE `nging_vhost_server` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-10-25 19:45:30
+-- Dump completed on 2023-10-26 13:17:20

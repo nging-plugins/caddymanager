@@ -59,9 +59,19 @@ func ServerAdd(ctx echo.Context) error {
 		}
 	}
 	ctx.Set(`activeURL`, `/caddy/server`)
-	ctx.Set(`engineList`, engine.Thirdparty())
 	ctx.Set(`isAdd`, true)
+	setServerForm(ctx)
 	return ctx.Render(`caddy/server_edit`, handler.Err(ctx, err))
+}
+
+func setServerForm(ctx echo.Context) {
+	thirdpartyEngines := engine.Thirdparty()
+	ctx.Set(`engineList`, thirdpartyEngines)
+	configDirs := map[string]string{}
+	for _, eng := range thirdpartyEngines {
+		configDirs[eng.K] = eng.X.(engine.Enginer).DefaultConfigDir()
+	}
+	ctx.Set(`configDirs`, configDirs)
 }
 
 func ServerEdit(ctx echo.Context) error {
@@ -111,8 +121,8 @@ func ServerEdit(ctx echo.Context) error {
 		echo.StructToForm(ctx, m.NgingVhostServer, ``, echo.LowerCaseFirstLetter)
 	}
 	ctx.Set(`activeURL`, `/caddy/server`)
-	ctx.Set(`engineList`, engine.Thirdparty())
 	ctx.Set(`isAdd`, false)
+	setServerForm(ctx)
 	return ctx.Render(`caddy/server_edit`, handler.Err(ctx, err))
 }
 

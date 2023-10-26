@@ -332,6 +332,9 @@ func (a *NgingVhost) ListByOffset(recv interface{}, mw func(db.Result) db.Result
 func (a *NgingVhost) Insert() (pk interface{}, err error) {
 	a.Created = uint(time.Now().Unix())
 	a.Id = 0
+	if len(a.ServerIdent) == 0 {
+		a.ServerIdent = "default"
+	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
 	}
@@ -357,6 +360,9 @@ func (a *NgingVhost) Insert() (pk interface{}, err error) {
 
 func (a *NgingVhost) Update(mw func(db.Result) db.Result, args ...interface{}) (err error) {
 	a.Updated = uint(time.Now().Unix())
+	if len(a.ServerIdent) == 0 {
+		a.ServerIdent = "default"
+	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
 	}
@@ -374,6 +380,9 @@ func (a *NgingVhost) Update(mw func(db.Result) db.Result, args ...interface{}) (
 
 func (a *NgingVhost) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
+	if len(a.ServerIdent) == 0 {
+		a.ServerIdent = "default"
+	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
 	}
@@ -392,6 +401,9 @@ func (a *NgingVhost) Updatex(mw func(db.Result) db.Result, args ...interface{}) 
 
 func (a *NgingVhost) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {
 	a.Updated = uint(time.Now().Unix())
+	if len(a.ServerIdent) == 0 {
+		a.ServerIdent = "default"
+	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
 	}
@@ -414,6 +426,9 @@ func (a *NgingVhost) UpdateByFields(mw func(db.Result) db.Result, fields []strin
 
 func (a *NgingVhost) UpdatexByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
+	if len(a.ServerIdent) == 0 {
+		a.ServerIdent = "default"
+	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
 	}
@@ -448,6 +463,11 @@ func (a *NgingVhost) UpdatexField(mw func(db.Result) db.Result, field string, va
 
 func (a *NgingVhost) UpdateFields(mw func(db.Result) db.Result, kvset map[string]interface{}, args ...interface{}) (err error) {
 
+	if val, ok := kvset["server_ident"]; ok && val != nil {
+		if v, ok := val.(string); ok && len(v) == 0 {
+			kvset["server_ident"] = "default"
+		}
+	}
 	if val, ok := kvset["disabled"]; ok && val != nil {
 		if v, ok := val.(string); ok && len(v) == 0 {
 			kvset["disabled"] = "N"
@@ -473,6 +493,11 @@ func (a *NgingVhost) UpdateFields(mw func(db.Result) db.Result, kvset map[string
 
 func (a *NgingVhost) UpdatexFields(mw func(db.Result) db.Result, kvset map[string]interface{}, args ...interface{}) (affected int64, err error) {
 
+	if val, ok := kvset["server_ident"]; ok && val != nil {
+		if v, ok := val.(string); ok && len(v) == 0 {
+			kvset["server_ident"] = "default"
+		}
+	}
 	if val, ok := kvset["disabled"]; ok && val != nil {
 		if v, ok := val.(string); ok && len(v) == 0 {
 			kvset["disabled"] = "N"
@@ -515,6 +540,9 @@ func (a *NgingVhost) UpdateValues(mw func(db.Result) db.Result, keysValues *db.K
 func (a *NgingVhost) Upsert(mw func(db.Result) db.Result, args ...interface{}) (pk interface{}, err error) {
 	pk, err = a.Param(mw, args...).SetSend(a).Upsert(func() error {
 		a.Updated = uint(time.Now().Unix())
+		if len(a.ServerIdent) == 0 {
+			a.ServerIdent = "default"
+		}
 		if len(a.Disabled) == 0 {
 			a.Disabled = "N"
 		}
@@ -525,6 +553,9 @@ func (a *NgingVhost) Upsert(mw func(db.Result) db.Result, args ...interface{}) (
 	}, func() error {
 		a.Created = uint(time.Now().Unix())
 		a.Id = 0
+		if len(a.ServerIdent) == 0 {
+			a.ServerIdent = "default"
+		}
 		if len(a.Disabled) == 0 {
 			a.Disabled = "N"
 		}

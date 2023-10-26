@@ -4,6 +4,7 @@ import (
 	"github.com/webx-top/echo"
 
 	"github.com/nging-plugins/caddymanager/application/dbschema"
+	"github.com/nging-plugins/caddymanager/application/library/caddy"
 	"github.com/nging-plugins/caddymanager/application/library/engine"
 )
 
@@ -31,4 +32,8 @@ func (b *Engine) BuildConfig(ctx echo.Context, m *dbschema.NgingVhostServer) eng
 
 func (b *Engine) ReloadServer(ctx echo.Context, cfg engine.Configer) error {
 	return GetCaddyCmd().ReloadServer()
+}
+
+func (b *Engine) DefaultConfigDir() string {
+	return caddy.DefaultConfigDir()
 }

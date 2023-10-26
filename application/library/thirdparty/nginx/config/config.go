@@ -23,6 +23,7 @@ var (
 
 type Config struct {
 	Command       string
+	CmdWithConfig bool
 	Version       string
 	ConfigPath    string
 	ConfigInclude string
@@ -38,29 +39,32 @@ func (c *Config) Init() error {
 			return err
 		}
 	}
-	if len(c.ConfigPath) == 0 {
-		c.ConfigPath, err = c.getConfigFilePath(ctx)
-		if err != nil {
-			return err
-		}
-	}
 	if len(c.ConfigInclude) == 0 {
+		if len(c.ConfigPath) == 0 {
+			c.ConfigPath, err = c.getConfigFilePath(ctx)
+			if err != nil {
+				return err
+			}
+		}
 		c.ConfigInclude, err = c.getConfigIncludePath(c.ConfigPath)
 	}
 	return err
 }
 
+func DefaultConfigDir() string {
+	return filepath.Join(config.FromCLI().ConfDir(), `vhosts-nginx`)
+}
+
 func (c *Config) GetVhostConfigDirAbsPath() (string, error) {
-	var err error
 	if len(c.ConfigInclude) == 0 {
-		if err = c.Init(); err != nil {
+		if err := c.Init(); err != nil {
 			log.Error(err)
 			if len(c.ConfigInclude) == 0 {
-				c.ConfigInclude = filepath.Join(config.FromCLI().ConfDir(), `vhosts-nginx`)
+				c.ConfigInclude = filepath.Join(DefaultConfigDir(), c.ID)
 			}
 		}
 	}
-	return c.ConfigInclude, err
+	return c.ConfigInclude, nil
 }
 
 func (c *Config) TemplateFile() string {
@@ -76,10 +80,11 @@ func (c *Config) Engine() string {
 }
 
 func (c *Config) Start(ctx context.Context) error {
-	_, err := c.exec(
-		ctx,
-		`-c`, c.ConfigPath,
-	)
+	args := []string{}
+	if c.CmdWithConfig && len(c.ConfigPath) > 0 && strings.HasSuffix(c.ConfigPath, `.conf`) {
+		args = append(args, `-c`, c.ConfigPath)
+	}
+	_, err := c.exec(ctx)
 	return err
 }
 

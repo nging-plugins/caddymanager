@@ -42,23 +42,26 @@ func (b *Engine) ListConfig(ctx echo.Context) ([]engine.Configer, error) {
 	rows := m.Objects()
 	result := make([]engine.Configer, len(rows))
 	for idx, row := range rows {
-		result[idx] = &caddy2ConfigPkg.Config{
-			Command:   row.ExecutableFile,
-			Caddyfile: row.ConfigFile,
-			ID:        row.Ident,
-		}
+		result[idx] = b.BuildConfig(ctx, row)
 	}
 	return result, err
 }
 
 func (b *Engine) BuildConfig(ctx echo.Context, m *dbschema.NgingVhostServer) engine.Configer {
-	return &caddy2ConfigPkg.Config{
-		Command:   m.ExecutableFile,
-		Caddyfile: m.ConfigFile,
-		ID:        m.Ident,
+	cfg := &caddy2ConfigPkg.Config{
+		Command:       m.ExecutableFile,
+		Caddyfile:     m.ConfigFile,
+		ConfigInclude: m.VhostConfigDir,
+		CmdWithConfig: m.CmdWithConfig == common.BoolY,
+		ID:            m.Ident,
 	}
+	return cfg
 }
 
 func (b *Engine) ReloadServer(ctx echo.Context, cfg engine.Configer) error {
 	return cfg.(*caddy2ConfigPkg.Config).Reload(ctx)
+}
+
+func (b *Engine) DefaultConfigDir() string {
+	return caddy2ConfigPkg.DefaultConfigDir()
 }

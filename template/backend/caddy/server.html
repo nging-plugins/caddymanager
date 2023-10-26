@@ -23,6 +23,7 @@
 							<th style="width:55px"><strong>ID</strong></th>
                             <th style="width:60px"><strong>{{"状态"|$.T}}</strong></th>
 							<th><strong>{{"名称"|$.T}}</strong></th>
+							<th><strong>{{"引擎"|$.T}}</strong></th>
 							<th><strong>{{"唯一标识"|$.T}}</strong></th>
 							<th><strong>{{"文件路径"|$.T}}</strong></th>
 							<th style="width:80px" class="text-center"><strong>{{"操作"|$.T}}</strong></th>
@@ -38,11 +39,13 @@
                                 </div>
                             </td>
 							<td>{{$v.Name}}</td>
+							<td>{{call $.Func.engineName $v.Engine}}</td>
 							<td>{{$v.Ident}}</td>
 							<td>
-                                <div class="label-group xs-margin-top wrap">
-                                    <span class="label label-success">{{`执行文件`|$.T}}</span>{{$v.ExecutableFile}}<br />
-                                    <span class="label label-info">{{`配置文件`|$.T}}</span>{{$v.ConfigFile}}
+                                <div class="label-group wrap">
+                                    <span class="label label-success label-sm">{{`执行文件`|$.T}}</span> {{$v.ExecutableFile}}<br />
+                                    <span class="label label-info label-sm">{{`引擎配置`|$.T}}</span> {{$v.ConfigFile|Default `-`}}<br />
+                                    <span class="label label-primary label-sm">{{`网站配置`|$.T}}</span> {{$v.VhostConfigDir|Default `-`}}
                                 </div>
                             </td>
 							<td class="text-center">

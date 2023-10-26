@@ -142,13 +142,17 @@ func now() string {
 	return time.Now().Format(`2006-01-02 15:04:05`)
 }
 
+func DefaultConfigDir() string {
+	return filepath.Join(config.FromCLI().ConfDir(), `vhosts`)
+}
+
 func (c *Config) GetVhostConfigDirAbsPath() (string, error) {
 	var err error
 	if len(c.vhostConfigDirAbsPath) == 0 {
 		if len(c.VhostConfigDir) > 0 {
 			c.vhostConfigDirAbsPath, err = filepath.Abs(c.VhostConfigDir)
 		} else {
-			c.vhostConfigDirAbsPath = filepath.Join(config.FromCLI().ConfDir(), `vhosts`)
+			c.vhostConfigDirAbsPath = DefaultConfigDir()
 		}
 	}
 	return c.vhostConfigDirAbsPath, err
