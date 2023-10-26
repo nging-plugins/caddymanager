@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"net/url"
@@ -28,7 +29,10 @@ import (
 	"strings"
 
 	"github.com/admpub/log"
+	"github.com/admpub/nging/v5/application/handler"
 	"github.com/webx-top/com"
+	"github.com/webx-top/db"
+	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo"
 
 	"github.com/nging-plugins/caddymanager/application/dbschema"
@@ -38,8 +42,18 @@ import (
 	"github.com/nging-plugins/caddymanager/application/model"
 )
 
-func DeleteCaddyfileByID(ctx echo.Context, serverIdent string, id uint) error {
-	cfg, err := getServerConfig(ctx, serverIdent)
+const configFilePrefix = `nging_`
+
+func makeConfigFileName(cfg engine.Configer, id uint) string {
+	if cfg.Engine() == `default` { // 默认引擎为 Nging 内置服务器，为 Nging 所独有，所以配置文件不用加前缀
+		return fmt.Sprint(id) + `.conf`
+	}
+	// 其它引擎由用户配置，可能会将网站配置目录指向旧系统的配置目录，通过加本系统的前缀标识“nging_”来避免删掉旧配置
+	return configFilePrefix + fmt.Sprint(id) + `.conf`
+}
+
+func DeleteCaddyfileByID(ctx echo.Context, serverIdent string, id uint, serverM ...*dbschema.NgingVhostServer) error {
+	cfg, err := getServerConfig(ctx, serverIdent, serverM...)
 	if err != nil || cfg == nil {
 		return err
 	}
@@ -47,7 +61,7 @@ func DeleteCaddyfileByID(ctx echo.Context, serverIdent string, id uint) error {
 	if err != nil {
 		return err
 	}
-	saveFile := filepath.Join(saveDir, fmt.Sprint(id)+`.conf`)
+	saveFile := filepath.Join(saveDir, makeConfigFileName(cfg, id))
 	err = os.Remove(saveFile)
 	if err == nil {
 		item := engine.Engines.GetItem(cfg.Engine())
@@ -56,6 +70,33 @@ func DeleteCaddyfileByID(ctx echo.Context, serverIdent string, id uint) error {
 		}
 	} else if os.IsNotExist(err) {
 		err = nil
+	}
+	return err
+}
+
+func deleteCaddyfileByServer(ctx echo.Context, svr *dbschema.NgingVhostServer, restart bool) (err error) {
+	for _, v := range engine.Engines.Slice() {
+		if v.K != svr.Engine {
+			continue
+		}
+		eng := v.X.(engine.Enginer)
+		if eng == nil {
+			continue
+		}
+		cfg := eng.BuildConfig(ctx, svr)
+		var saveDir string
+		saveDir, err = cfg.GetVhostConfigDirAbsPath()
+		if err != nil {
+			break
+		}
+		err = removeAllConf(cfg, saveDir)
+		if err != nil {
+			break
+		}
+		os.Remove(saveDir)
+		if restart {
+			err = eng.ReloadServer(ctx, cfg)
+		}
 	}
 	return err
 }
@@ -98,7 +139,8 @@ func generateHostURL(currentHost string, hosts string) []template.HTML {
 	return urls
 }
 
-func removeAllConf(rootDir string) error {
+func removeAllConf(cfg engine.Configer, rootDir string) error {
+	isDefaultEngine := cfg.Engine() == `default`
 	return filepath.Walk(rootDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -106,10 +148,10 @@ func removeAllConf(rootDir string) error {
 		if info.IsDir() {
 			return nil
 		}
-		if !strings.HasSuffix(path, `.conf`) {
+		if !strings.HasSuffix(path, `.conf`) || (!isDefaultEngine && !strings.HasPrefix(info.Name(), configFilePrefix)) {
 			return nil
 		}
-		log.Info(`Delete the Caddy configuration file: `, path)
+		log.Info(`Delete the WebServer configuration file: `, path)
 		return os.Remove(path)
 	})
 }
@@ -143,29 +185,34 @@ func saveVhostConf(ctx echo.Context, cfg engine.Configer, id uint, values url.Va
 	if !com.FileExists(saveFile) {
 		com.MkdirAll(saveFile, os.ModePerm)
 	}
-	saveFile = filepath.Join(saveFile, fmt.Sprint(id)+`.conf`)
-	log.Info(`Generate a Caddy configuration file: `, saveFile)
+	saveFile = filepath.Join(saveFile, makeConfigFileName(cfg, id))
+	log.Info(`Generate a `+cfg.Engine()+` configuration file: `, saveFile)
 	err = os.WriteFile(saveFile, b, os.ModePerm)
 	//jsonb, _ := caddyfile.ToJSON(b)
 	//err = os.WriteFile(saveFile+`.json`, jsonb, os.ModePerm)
 	return err
 }
 
-func getServerConfig(ctx echo.Context, serverIdent string) (engine.Configer, error) {
+func getServerConfig(ctx echo.Context, serverIdent string, serverM ...*dbschema.NgingVhostServer) (engine.Configer, error) {
 	var cfg engine.Configer
 	if serverIdent == `default` {
 		cfg = cmder.GetCaddyConfig()
 	} else {
-		svrM := model.NewVhostServer(ctx)
-		err := svrM.Get(nil, `ident`, serverIdent)
-		if err != nil {
-			return cfg, err
+		var svrM *dbschema.NgingVhostServer
+		if len(serverM) > 0 && serverM[0] != nil {
+			svrM = serverM[0]
+		} else {
+			svrM = dbschema.NewNgingVhostServer(ctx)
+			err := svrM.Get(nil, `ident`, serverIdent)
+			if err != nil {
+				return cfg, err
+			}
 		}
 		item := engine.Engines.GetItem(svrM.Engine)
 		if item == nil {
-			return cfg, err
+			return cfg, nil
 		}
-		cfg = item.X.(engine.Enginer).BuildConfig(ctx, svrM.NgingVhostServer)
+		cfg = item.X.(engine.Enginer).BuildConfig(ctx, svrM)
 	}
 	return cfg, nil
 }
@@ -182,7 +229,7 @@ func saveVhostData(ctx echo.Context, m *dbschema.NgingVhost, values url.Values, 
 		return
 	}
 	if m.Disabled == `Y` {
-		saveFile := filepath.Join(saveDir, fmt.Sprint(m.Id)+`.conf`)
+		saveFile := filepath.Join(saveDir, makeConfigFileName(cfg, m.Id))
 		if err = os.Remove(saveFile); os.IsNotExist(err) {
 			err = nil
 		}
@@ -205,4 +252,136 @@ func receiveFormData(ctx echo.Context, m *dbschema.NgingVhost) {
 	m.Name = ctx.Form(`name`)
 	m.GroupId = ctx.Formx(`groupId`).Uint()
 	m.ServerIdent = ctx.Form(`serverIdent`)
+}
+
+func vhostbuild(ctx echo.Context, groupID uint, serverIdent string, engineType string, serverM ...*dbschema.NgingVhostServer) error {
+	cond := db.NewCompounds()
+	cond.AddKV(`a.disabled`, `N`)
+	if groupID > 0 {
+		cond.AddKV(`a.group_id`, groupID)
+	}
+	var hasEngine, hasIdent bool
+	if len(serverM) == 0 {
+		if len(engineType) > 0 {
+			if engineType == `default` {
+				serverIdent = engineType
+			} else {
+				cond.AddKV(`b.engine`, engineType)
+				hasEngine = true
+			}
+		}
+	} else {
+		serverIdent = serverM[0].Ident
+	}
+	if len(serverIdent) > 0 {
+		hasIdent = true
+		cond.AddKV(`a.server_ident`, serverIdent)
+	}
+	var err error
+	configs := map[string]engine.Configer{}
+	for _, v := range engine.Engines.Slice() {
+		if hasEngine && v.K != engineType {
+			continue
+		}
+		eng := v.X.(engine.Enginer)
+		if eng == nil {
+			continue
+		}
+		if len(serverM) == 0 {
+			var rows []engine.Configer
+			rows, err = eng.ListConfig(ctx)
+			if err != nil {
+				return err
+			}
+			for _, cfg := range rows {
+				if hasIdent && cfg.Ident() != serverIdent {
+					continue
+				}
+				if groupID == 0 {
+					var saveDir string
+					saveDir, err = cfg.GetVhostConfigDirAbsPath()
+					if err != nil {
+						break
+					}
+					err = removeAllConf(cfg, saveDir)
+					if err != nil {
+						break
+					}
+					os.Remove(saveDir)
+				}
+				configs[cfg.Ident()] = cfg
+			}
+		} else {
+			cfg := eng.BuildConfig(ctx, serverM[0])
+			if groupID == 0 {
+				var saveDir string
+				saveDir, err = cfg.GetVhostConfigDirAbsPath()
+				if err != nil {
+					break
+				}
+				err = removeAllConf(cfg, saveDir)
+				if err != nil {
+					break
+				}
+				os.Remove(saveDir)
+			}
+			configs[cfg.Ident()] = cfg
+		}
+	}
+	if err != nil {
+		return err
+	}
+	m := model.NewVhost(ctx)
+	n := 100
+	serverTable := dbschema.NewNgingVhostServer(ctx).Short_()
+	var rowAndGroup []*model.VhostAndGroup
+	var makeQuerier = func() *factory.Param {
+		p := m.NewParam()
+		if hasEngine {
+			p.SetCols(`a.*`, `b.name AS serverName`, `b.engine AS serverEngine`).AddJoin(`LEFT`, serverTable, `b`, `b.ident=a.server_ident`)
+		} else {
+			p.SetCols(`a.*`)
+		}
+		return p.SetAlias(`a`).SetRecv(&rowAndGroup).AddArgs(cond.And())
+	}
+	cnt, err := makeQuerier().SetOffset(0).SetSize(n).List()
+	if err != nil {
+		return err
+	}
+	for i, j := 0, cnt(); int64(i) < j; i += n {
+		if i > 0 {
+			rowAndGroup = rowAndGroup[0:0]
+			_, err = makeQuerier().SetOffset(i).SetSize(n).List()
+			if err != nil {
+				handler.SendFail(ctx, err.Error())
+				return ctx.Redirect(handler.URLFor(`/caddy/vhost`))
+			}
+		}
+		for _, m := range rowAndGroup {
+			var formData url.Values
+			err := json.Unmarshal([]byte(m.Setting), &formData)
+			if err == nil {
+				cfg, ok := configs[m.ServerIdent]
+				if ok {
+					err = saveVhostConf(ctx, cfg, m.Id, formData)
+				} else {
+					err = DeleteCaddyfileByID(ctx, m.ServerIdent, m.Id, serverM...)
+				}
+			}
+			if err != nil {
+				return err
+			}
+		}
+	}
+	for _, cfg := range configs {
+		item := engine.Engines.GetItem(cfg.Engine())
+		if item == nil {
+			continue
+		}
+		err = item.X.(engine.Enginer).ReloadServer(ctx, cfg)
+		if err != nil {
+			ctx.Logger().Error(err)
+		}
+	}
+	return nil
 }

@@ -24,7 +24,6 @@ import (
 	"net/url"
 
 	"github.com/webx-top/db"
-	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
 
@@ -84,111 +83,10 @@ func Vhostbuild(ctx echo.Context) error {
 	groupID := ctx.Formx(`groupId`).Uint()
 	serverIdent := ctx.Formx(`serverIdent`).String()
 	engineType := ctx.Formx(`engine`).String()
-	cond := db.NewCompounds()
-	cond.AddKV(`a.disabled`, `N`)
-	if groupID > 0 {
-		cond.AddKV(`a.group_id`, groupID)
-	}
-	var hasEngine, hasIdent bool
-	if len(engineType) > 0 {
-		if engineType == `default` {
-			serverIdent = engineType
-		} else {
-			cond.AddKV(`b.engine`, engineType)
-			hasEngine = true
-		}
-	}
-	if len(serverIdent) > 0 {
-		hasIdent = true
-		cond.AddKV(`a.server_ident`, serverIdent)
-	}
-	var err error
-	configs := map[string]engine.Configer{}
-	for _, v := range engine.Engines.Slice() {
-		if hasEngine && v.K != engineType {
-			continue
-		}
-		eng := v.X.(engine.Enginer)
-		if eng == nil {
-			continue
-		}
-		var rows []engine.Configer
-		rows, err = eng.ListConfig(ctx)
-		if err != nil {
-			return err
-		}
-		for _, cfg := range rows {
-			if hasIdent && cfg.Ident() != serverIdent {
-				continue
-			}
-			if groupID == 0 {
-				var saveDir string
-				saveDir, err = getSaveDir(cfg)
-				if err != nil {
-					break
-				}
-				err = removeAllConf(saveDir)
-				if err != nil {
-					break
-				}
-			}
-			configs[cfg.Ident()] = cfg
-		}
-	}
+	err := vhostbuild(ctx, groupID, serverIdent, engineType)
 	if err != nil {
 		handler.SendFail(ctx, err.Error())
 		return ctx.Redirect(handler.URLFor(`/caddy/vhost`))
-	}
-	m := model.NewVhost(ctx)
-	n := 100
-	serverTable := dbschema.NewNgingVhostServer(ctx).Short_()
-	var rowAndGroup []*model.VhostAndGroup
-	var makeQuerier = func() *factory.Param {
-		p := m.NewParam()
-		if hasEngine {
-			p.SetCols(`a.*`, `b.name AS serverName`, `b.engine AS serverEngine`).AddJoin(`LEFT`, serverTable, `b`, `b.ident=a.server_ident`)
-		} else {
-			p.SetCols(`a.*`)
-		}
-		return p.SetAlias(`a`).SetRecv(&rowAndGroup).AddArgs(cond.And())
-	}
-	cnt, err := makeQuerier().SetOffset(0).SetSize(n).List()
-	if err != nil {
-		return err
-	}
-	for i, j := 0, cnt(); int64(i) < j; i += n {
-		if i > 0 {
-			rowAndGroup = rowAndGroup[0:0]
-			_, err = makeQuerier().SetOffset(i).SetSize(n).List()
-			if err != nil {
-				handler.SendFail(ctx, err.Error())
-				return ctx.Redirect(handler.URLFor(`/caddy/vhost`))
-			}
-		}
-		for _, m := range rowAndGroup {
-			var formData url.Values
-			err := json.Unmarshal([]byte(m.Setting), &formData)
-			if err == nil {
-				cfg, ok := configs[m.ServerIdent]
-				if ok {
-					err = saveVhostConf(ctx, cfg, m.Id, formData)
-				}
-			}
-			if err != nil {
-				handler.SendFail(ctx, err.Error())
-				return ctx.Redirect(handler.URLFor(`/caddy/vhost`))
-			}
-		}
-	}
-	for _, cfg := range configs {
-		item := engine.Engines.GetItem(cfg.Engine())
-		if item == nil {
-			continue
-		}
-		err = item.X.(engine.Enginer).ReloadServer(ctx, cfg)
-		if err != nil {
-			ctx.Logger().Error(err)
-		}
 	}
 	handler.SendOk(ctx, ctx.T(`操作成功`))
 	return ctx.Redirect(handler.URLFor(`/caddy/vhost`))

@@ -106,9 +106,9 @@ func ServerEdit(ctx echo.Context) error {
 				return ctx.JSON(data)
 			}
 			if m.Disabled == `Y` {
-				//TODO
+				err = deleteCaddyfileByServer(ctx, m.NgingVhostServer, true)
 			} else {
-				//TODO
+				err = vhostbuild(ctx, 0, m.Ident, ``, m.NgingVhostServer)
 			}
 			if err != nil {
 				data.SetError(err)
@@ -130,6 +130,9 @@ func ServerDelete(ctx echo.Context) error {
 	id := ctx.Formx(`id`).Uint()
 	m := model.NewVhostServer(ctx)
 	err := m.Delete(nil, db.Cond{`id`: id})
+	if err == nil {
+		err = deleteCaddyfileByServer(ctx, m.NgingVhostServer, true)
+	}
 	if err == nil {
 		handler.SendOk(ctx, ctx.T(`操作成功`))
 	} else {
