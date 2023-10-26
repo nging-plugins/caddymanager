@@ -45,7 +45,7 @@ import (
 const configFilePrefix = `nging_`
 
 func makeConfigFileName(cfg engine.Configer, id uint) string {
-	if cfg.Engine() == `default` { // 默认引擎为 Nging 内置服务器，为 Nging 所独有，所以配置文件不用加前缀
+	if cfg.Engine() == `default` { // 默认引擎为 Nging 内置服务器，为 Nging 所独有，所以配置文件不用加前缀(同时保持对旧版的兼容)
 		return fmt.Sprint(id) + `.conf`
 	}
 	// 其它引擎由用户配置，可能会将网站配置目录指向旧系统的配置目录，通过加本系统的前缀标识“nging_”来避免删掉旧配置
