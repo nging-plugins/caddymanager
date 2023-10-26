@@ -72,7 +72,13 @@ func (c *Config) exec(ctx context.Context, args ...string) error {
 			c.Command += `.exe`
 		}
 	}
-	cmd := exec.CommandContext(ctx, c.Command, args...)
+	command := c.Command
+	rootArgs := com.ParseArgs(command)
+	if len(rootArgs) > 1 {
+		command = rootArgs[0]
+		args = append(rootArgs[1:], args...)
+	}
+	cmd := exec.CommandContext(ctx, command, args...)
 	if stderr := thirdparty.GetCtxStderr(ctx); stderr != nil {
 		cmd.Stderr = stderr
 	}

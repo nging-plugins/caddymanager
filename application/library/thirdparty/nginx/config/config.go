@@ -83,6 +83,8 @@ func (c *Config) Start(ctx context.Context) error {
 	return err
 }
 
+var versionRegex = regexp.MustCompile(`[\d]+\.[\d]+\.[\d]+`)
+
 func (c *Config) getVersion(ctx context.Context) (string, error) {
 	result, err := c.exec(ctx, `-v`)
 	if err != nil {
@@ -91,6 +93,10 @@ func (c *Config) getVersion(ctx context.Context) (string, error) {
 	result = bytes.TrimSpace(result)
 	parts := bytes.SplitN(result, []byte(`:`), 2)
 	if len(parts) != 2 {
+		matches := versionRegex.FindStringSubmatch(string(result))
+		if len(matches) > 0 {
+			return matches[0], err
+		}
 		return ``, err
 	}
 	result = parts[1]
@@ -167,7 +173,13 @@ func (c *Config) exec(ctx context.Context, args ...string) ([]byte, error) {
 			c.Command += `.exe`
 		}
 	}
-	cmd := exec.CommandContext(ctx, c.Command, args...)
+	command := c.Command
+	rootArgs := com.ParseArgs(command)
+	if len(rootArgs) > 1 {
+		command = rootArgs[0]
+		args = append(rootArgs[1:], args...)
+	}
+	cmd := exec.CommandContext(ctx, command, args...)
 	if stderr := thirdparty.GetCtxStderr(ctx); stderr != nil {
 		cmd.Stderr = stderr
 	}

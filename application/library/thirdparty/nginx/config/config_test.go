@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/webx-top/com"
 )
 
 func TestParseConfigFilePath(t *testing.T) {
@@ -31,4 +32,20 @@ func TestConfig(t *testing.T) {
 	c.ConfigInclude, err = c.getConfigIncludePath(c.ConfigPath)
 	assert.NoError(t, err)
 	assert.Equal(t, `/etc/nginx/modules-enabled/`, c.ConfigInclude)
+}
+
+func _TestConfig2(t *testing.T) {
+	c := &Config{
+		Command: `docker exec nginx nginx`,
+	}
+	ctx := context.Background()
+	var err error
+	assert.NoError(t, err)
+	var b []byte
+	b, err = c.exec(ctx, `-v`)
+	assert.NoError(t, err)
+	t.Logf(`%s`, b)
+	matches := versionRegex.FindStringSubmatch(string(b))
+	com.Dump(matches)
+	_, _ = c, ctx
 }
