@@ -57,7 +57,7 @@ func DeleteCaddyfileByID(ctx echo.Context, serverIdent string, id uint, serverM 
 	if err != nil || cfg == nil {
 		return err
 	}
-	saveDir, err := cfg.GetVhostConfigDirAbsPath()
+	saveDir, err := cfg.GetVhostConfigLocalDirAbs()
 	if err != nil {
 		return err
 	}
@@ -85,7 +85,7 @@ func deleteCaddyfileByServer(ctx echo.Context, svr *dbschema.NgingVhostServer, r
 		}
 		cfg := eng.BuildConfig(ctx, svr)
 		var saveDir string
-		saveDir, err = cfg.GetVhostConfigDirAbsPath()
+		saveDir, err = cfg.GetVhostConfigLocalDirAbs()
 		if err != nil {
 			break
 		}
@@ -161,7 +161,7 @@ func removeAllConf(cfg engine.Configer, rootDir string) error {
 }
 
 func getSaveDir(cfg engine.Configer) (saveDir string, err error) {
-	saveDir, err = cfg.GetVhostConfigDirAbsPath()
+	saveDir, err = cfg.GetVhostConfigLocalDirAbs()
 	if err != nil {
 		return
 	}
@@ -178,7 +178,7 @@ func saveVhostConf(ctx echo.Context, cfg engine.Configer, id uint, values url.Va
 		return err
 	}
 	b = com.CleanSpaceLine(b)
-	saveFile, err := cfg.GetVhostConfigDirAbsPath()
+	saveFile, err := cfg.GetVhostConfigLocalDirAbs()
 	if err != nil {
 		return err
 	}
@@ -304,7 +304,7 @@ func vhostbuild(ctx echo.Context, groupID uint, serverIdent string, engineType s
 				}
 				if groupID == 0 {
 					var saveDir string
-					saveDir, err = cfg.GetVhostConfigDirAbsPath()
+					saveDir, err = cfg.GetVhostConfigLocalDirAbs()
 					if err != nil {
 						return fmt.Errorf(`failed to GetVhostConfigDirAbsPath: %w`, err)
 					}
@@ -320,7 +320,7 @@ func vhostbuild(ctx echo.Context, groupID uint, serverIdent string, engineType s
 			cfg := eng.BuildConfig(ctx, serverM[0])
 			if groupID == 0 {
 				var saveDir string
-				saveDir, err = cfg.GetVhostConfigDirAbsPath()
+				saveDir, err = cfg.GetVhostConfigLocalDirAbs()
 				if err != nil {
 					return fmt.Errorf(`failed to GetVhostConfigDirAbsPath: %w`, err)
 				}

@@ -148,7 +148,7 @@ func DefaultConfigDir() string {
 	return filepath.Join(config.FromCLI().ConfDir(), `vhosts`)
 }
 
-func (c *Config) GetVhostConfigDirAbsPath() (string, error) {
+func (c *Config) GetVhostConfigLocalDirAbs() (string, error) {
 	var err error
 	if len(c.vhostConfigDirAbsPath) == 0 {
 		if len(c.VhostConfigDir) > 0 {
@@ -202,7 +202,7 @@ func (c *Config) GetEngineConfigContainerFile() string {
 
 func (c *Config) setDefaultCaddyfile() (err error) {
 	var saveDir string
-	saveDir, err = c.GetVhostConfigDirAbsPath()
+	saveDir, err = c.GetVhostConfigLocalDirAbs()
 	if err != nil {
 		return err
 	}
@@ -241,7 +241,7 @@ func (c *Config) fixedCaddyfile() error {
 	b = bytes.TrimSpace(b)
 	if bytes.Equal(b, []byte(`import ./config/vhosts/*.conf`)) {
 		var actualDir string
-		actualDir, err = c.GetVhostConfigDirAbsPath()
+		actualDir, err = c.GetVhostConfigLocalDirAbs()
 		if err != nil {
 			return err
 		}

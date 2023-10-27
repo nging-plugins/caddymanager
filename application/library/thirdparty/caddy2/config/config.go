@@ -38,11 +38,25 @@ func DefaultConfigDir() string {
 	return filepath.Join(config.FromCLI().ConfDir(), `vhosts-caddy2`)
 }
 
-func (c *Config) GetVhostConfigDirAbsPath() (string, error) {
+func (c *Config) GetVhostConfigLocalDirAbs() (string, error) {
 	if len(c.VhostConfigLocalDir) == 0 {
 		c.VhostConfigLocalDir = filepath.Join(DefaultConfigDir(), c.ID)
 	}
 	return c.VhostConfigLocalDir, nil
+}
+
+func (c *Config) GetVhostConfigDirAbs() (string, error) {
+	var vhostDir string
+	if c.Environ == engine.EnvironContainer {
+		vhostDir = c.VhostConfigContainerDir
+	} else {
+		var err error
+		vhostDir, err = c.GetVhostConfigLocalDirAbs()
+		if err != nil {
+			return vhostDir, err
+		}
+	}
+	return vhostDir, nil
 }
 
 func (c *Config) Start(ctx context.Context) error {
@@ -89,14 +103,18 @@ func (c *Config) exec(ctx context.Context, args ...string) error {
 }
 
 func (c *Config) FixEngineConfigFile(deleteMode ...bool) (bool, error) {
-	if len(c.EngineConfigLocalFile) == 0 || len(c.VhostConfigDir()) == 0 {
+	if len(c.EngineConfigLocalFile) == 0 {
 		return false, nil
+	}
+	vhostDir, err := c.GetVhostConfigDirAbs()
+	if len(vhostDir) == 0 {
+		return false, err
 	}
 	var delmode bool
 	if len(deleteMode) > 0 {
 		delmode = deleteMode[0]
 	}
-	findString := `[\s]*import[\s]+["']?` + regexp.QuoteMeta(c.VhostConfigDir()) + `[\/]?\*(\.conf)?["']?[\s]*`
+	findString := `[\s]*import[\s]+["']?` + regexp.QuoteMeta(vhostDir) + `[\/]?\*(\.conf)?["']?[\s]*`
 	re, err := regexp.Compile(findString)
 	if err != nil {
 		return false, err
@@ -107,7 +125,7 @@ func (c *Config) FixEngineConfigFile(deleteMode ...bool) (bool, error) {
 	err = com.SeekFileLines(c.EngineConfigLocalFile, func(line string) error {
 		if httpBlockStart && strings.TrimRight(line, "\t ") == `}` {
 			if !delmode {
-				dir := c.VhostConfigDir()
+				dir := vhostDir
 				var sep string
 				if strings.Contains(dir, `\`) {
 					sep = `\`

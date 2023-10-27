@@ -6,7 +6,7 @@ import (
 )
 
 type Configer interface {
-	GetVhostConfigDirAbsPath() (string, error)
+	GetVhostConfigLocalDirAbs() (string, error)
 	GetTemplateFile() string
 	GetIdent() string
 	GetEngine() string

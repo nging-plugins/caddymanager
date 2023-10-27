@@ -48,7 +48,7 @@
                 <div class="col-sm-3">
                     <input type="text" class="form-control" required name="ident" value="{{$.Form `ident`}}" placeholder="nginx" pattern="^[\w\-]+$"{{if not $.Stored.isAdd}} disabled{{end}}>
                     <div class="help-block">
-                      {{`唯一标识只能包含字母、数字、下划线或短横。`|$.T}}
+                      {{`只能包含字母、数字、下划线或短横。`|$.T}}
                       {{`设置后不可更改`|$.T}}
                     </div>
                 </div>
@@ -96,7 +96,7 @@
                           <input type="radio" value="N" id="autoModifyConfig-N" name="autoModifyConfig"{{if eq $v `N`}} checked{{end}}><label for="autoModifyConfig-N">{{"禁用"|$.T}}</label> 
                         </div>
                         <div class="help-block">
-                          {{`是指是否自动在配置文件中引用网站Vhost配置文件夹路径`|$.T}}
+                          {{`“自动修改”是指自动在配置文件中引用下面设置的网站vhost配置文件夹路径`|$.T}}
                         </div>
                       </div>
                     </div><!-- form-group -->
@@ -112,7 +112,7 @@
                       <div class="col-sm-8">
                         <input type="text" class="form-control" name="vhostConfigLocalDir" value="{{$.Form `vhostConfigLocalDir`}}">
                         <div class="help-block">
-                          {{`此处设置保存网站配置文件的文件夹路径，必须是本系统可以访问的文件夹`|$.T}}<br />
+                          {{`此文件夹用来保存网站vhost配置，必须是本系统可以访问的文件夹`|$.T}}<br />
                           {{`如果不设置，则保存到默认文件夹：`|$.T}} <span id="defaultConfigLocalDir"></span><br />
                           {{`使用默认文件夹时，需要在配置文件(比如nginx.conf)中引用此路径(在容器环境则是引用挂载了此目录的容器内路径)`|$.T}}
                         </div>
@@ -217,10 +217,36 @@ $(function(){
     $('#defaultConfigLocalSubdir').text(this.value);
   })
   $('#vhostServerForm input[name=environ]').on('change',function(){
-    $('.environ-'+this.value+'-show').show();
-    $('[class^="environ-"]:not(.environ-'+this.value+'-show)').hide();
+    var $form=$('#vhostServerForm');
+    $form.find('.environ-'+this.value+'-show').show();
+    $form.find('[class^="environ-"]:not(.environ-'+this.value+'-show)').hide();
+    $form.find('input[name=autoModifyConfig]:checked').trigger('change');
   });
   $('#vhostServerForm input[name=environ]:checked').trigger('change');
+  $('#vhostServerForm input[name=autoModifyConfig]').on('change',function(){
+    var $form=$('#vhostServerForm');
+    var switchR=function(name,required){
+      var $e=$form.find('input[name='+name+']');
+      $e.prop('required',required);
+      var $lb=$e.closest('.form-group').children('.control-label');
+      if(required) $lb.addClass('required');
+      else $lb.removeClass('required');
+    };
+    if(this.value=='Y'){
+      var environ=$form.find('input[name=environ]:checked').val();
+      if(environ=='local'){
+        switchR('configLocalFile',true);
+        switchR('configContainerFile',false);switchR('vhostConfigContainerDir',false);
+      }else{
+        switchR('configLocalFile',true);
+        switchR('configContainerFile',true);switchR('vhostConfigContainerDir',true);
+      }
+    }else{
+      switchR('configLocalFile',false);
+      switchR('configContainerFile',false);switchR('vhostConfigContainerDir',false);
+    }
+  });
+  $('#vhostServerForm input[name=autoModifyConfig]:checked').trigger('change');
 })
 </script>
 {{/Block}}

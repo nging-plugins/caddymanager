@@ -11,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/admpub/log"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 
@@ -43,22 +42,24 @@ type Config struct {
 
 func (c *Config) Init() error {
 	var err error
-	ctx := context.Background()
-	if len(c.Version) == 0 {
-		c.Version, err = c.getVersion(ctx)
-		if err != nil {
-			return err
-		}
-	}
-	if len(c.VhostConfigLocalDir) == 0 {
-		if len(c.EngineConfigLocalFile) == 0 {
-			c.EngineConfigLocalFile, err = c.getEngineConfigLocalFile(ctx)
+	/*
+		ctx := context.Background()
+		if len(c.Version) == 0 {
+			c.Version, err = c.getVersion(ctx)
 			if err != nil {
 				return err
 			}
 		}
-		c.VhostConfigLocalDir, err = c.getVhostConfigLocalDir(c.EngineConfigLocalFile)
-	}
+		if len(c.VhostConfigLocalDir) == 0 {
+			if len(c.EngineConfigLocalFile) == 0 {
+				c.EngineConfigLocalFile, err = c.getEngineConfigLocalFile(ctx)
+				if err != nil {
+					return err
+				}
+			}
+			c.VhostConfigLocalDir, err = c.getVhostConfigLocalDir(c.EngineConfigLocalFile)
+		}
+	*/
 	return err
 }
 
@@ -66,14 +67,9 @@ func DefaultConfigDir() string {
 	return filepath.Join(config.FromCLI().ConfDir(), `vhosts-nginx`)
 }
 
-func (c *Config) GetVhostConfigDirAbsPath() (string, error) {
+func (c *Config) GetVhostConfigLocalDirAbs() (string, error) {
 	if len(c.VhostConfigLocalDir) == 0 {
-		if err := c.Init(); err != nil {
-			log.Error(err)
-			if len(c.VhostConfigLocalDir) == 0 {
-				c.VhostConfigLocalDir = filepath.Join(DefaultConfigDir(), c.ID)
-			}
-		}
+		c.VhostConfigLocalDir = filepath.Join(DefaultConfigDir(), c.ID)
 	}
 	return c.VhostConfigLocalDir, nil
 }
@@ -214,15 +210,33 @@ func (c *Config) exec(ctx context.Context, args ...string) ([]byte, error) {
 	return c.CommonConfig.Exec(ctx, args...)
 }
 
+func (c *Config) GetVhostConfigDirAbs() (string, error) {
+	var vhostDir string
+	if c.Environ == engine.EnvironContainer {
+		vhostDir = c.VhostConfigContainerDir
+	} else {
+		var err error
+		vhostDir, err = c.GetVhostConfigLocalDirAbs()
+		if err != nil {
+			return vhostDir, err
+		}
+	}
+	return vhostDir, nil
+}
+
 func (c *Config) FixEngineConfigFile(deleteMode ...bool) (bool, error) {
-	if len(c.EngineConfigLocalFile) == 0 || len(c.VhostConfigDir()) == 0 {
+	if len(c.EngineConfigLocalFile) == 0 {
 		return false, nil
+	}
+	vhostDir, err := c.GetVhostConfigDirAbs()
+	if len(vhostDir) == 0 {
+		return false, err
 	}
 	var delmode bool
 	if len(deleteMode) > 0 {
 		delmode = deleteMode[0]
 	}
-	findString := `[\s]*include[\s]+["']?` + regexp.QuoteMeta(c.VhostConfigDir()) + `[\/]?\*(\.conf)?["']?[\s]*;`
+	findString := `[\s]*include[\s]+["']?` + regexp.QuoteMeta(vhostDir) + `[\/]?\*(\.conf)?["']?[\s]*;`
 	re, err := regexp.Compile(findString)
 	if err != nil {
 		return false, err
@@ -233,7 +247,7 @@ func (c *Config) FixEngineConfigFile(deleteMode ...bool) (bool, error) {
 	err = com.SeekFileLines(c.EngineConfigLocalFile, func(line string) error {
 		if httpBlockStart && strings.TrimRight(line, "\t ") == `}` {
 			if !delmode {
-				dir := c.VhostConfigDir()
+				dir := vhostDir
 				var sep string
 				if strings.Contains(dir, `\`) {
 					sep = `\`
@@ -295,6 +309,9 @@ func (c *Config) RenewalCert(ctx context.Context, domain, email string) error {
 	command = strings.TrimSuffix(command, `.exe`)
 	command = strings.TrimSuffix(command, `nginx`)
 	if c.Environ == engine.EnvironContainer {
+		if len(c.CertContainerDir) == 0 {
+			return nil
+		}
 		certDir := filepath.Join(c.CertContainerDir, `_letsencrypt`)
 		certDir = filepath.ToSlash(certDir)
 		cmd := exec.CommandContext(ctx, command+`mkdir`, `-R`, `0644`, certDir)
@@ -305,6 +322,9 @@ func (c *Config) RenewalCert(ctx context.Context, domain, email string) error {
 		}
 		command += `certbot`
 		return RenewalCert(ctx, command, domain, email, certDir)
+	}
+	if len(c.CertLocalDir) == 0 {
+		return nil
 	}
 	command += `certbot`
 	certDir := filepath.Join(c.CertLocalDir, `_letsencrypt`)
