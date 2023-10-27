@@ -1,8 +1,17 @@
 package engine
 
+import "context"
+
 type Configer interface {
 	GetVhostConfigDirAbsPath() (string, error)
-	TemplateFile() string
-	Ident() string
-	Engine() string
+	GetTemplateFile() string
+	GetIdent() string
+	GetEngine() string
+	GetEnviron() string
+	GetCertLocalDir() string
+	GetCertContainerDir() string
+}
+
+type CertRenewaler interface {
+	RenewalCert(ctx context.Context, domain, email string) error
 }

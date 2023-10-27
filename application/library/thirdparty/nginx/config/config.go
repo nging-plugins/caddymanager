@@ -11,6 +11,7 @@ import (
 
 	"github.com/admpub/log"
 	"github.com/admpub/nging/v5/application/library/config"
+	"github.com/nging-plugins/caddymanager/application/library/engine"
 	"github.com/nging-plugins/caddymanager/application/library/thirdparty"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
@@ -25,13 +26,16 @@ var (
 )
 
 type Config struct {
-	Command       string
-	CmdWithConfig bool
-	Version       string
-	ConfigPath    string
-	ConfigInclude string
-	ID            string
-	WorkDir       string
+	Command          string
+	CmdWithConfig    bool
+	Version          string
+	ConfigPath       string
+	ConfigInclude    string
+	ID               string
+	WorkDir          string
+	Environ          string
+	CertLocalDir     string
+	CertContainerDir string
 }
 
 func (c *Config) Init() error {
@@ -71,16 +75,28 @@ func (c *Config) GetVhostConfigDirAbsPath() (string, error) {
 	return c.ConfigInclude, nil
 }
 
-func (c *Config) TemplateFile() string {
+func (c *Config) GetTemplateFile() string {
 	return Name
 }
 
-func (c *Config) Ident() string {
+func (c *Config) GetIdent() string {
 	return c.ID
 }
 
-func (c *Config) Engine() string {
+func (c *Config) GetEngine() string {
 	return Name
+}
+
+func (c *Config) GetEnviron() string {
+	return c.Environ
+}
+
+func (c *Config) GetCertLocalDir() string {
+	return c.CertLocalDir
+}
+
+func (c *Config) GetCertContainerDir() string {
+	return c.CertContainerDir
 }
 
 func (c *Config) Start(ctx context.Context) error {
@@ -164,7 +180,7 @@ func (c *Config) getConfigIncludePath(confPath string) (string, error) {
 			return nil
 		}
 		line = matches[0][1]
-		if strings.Contains(line, `sites-enabled`) {
+		if strings.Contains(line, `sites-`) /*strings.Contains(line, `sites-enabled`) || strings.Contains(line, `sites-available`)*/ {
 			includeSitesEnabled = line
 			return echo.ErrExit
 		}
@@ -217,10 +233,12 @@ func (c *Config) exec(ctx context.Context, args ...string) ([]byte, error) {
 		}
 	}
 	command := c.Command
-	rootArgs := com.ParseArgs(command)
-	if len(rootArgs) > 1 {
-		command = rootArgs[0]
-		args = append(rootArgs[1:], args...)
+	if c.Environ == engine.EnvironContainer {
+		rootArgs := com.ParseArgs(command)
+		if len(rootArgs) > 1 {
+			command = rootArgs[0]
+			args = append(rootArgs[1:], args...)
+		}
 	}
 	cmd := exec.CommandContext(ctx, command, args...)
 	cmd.Dir = c.WorkDir
@@ -239,4 +257,43 @@ func (c *Config) exec(ctx context.Context, args ...string) ([]byte, error) {
 	}
 	err := cmd.Run()
 	return nil, err
+}
+
+func (c *Config) RenewalCert(ctx context.Context, domain, email string) error {
+	command := strings.TrimSpace(c.Command)
+	command = strings.TrimSuffix(command, `.exe`)
+	command = strings.TrimSuffix(command, `nginx`)
+	command += `certbot`
+	if c.Environ == engine.EnvironContainer {
+		return RenewalCert(ctx, command, domain, email, c.CertContainerDir)
+	}
+	return RenewalCert(ctx, command, domain, email, c.CertLocalDir)
+}
+
+func RenewalCert(ctx context.Context, customCmd, domain, email, certDir string) error {
+	//certbot certonly --webroot -d example.com --email info@example.com -w /var/www/_letsencrypt -n --agree-tos --force-renewal
+	command := `certbot`
+	args := []string{
+		`certonly`,
+		`--webroot`,
+		`-d`, domain,
+		`--email`, email,
+		`-w`, certDir,
+		`-n`,
+		`--agree-tos`,
+		`--force-renewal`,
+	}
+	if len(customCmd) > 0 {
+		rootArgs := com.ParseArgs(customCmd)
+		if len(rootArgs) > 1 {
+			command = rootArgs[0]
+			args = append(rootArgs[1:], args...)
+		}
+	}
+	cmd := exec.CommandContext(ctx, command, args...)
+	result, err := cmd.CombinedOutput()
+	if err != nil {
+		err = fmt.Errorf(`%s: %w`, result, err)
+	}
+	return err
 }

@@ -30,6 +30,10 @@ upstream nging_proxy_{{$.Get `id`}}{
     {{end}}
 {{end}}
 
+{{if eq ($v.Get "log") "1"}}
+log_format nging_log_format_{{$.Get `id`}} '{{$v.AsNginxLogFormat|$v.AddSlashesSingleQuote|ToHTML}}';
+{{end}}
+
 server {
     listen {{$val.Port}} {{- range $val.Args}} {{.}}{{end}};
     listen [::]:{{$val.Port}} {{- range $val.Args}} {{.}}{{end}};
@@ -150,6 +154,32 @@ server {
 
         #proxy_limit_rate 0;
     }
+    {{end}}
+
+    {{if eq ($v.Get "log") "1"}}
+    access_log  "{{$v.Get "log_file"|$v.AddSlashes|ToHTML}}" nging_log_format_{{$.Get `id`}} buffer=512k flush=1m;
+    #error_log  /var/log/nginx/error.log warn;
+    {{end}}
+ 
+    {{if eq ($v.Get "tls") "1"}}
+    ssl on;
+        {{if and ($v.Get "tls_cert") ($v.Get "tls_key")}}
+    ssl_certificate "{{$v.Get "tls_cert"|$v.AddSlashes|ToHTML}}";
+    ssl_certificate_key "{{$v.Get "tls_key"|$v.AddSlashes|ToHTML}}";
+        {{else if $v.Get "tls_email"|ToHTML}}
+    tls {{$v.Get "tls_email"|ToHTML}}
+        {{end}}
+
+    # ACME-challenge
+    location ^~ /.well-known/acme-challenge/ {
+        {{if eq $v.Config.GetEnviron `container`}}
+        root {{$v.Config.GetCertContainerDir}}/_letsencrypt;
+        {{else}}
+        root {{$v.Config.GetCertLocalDir}}/_letsencrypt;
+        {{end}}
+    }
+    {{else}}
+    ssl off;
     {{end}}
 
     location ~* /[^/]*\.(bak|inc|lib|sh|tpl|lbi|dwt|dhp) {

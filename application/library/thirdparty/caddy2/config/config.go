@@ -8,6 +8,7 @@ import (
 
 	"github.com/admpub/log"
 	"github.com/admpub/nging/v5/application/library/config"
+	"github.com/nging-plugins/caddymanager/application/library/engine"
 	"github.com/nging-plugins/caddymanager/application/library/thirdparty"
 	"github.com/webx-top/com"
 )
@@ -22,6 +23,9 @@ type Config struct {
 	ConfigInclude         string
 	ID                    string
 	WorkDir               string
+	Environ               string
+	CertLocalDir          string
+	CertContainerDir      string
 	vhostConfigDirAbsPath string
 }
 
@@ -40,16 +44,28 @@ func (c *Config) GetVhostConfigDirAbsPath() (string, error) {
 	return c.ConfigInclude, nil
 }
 
-func (c *Config) TemplateFile() string {
+func (c *Config) GetTemplateFile() string {
 	return Name
 }
 
-func (c *Config) Ident() string {
+func (c *Config) GetIdent() string {
 	return c.ID
 }
 
-func (c *Config) Engine() string {
+func (c *Config) GetEngine() string {
 	return Name
+}
+
+func (c *Config) GetEnviron() string {
+	return c.Environ
+}
+
+func (c *Config) GetCertLocalDir() string {
+	return c.CertLocalDir
+}
+
+func (c *Config) GetCertContainerDir() string {
+	return c.CertContainerDir
 }
 
 func (c *Config) Start(ctx context.Context) error {
@@ -92,10 +108,12 @@ func (c *Config) exec(ctx context.Context, args ...string) error {
 		}
 	}
 	command := c.Command
-	rootArgs := com.ParseArgs(command)
-	if len(rootArgs) > 1 {
-		command = rootArgs[0]
-		args = append(rootArgs[1:], args...)
+	if c.Environ == engine.EnvironContainer {
+		rootArgs := com.ParseArgs(command)
+		if len(rootArgs) > 1 {
+			command = rootArgs[0]
+			args = append(rootArgs[1:], args...)
+		}
 	}
 	cmd := exec.CommandContext(ctx, command, args...)
 	cmd.Dir = c.WorkDir

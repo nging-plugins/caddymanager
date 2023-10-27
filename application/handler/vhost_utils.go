@@ -45,7 +45,7 @@ import (
 const configFilePrefix = `nging_`
 
 func makeConfigFileName(cfg engine.Configer, id uint) string {
-	if cfg.Engine() == `default` { // 默认引擎为 Nging 内置服务器，为 Nging 所独有，所以配置文件不用加前缀(同时保持对旧版的兼容)
+	if cfg.GetEngine() == `default` { // 默认引擎为 Nging 内置服务器，为 Nging 所独有，所以配置文件不用加前缀(同时保持对旧版的兼容)
 		return fmt.Sprint(id) + `.conf`
 	}
 	// 其它引擎由用户配置，可能会将网站配置目录指向旧系统的配置目录，通过加本系统的前缀标识“nging_”来避免删掉旧配置
@@ -64,7 +64,7 @@ func DeleteCaddyfileByID(ctx echo.Context, serverIdent string, id uint, serverM 
 	saveFile := filepath.Join(saveDir, makeConfigFileName(cfg, id))
 	err = os.Remove(saveFile)
 	if err == nil {
-		item := engine.Engines.GetItem(cfg.Engine())
+		item := engine.Engines.GetItem(cfg.GetEngine())
 		if item != nil {
 			err = item.X.(engine.Enginer).ReloadServer(ctx, cfg)
 		}
@@ -140,7 +140,7 @@ func generateHostURL(currentHost string, hosts string) []template.HTML {
 }
 
 func removeAllConf(cfg engine.Configer, rootDir string) error {
-	isDefaultEngine := cfg.Engine() == `default`
+	isDefaultEngine := cfg.GetEngine() == `default`
 	err := filepath.Walk(rootDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -172,8 +172,8 @@ func getSaveDir(cfg engine.Configer) (saveDir string, err error) {
 func saveVhostConf(ctx echo.Context, cfg engine.Configer, id uint, values url.Values) error {
 	ctx.Set(`values`, form.NewValues(values, cfg))
 	ctx.Set(`id`, id)
-	ctx.Set(`engine`, cfg.Engine())
-	b, err := ctx.Fetch(`caddy/makeconfig/`+cfg.TemplateFile(), nil)
+	ctx.Set(`engine`, cfg.GetEngine())
+	b, err := ctx.Fetch(`caddy/makeconfig/`+cfg.GetTemplateFile(), nil)
 	if err != nil {
 		return err
 	}
@@ -186,7 +186,7 @@ func saveVhostConf(ctx echo.Context, cfg engine.Configer, id uint, values url.Va
 		com.MkdirAll(saveFile, os.ModePerm)
 	}
 	saveFile = filepath.Join(saveFile, makeConfigFileName(cfg, id))
-	log.Info(`Generate a `+cfg.Engine()+` configuration file: `, saveFile)
+	log.Info(`Generate a `+cfg.GetEngine()+` configuration file: `, saveFile)
 	err = os.WriteFile(saveFile, b, os.ModePerm)
 	//jsonb, _ := caddyfile.ToJSON(b)
 	//err = os.WriteFile(saveFile+`.json`, jsonb, os.ModePerm)
@@ -237,7 +237,7 @@ func saveVhostData(ctx echo.Context, m *dbschema.NgingVhost, values url.Values, 
 		err = saveVhostConf(ctx, cfg, m.Id, values)
 	}
 	if err == nil && restart {
-		item := engine.Engines.GetItem(cfg.Engine())
+		item := engine.Engines.GetItem(cfg.GetEngine())
 		if item != nil {
 			err = item.X.(engine.Enginer).ReloadServer(ctx, cfg)
 		}
@@ -299,7 +299,7 @@ func vhostbuild(ctx echo.Context, groupID uint, serverIdent string, engineType s
 				return fmt.Errorf(`failed to ListConfig: %w`, err)
 			}
 			for _, cfg := range rows {
-				if hasIdent && cfg.Ident() != serverIdent {
+				if hasIdent && cfg.GetIdent() != serverIdent {
 					continue
 				}
 				if groupID == 0 {
@@ -314,7 +314,7 @@ func vhostbuild(ctx echo.Context, groupID uint, serverIdent string, engineType s
 					}
 					os.Remove(saveDir)
 				}
-				configs[cfg.Ident()] = cfg
+				configs[cfg.GetIdent()] = cfg
 			}
 		} else {
 			cfg := eng.BuildConfig(ctx, serverM[0])
@@ -330,7 +330,7 @@ func vhostbuild(ctx echo.Context, groupID uint, serverIdent string, engineType s
 				}
 				os.Remove(saveDir)
 			}
-			configs[cfg.Ident()] = cfg
+			configs[cfg.GetIdent()] = cfg
 		}
 	}
 	m := model.NewVhost(ctx)
@@ -377,7 +377,7 @@ func vhostbuild(ctx echo.Context, groupID uint, serverIdent string, engineType s
 		}
 	}
 	for _, cfg := range configs {
-		item := engine.Engines.GetItem(cfg.Engine())
+		item := engine.Engines.GetItem(cfg.GetEngine())
 		if item == nil {
 			continue
 		}

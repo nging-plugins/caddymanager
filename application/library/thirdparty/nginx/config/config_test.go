@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/nging-plugins/caddymanager/application/library/engine"
 	"github.com/stretchr/testify/assert"
 	"github.com/webx-top/com"
 )
@@ -20,6 +21,7 @@ func TestParseConfigFilePath(t *testing.T) {
 
 func TestConfig(t *testing.T) {
 	c := &Config{
+		//Environ: engine.EnvironContainer,
 		//Command: `docker exec nginx nginx`,
 	}
 	ctx := context.Background()
@@ -46,6 +48,7 @@ func TestConfig(t *testing.T) {
 
 func _TestConfig2(t *testing.T) {
 	c := &Config{
+		Environ: engine.EnvironContainer,
 		Command: `docker exec nginx nginx`,
 	}
 	ctx := context.Background()

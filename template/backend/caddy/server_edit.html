@@ -13,7 +13,7 @@
             <h3>{{if $.Stored.isAdd}}{{"添加引擎配置"|$.T}}{{else}}{{"修改引擎配置"|$.T}}{{end}}</h3>
           </div>
           <div class="content">
-              <form class="form-horizontal group-border-dashed" method="POST" action="">
+              <form class="form-horizontal group-border-dashed" method="POST" action="" id="vhostServerForm">
               <div class="form-group">
                 <label class="col-sm-2 control-label required">{{"引擎"|$.T}}</label>
                 <div class="col-sm-3">{{$engine := $.Form "engine" "nginx"}}
@@ -87,9 +87,18 @@
               <div class="form-group">
                 <label class="col-sm-2 control-label">{{"证书保存目录"|$.T}}</label>
                 <div class="col-sm-8">
-                    <input type="text" class="form-control" name="certDir" value="{{$.Form `certDir`}}">
+                    <input type="text" class="form-control" name="certLocalDir" value="{{$.Form `certLocalDir`}}">
                     <div class="help-block">
                       {{`这里填写用来保存网站HTTPS证书的文件夹路径，必须是本系统可以访问的文件夹`|$.T}}
+                    </div>
+                </div>
+              </div>
+              <div class="environ-container-show form-group">
+                <label class="col-sm-2 control-label">{{"证书目录容器路径"|$.T}}</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" name="certContainerDir" value="{{$.Form `certContainerDir`}}">
+                    <div class="help-block">
+                      {{`证书保存目录在容器内的路径`|$.T}}
                     </div>
                 </div>
               </div>
@@ -139,20 +148,26 @@ var defaultConfigDirs = {{$.Stored.configDirs}};
 $(function(){
   function setDefaultConfigDirTips(elem){
     var v=$(elem).val(),dftDir=defaultConfigDirs[v];
-    $('#defaultConfigDir').html(dftDir?dftDir+'/'+($('input[name=ident]').val()?'<span id="defaultConfigSubdir">'+$('input[name=ident]').val()+'</span>':'<code>'+App.t('唯一标识')+'</code>')+'/':'');
+    if(!dftDir) return $('#defaultConfigDir').html('');
+    var ident=$('#vhostServerForm input[name=ident]').val();
+    var value=dftDir+'/';
+    if(ident) value+='<span id="defaultConfigSubdir">'+ident+'</span>';
+    else value+='<code>'+App.t('唯一标识')+'</code>';
+    value +='/';
+    $('#defaultConfigDir').html(value);
   }
-  setDefaultConfigDirTips('input[name=engine]:checked');
-  $('input[name=engine]').on('click',function(){
+  setDefaultConfigDirTips('#vhostServerForm input[name=engine]:checked');
+  $('#vhostServerForm input[name=engine]').on('click',function(){
     setDefaultConfigDirTips(this);
   })
-  $('input[name=ident]').on('change',function(){
+  $('#vhostServerForm input[name=ident]').on('change',function(){
     $('#defaultConfigSubdir').text(this.value);
   })
-  $('input[name=environ]').on('change',function(){
+  $('#vhostServerForm input[name=environ]').on('change',function(){
     $('.environ-'+this.value+'-show').show();
     $('[class^="environ-"]:not(.environ-'+this.value+'-show)').hide();
   });
-  $('input[name=environ]:checked').trigger('change');
+  $('#vhostServerForm input[name=environ]:checked').trigger('change');
 })
 </script>
 {{/Block}}

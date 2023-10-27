@@ -158,16 +158,28 @@ func (c *Config) GetVhostConfigDirAbsPath() (string, error) {
 	return c.vhostConfigDirAbsPath, err
 }
 
-func (c *Config) TemplateFile() string {
+func (c *Config) GetTemplateFile() string {
 	return `caddyfile`
 }
 
-func (c *Config) Ident() string {
+func (c *Config) GetIdent() string {
 	return `default`
 }
 
-func (c *Config) Engine() string {
+func (c *Config) GetEngine() string {
 	return `default`
+}
+
+func (c *Config) GetEnviron() string {
+	return `local`
+}
+
+func (c *Config) GetCertLocalDir() string {
+	return ``
+}
+
+func (c *Config) GetCertContainerDir() string {
+	return ``
 }
 
 func (c *Config) setDefaultCaddyfile() (err error) {

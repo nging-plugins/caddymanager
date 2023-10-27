@@ -102,20 +102,21 @@ type NgingVhostServer struct {
 	base    factory.Base
 	objects []*NgingVhostServer
 
-	Id             uint   `db:"id,omitempty,pk" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
-	Engine         string `db:"engine" bson:"engine" comment:"引擎类型" json:"engine" xml:"engine"`
-	Environ        string `db:"environ" bson:"environ" comment:"引擎环境" json:"environ" xml:"environ"`
-	Ident          string `db:"ident" bson:"ident" comment:"唯一标识" json:"ident" xml:"ident"`
-	Name           string `db:"name" bson:"name" comment:"引擎名称" json:"name" xml:"name"`
-	ExecutableFile string `db:"executable_file" bson:"executable_file" comment:"可执行文件路径(支持容器)" json:"executable_file" xml:"executable_file"`
-	ConfigFile     string `db:"config_file" bson:"config_file" comment:"配置文件路径" json:"config_file" xml:"config_file"`
-	VhostConfigDir string `db:"vhost_config_dir" bson:"vhost_config_dir" comment:"网站配置文件保存目录" json:"vhost_config_dir" xml:"vhost_config_dir"`
-	CertDir        string `db:"cert_dir" bson:"cert_dir" comment:"证书文件保存目录" json:"cert_dir" xml:"cert_dir"`
-	WorkDir        string `db:"work_dir" bson:"work_dir" comment:"工作目录" json:"work_dir" xml:"work_dir"`
-	CmdWithConfig  string `db:"cmd_with_config" bson:"cmd_with_config" comment:"命令是否(Y/N)带配置文件参数" json:"cmd_with_config" xml:"cmd_with_config"`
-	Disabled       string `db:"disabled" bson:"disabled" comment:"是否(Y/N)禁用" json:"disabled" xml:"disabled"`
-	Created        uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
-	Updated        uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
+	Id               uint   `db:"id,omitempty,pk" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
+	Engine           string `db:"engine" bson:"engine" comment:"引擎类型" json:"engine" xml:"engine"`
+	Environ          string `db:"environ" bson:"environ" comment:"引擎环境" json:"environ" xml:"environ"`
+	Ident            string `db:"ident" bson:"ident" comment:"唯一标识" json:"ident" xml:"ident"`
+	Name             string `db:"name" bson:"name" comment:"引擎名称" json:"name" xml:"name"`
+	ExecutableFile   string `db:"executable_file" bson:"executable_file" comment:"可执行文件路径(支持容器)" json:"executable_file" xml:"executable_file"`
+	ConfigFile       string `db:"config_file" bson:"config_file" comment:"配置文件路径" json:"config_file" xml:"config_file"`
+	VhostConfigDir   string `db:"vhost_config_dir" bson:"vhost_config_dir" comment:"网站配置文件保存目录" json:"vhost_config_dir" xml:"vhost_config_dir"`
+	CertLocalDir     string `db:"cert_local_dir" bson:"cert_local_dir" comment:"证书文件保存在本机的目录" json:"cert_local_dir" xml:"cert_local_dir"`
+	CertContainerDir string `db:"cert_container_dir" bson:"cert_container_dir" comment:"证书文件保存在容器的目录" json:"cert_container_dir" xml:"cert_container_dir"`
+	WorkDir          string `db:"work_dir" bson:"work_dir" comment:"工作目录" json:"work_dir" xml:"work_dir"`
+	CmdWithConfig    string `db:"cmd_with_config" bson:"cmd_with_config" comment:"命令是否(Y/N)带配置文件参数" json:"cmd_with_config" xml:"cmd_with_config"`
+	Disabled         string `db:"disabled" bson:"disabled" comment:"是否(Y/N)禁用" json:"disabled" xml:"disabled"`
+	Created          uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
+	Updated          uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
 }
 
 // - base function
@@ -693,7 +694,8 @@ func (a *NgingVhostServer) Reset() *NgingVhostServer {
 	a.ExecutableFile = ``
 	a.ConfigFile = ``
 	a.VhostConfigDir = ``
-	a.CertDir = ``
+	a.CertLocalDir = ``
+	a.CertContainerDir = ``
 	a.WorkDir = ``
 	a.CmdWithConfig = ``
 	a.Disabled = ``
@@ -713,7 +715,8 @@ func (a *NgingVhostServer) AsMap(onlyFields ...string) param.Store {
 		r["ExecutableFile"] = a.ExecutableFile
 		r["ConfigFile"] = a.ConfigFile
 		r["VhostConfigDir"] = a.VhostConfigDir
-		r["CertDir"] = a.CertDir
+		r["CertLocalDir"] = a.CertLocalDir
+		r["CertContainerDir"] = a.CertContainerDir
 		r["WorkDir"] = a.WorkDir
 		r["CmdWithConfig"] = a.CmdWithConfig
 		r["Disabled"] = a.Disabled
@@ -739,8 +742,10 @@ func (a *NgingVhostServer) AsMap(onlyFields ...string) param.Store {
 			r["ConfigFile"] = a.ConfigFile
 		case "VhostConfigDir":
 			r["VhostConfigDir"] = a.VhostConfigDir
-		case "CertDir":
-			r["CertDir"] = a.CertDir
+		case "CertLocalDir":
+			r["CertLocalDir"] = a.CertLocalDir
+		case "CertContainerDir":
+			r["CertContainerDir"] = a.CertContainerDir
 		case "WorkDir":
 			r["WorkDir"] = a.WorkDir
 		case "CmdWithConfig":
@@ -775,8 +780,10 @@ func (a *NgingVhostServer) FromRow(row map[string]interface{}) {
 			a.ConfigFile = param.AsString(value)
 		case "vhost_config_dir":
 			a.VhostConfigDir = param.AsString(value)
-		case "cert_dir":
-			a.CertDir = param.AsString(value)
+		case "cert_local_dir":
+			a.CertLocalDir = param.AsString(value)
+		case "cert_container_dir":
+			a.CertContainerDir = param.AsString(value)
 		case "work_dir":
 			a.WorkDir = param.AsString(value)
 		case "cmd_with_config":
@@ -827,8 +834,10 @@ func (a *NgingVhostServer) Set(key interface{}, value ...interface{}) {
 			a.ConfigFile = param.AsString(vv)
 		case "VhostConfigDir":
 			a.VhostConfigDir = param.AsString(vv)
-		case "CertDir":
-			a.CertDir = param.AsString(vv)
+		case "CertLocalDir":
+			a.CertLocalDir = param.AsString(vv)
+		case "CertContainerDir":
+			a.CertContainerDir = param.AsString(vv)
 		case "WorkDir":
 			a.WorkDir = param.AsString(vv)
 		case "CmdWithConfig":
@@ -854,7 +863,8 @@ func (a *NgingVhostServer) AsRow(onlyFields ...string) param.Store {
 		r["executable_file"] = a.ExecutableFile
 		r["config_file"] = a.ConfigFile
 		r["vhost_config_dir"] = a.VhostConfigDir
-		r["cert_dir"] = a.CertDir
+		r["cert_local_dir"] = a.CertLocalDir
+		r["cert_container_dir"] = a.CertContainerDir
 		r["work_dir"] = a.WorkDir
 		r["cmd_with_config"] = a.CmdWithConfig
 		r["disabled"] = a.Disabled
@@ -880,8 +890,10 @@ func (a *NgingVhostServer) AsRow(onlyFields ...string) param.Store {
 			r["config_file"] = a.ConfigFile
 		case "vhost_config_dir":
 			r["vhost_config_dir"] = a.VhostConfigDir
-		case "cert_dir":
-			r["cert_dir"] = a.CertDir
+		case "cert_local_dir":
+			r["cert_local_dir"] = a.CertLocalDir
+		case "cert_container_dir":
+			r["cert_container_dir"] = a.CertContainerDir
 		case "work_dir":
 			r["work_dir"] = a.WorkDir
 		case "cmd_with_config":

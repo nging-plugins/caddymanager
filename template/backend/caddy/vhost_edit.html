@@ -32,10 +32,10 @@
                   </div>
                   <label class="col-sm-2 control-label">{{"引擎配置"|$.T}}</label>
                   <div class="col-sm-3">{{$v := $.Form "serverIdent"}}
-                      <select class="form-control" name="serverIdent">
-                          <option value="default">{{"<默认>"|$.T}}</option>
+                      <select class="form-control" id="serverIdent" name="serverIdent">
+                          <option value="default" data-engine="default" data-environ="local">{{"<默认>"|$.T}}</option>
                           {{range $k,$g:=$.Stored.Get "serverList"}}
-                          <option value="{{$g.Ident}}"{{if eq $v $g.Ident}} selected{{end}}>{{$g.Name}}</option>
+                          <option value="{{$g.Ident}}" data-engine="{{$g.Engine}}" data-environ="{{$g.Environ}}"{{if eq $v $g.Ident}} selected{{end}}>{{$g.Name}}</option>
                           {{end}}
                       </select>
                   </div>
@@ -303,7 +303,7 @@
      <textarea type="text" id="rewrite_rule" class="form-control" style="min-height:200px" name="rewrite_rule">{{$.Form "rewrite_rule"}}</textarea>
      <div class="help-block">
         {{"网址重写规则支持"|$.T}}<a href='javascript:;' onclick="showRequestPlaceholders('#rewrite_rule')" style="font-weight:bold">{{"占位符"|$.T}}</a><br/>
-         1. {{"简洁语法："|$.T}}<a href="javascript:;" onclick="App.insertAtCursor($('#rewrite_rule')[0],'rewrite from to\n',8,12);"><strong>rewrite</strong> <em data-toggle="tooltip" title="not: {{"不匹配。可选"|$.T}}">[not]</em> <em style="color:green" data-toggle="tooltip" title="from: {{"匹配路径。支持正则"|$.T}}">from</em> <em style="color:green" data-toggle="tooltip" title="to: {{"目标路径。多个目标路径用半角空格隔开，to的作用与“高级语法”中的相同"|$.T}}">to</em></a>
+         1. {{"简洁语法："|$.T}}<a href="javascript:;" onclick="App.insertAtCursor($('#rewrite_rule')[0],'rewrite from to\n',8,12);"><strong>rewrite</strong> <em data-toggle="tooltip" title="not: {{`不匹配。可选`|$.T}}">[not]</em> <em style="color:green" data-toggle="tooltip" title="from: {{`匹配路径。支持正则`|$.T}}">from</em> <em style="color:green" data-toggle="tooltip" title="to: {{`目标路径。多个目标路径用半角空格隔开，to的作用与“高级语法”中的相同`|$.T}}">to</em></a>
          {{"例如："|$.T}}<a href="javascript:;" onclick="App.insertAtCursor($('#rewrite_rule')[0],'rewrite / {path} /index.php{uri}');">[{{"插入"|$.T}}]</a><br />
          <pre>rewrite / {path} /index.php{uri}</pre>
          2. {{"高级语法："|$.T}}<a href="javascript:;" onclick="insertAdvRewrite()">[{{"插入"|$.T}}]</a><br />
@@ -311,9 +311,9 @@
 .adv-rewrite-rule [data-popover]{border-bottom:1px dashed #aaa;cursor:help;}
 </style>
 <pre class="adv-rewrite-rule">
-<strong>rewrite</strong> <em style="color:green" data-html="true" data-popover="popover" data-content="{{"正则(网址重写之前匹配的路径)<br />默认为“/”"|$.T}}" title="basepath">[basepath]</em> {
-    <strong>regexp</strong> <span data-html="true" data-popover="popover" data-content="{{"匹配规则。<br />支持正则表达式。<br />对于高负载的网站应该尽量避免使用正则表达式"|$.T}}" title="pattern">pattern</span>
-    <strong>ext</strong>    <span data-html="true" data-popover="popover" data-content="{{"带点号的扩展名(多个用空格隔开)<br />带前缀“!”则表示排除，如果设为“/”则表示没有扩展名"|$.T}}" title="extensions...">extensions...</span>
+<strong>rewrite</strong> <em style="color:green" data-html="true" data-popover="popover" data-content="{{`正则(网址重写之前匹配的路径)<br />默认为“/”`|$.T}}" title="basepath">[basepath]</em> {
+    <strong>regexp</strong> <span data-html="true" data-popover="popover" data-content="{{`匹配规则。<br />支持正则表达式。<br />对于高负载的网站应该尽量避免使用正则表达式`|$.T}}" title="pattern">pattern</span>
+    <strong>ext</strong>    <span data-html="true" data-popover="popover" data-content="{{`带点号的扩展名(多个用空格隔开)<br />带前缀“!”则表示排除，如果设为“/”则表示没有扩展名`|$.T}}" title="extensions...">extensions...</span>
     <strong>if</strong>     <span data-html="true" data-popover="popover" data-content="if用来指定重写条件，支持多个if。<br />
   <strong>a</strong>和<strong>b</strong>可以是字符串或<a href='javascript:;' onclick='showRequestPlaceholders()'>占位符</a>；<br />
   <strong>cond</strong>是条件，支持以下条件：<p>

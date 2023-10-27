@@ -14,3 +14,7 @@ func SplitBySpace(value string) []string {
 	}
 	return spaceSeperate.Split(value, -1)
 }
+
+func ExplodeCombinedLogFormat(value string) string {
+	return strings.Replace(value, `{combined}`, `{remote} - {user} [{when}] "{method} {uri} {proto}" {status} {size}`, 1)
+}

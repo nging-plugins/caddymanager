@@ -30,12 +30,12 @@ import (
 )
 
 func NewValues(values url.Values, cfg engine.Configer) *Values {
-	return &Values{Values: values, cfg: cfg}
+	return &Values{Values: values, Config: cfg}
 }
 
 type Values struct {
 	url.Values
-	cfg engine.Configer
+	Config engine.Configer
 }
 
 func (v Values) GetWebdavGlobal() []*webdav.WebdavPerm {
@@ -60,6 +60,10 @@ func (v Values) AddSlashes(val string) string {
 	return com.AddCSlashes(val, '"')
 }
 
+func (v Values) AddSlashesSingleQuote(val string) string {
+	return com.AddCSlashes(val, '\'')
+}
+
 func (v Values) IteratorKV(addon string, item string, prefix string, withQuotes ...bool) interface{} {
 	if len(addon) > 0 && len(item) > 0 {
 		addon += `_`
@@ -77,7 +81,7 @@ func (v Values) IteratorKV(addon string, item string, prefix string, withQuotes 
 	}
 	l := len(values)
 	var suffix string
-	if v.cfg.Engine() == `nginx` {
+	if v.Config.GetEngine() == `nginx` {
 		suffix = `;`
 	}
 	for i, k := range keys {
