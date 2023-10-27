@@ -167,9 +167,7 @@ server {
     ssl_certificate "{{$v.Get "tls_cert"|$v.AddSlashes|ToHTML}}";
     ssl_certificate_key "{{$v.Get "tls_key"|$v.AddSlashes|ToHTML}}";
         {{else if $v.Get "tls_email"|ToHTML}}
-    tls {{$v.Get "tls_email"|ToHTML}}
-        {{end}}
-
+    #{{$v.Get "tls_email"|ToHTML}}
     # ACME-challenge
     location ^~ /.well-known/acme-challenge/ {
         {{if eq $v.Config.GetEnviron `container`}}
@@ -178,6 +176,7 @@ server {
         root {{$v.Config.GetCertLocalDir}}/_letsencrypt;
         {{end}}
     }
+        {{end}}
     {{else}}
     ssl off;
     {{end}}
