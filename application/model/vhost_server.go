@@ -41,6 +41,9 @@ func (f *VhostServer) check() error {
 	if f.Engine == `default` || !engine.Engines.Has(f.Engine) {
 		return ctx.NewError(code.InvalidParameter, `引擎无效`).SetZone(`engine`)
 	}
+	if !engine.Environs.Has(f.Environ) {
+		return ctx.NewError(code.InvalidParameter, `环境选项值无效`).SetZone(`environ`)
+	}
 	var exists bool
 	var err error
 	if f.Id > 0 {

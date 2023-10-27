@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
@@ -14,13 +13,15 @@ import (
 	"github.com/admpub/nging/v5/application/library/config"
 	"github.com/nging-plugins/caddymanager/application/library/thirdparty"
 	"github.com/webx-top/com"
+	"github.com/webx-top/echo"
 )
 
 const Name = `nginx`
 
 var (
 	regexConfigFile    = regexp.MustCompile(`[\s]+configuration file (.+\.conf)[\s]+`)
-	regexConfigInclude = regexp.MustCompile(`[\s]+include[\s]+(.+\.conf)[\s]*;[\s]*` + "\n")
+	regexConfigInclude = regexp.MustCompile(`^include[\s]+([\S]+(?:\*|\*\.conf))[\s]*;(?:[\s]*#.*)?[\s]*$`)
+	regexVersion       = regexp.MustCompile(`[\d]+\.[\d]+\.[\d]+`)
 )
 
 type Config struct {
@@ -102,8 +103,6 @@ func (c *Config) TestConfig(ctx context.Context) error {
 	return err
 }
 
-var versionRegex = regexp.MustCompile(`[\d]+\.[\d]+\.[\d]+`)
-
 func (c *Config) getVersion(ctx context.Context) (string, error) {
 	result, err := c.exec(ctx, `-v`)
 	if err != nil {
@@ -112,7 +111,7 @@ func (c *Config) getVersion(ctx context.Context) (string, error) {
 	result = bytes.TrimSpace(result)
 	parts := bytes.SplitN(result, []byte(`:`), 2)
 	if len(parts) != 2 {
-		matches := versionRegex.FindStringSubmatch(string(result))
+		matches := regexVersion.FindStringSubmatch(string(result))
 		if len(matches) > 0 {
 			return matches[0], err
 		}
@@ -149,18 +148,43 @@ func (c *Config) getConfigIncludePath(confPath string) (string, error) {
 	if len(confPath) == 0 {
 		return ``, nil
 	}
-	content, err := os.ReadFile(confPath)
-	if err != nil {
+	var includeConfD string
+	var includeSitesEnabled string
+	var includeDir string
+	err := com.SeekFileLines(confPath, func(line string) error {
+		line = strings.TrimSpace(line)
+		if len(line) == 0 {
+			return nil
+		}
+		if strings.HasPrefix(line, `#`) {
+			return nil
+		}
+		matches := regexConfigInclude.FindAllStringSubmatch(line, 1)
+		if len(matches) == 0 || len(matches[0]) < 2 {
+			return nil
+		}
+		line = matches[0][1]
+		if strings.Contains(line, `sites-enabled`) {
+			includeSitesEnabled = line
+			return echo.ErrExit
+		}
+		if strings.Contains(line, `conf.d`) {
+			includeConfD = line
+			return nil
+		}
+		includeDir = line
+		return nil
+	})
+	if err != nil && err != echo.ErrExit {
 		return ``, err
 	}
-	matches := regexConfigInclude.FindAllSubmatch(content, 1)
-	var include string
-	if len(matches) > 0 && len(matches[0]) > 1 {
-		include = string(matches[0][1])
-		include = strings.TrimSpace(include)
-		include = strings.SplitN(include, `*`, 2)[0]
+	if len(includeSitesEnabled) > 0 {
+		includeDir = includeSitesEnabled
+	} else if len(includeConfD) > 0 {
+		includeDir = includeConfD
 	}
-	return include, nil
+	includeDir = com.TrimFileName(includeDir)
+	return includeDir, nil
 }
 
 func (c *Config) Reload(ctx context.Context) error {

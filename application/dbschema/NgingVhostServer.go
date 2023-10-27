@@ -104,11 +104,13 @@ type NgingVhostServer struct {
 
 	Id             uint   `db:"id,omitempty,pk" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
 	Engine         string `db:"engine" bson:"engine" comment:"引擎类型" json:"engine" xml:"engine"`
+	Environ        string `db:"environ" bson:"environ" comment:"引擎环境" json:"environ" xml:"environ"`
 	Ident          string `db:"ident" bson:"ident" comment:"唯一标识" json:"ident" xml:"ident"`
 	Name           string `db:"name" bson:"name" comment:"引擎名称" json:"name" xml:"name"`
 	ExecutableFile string `db:"executable_file" bson:"executable_file" comment:"可执行文件路径(支持容器)" json:"executable_file" xml:"executable_file"`
 	ConfigFile     string `db:"config_file" bson:"config_file" comment:"配置文件路径" json:"config_file" xml:"config_file"`
 	VhostConfigDir string `db:"vhost_config_dir" bson:"vhost_config_dir" comment:"网站配置文件保存目录" json:"vhost_config_dir" xml:"vhost_config_dir"`
+	CertDir        string `db:"cert_dir" bson:"cert_dir" comment:"证书文件保存目录" json:"cert_dir" xml:"cert_dir"`
 	WorkDir        string `db:"work_dir" bson:"work_dir" comment:"工作目录" json:"work_dir" xml:"work_dir"`
 	CmdWithConfig  string `db:"cmd_with_config" bson:"cmd_with_config" comment:"命令是否(Y/N)带配置文件参数" json:"cmd_with_config" xml:"cmd_with_config"`
 	Disabled       string `db:"disabled" bson:"disabled" comment:"是否(Y/N)禁用" json:"disabled" xml:"disabled"`
@@ -337,6 +339,9 @@ func (a *NgingVhostServer) Insert() (pk interface{}, err error) {
 	if len(a.Engine) == 0 {
 		a.Engine = "nginx"
 	}
+	if len(a.Environ) == 0 {
+		a.Environ = "local"
+	}
 	if len(a.CmdWithConfig) == 0 {
 		a.CmdWithConfig = "N"
 	}
@@ -368,6 +373,9 @@ func (a *NgingVhostServer) Update(mw func(db.Result) db.Result, args ...interfac
 	if len(a.Engine) == 0 {
 		a.Engine = "nginx"
 	}
+	if len(a.Environ) == 0 {
+		a.Environ = "local"
+	}
 	if len(a.CmdWithConfig) == 0 {
 		a.CmdWithConfig = "N"
 	}
@@ -390,6 +398,9 @@ func (a *NgingVhostServer) Updatex(mw func(db.Result) db.Result, args ...interfa
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Engine) == 0 {
 		a.Engine = "nginx"
+	}
+	if len(a.Environ) == 0 {
+		a.Environ = "local"
 	}
 	if len(a.CmdWithConfig) == 0 {
 		a.CmdWithConfig = "N"
@@ -414,6 +425,9 @@ func (a *NgingVhostServer) UpdateByFields(mw func(db.Result) db.Result, fields [
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Engine) == 0 {
 		a.Engine = "nginx"
+	}
+	if len(a.Environ) == 0 {
+		a.Environ = "local"
 	}
 	if len(a.CmdWithConfig) == 0 {
 		a.CmdWithConfig = "N"
@@ -442,6 +456,9 @@ func (a *NgingVhostServer) UpdatexByFields(mw func(db.Result) db.Result, fields 
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Engine) == 0 {
 		a.Engine = "nginx"
+	}
+	if len(a.Environ) == 0 {
+		a.Environ = "local"
 	}
 	if len(a.CmdWithConfig) == 0 {
 		a.CmdWithConfig = "N"
@@ -485,6 +502,11 @@ func (a *NgingVhostServer) UpdateFields(mw func(db.Result) db.Result, kvset map[
 			kvset["engine"] = "nginx"
 		}
 	}
+	if val, ok := kvset["environ"]; ok && val != nil {
+		if v, ok := val.(string); ok && len(v) == 0 {
+			kvset["environ"] = "local"
+		}
+	}
 	if val, ok := kvset["cmd_with_config"]; ok && val != nil {
 		if v, ok := val.(string); ok && len(v) == 0 {
 			kvset["cmd_with_config"] = "N"
@@ -518,6 +540,11 @@ func (a *NgingVhostServer) UpdatexFields(mw func(db.Result) db.Result, kvset map
 	if val, ok := kvset["engine"]; ok && val != nil {
 		if v, ok := val.(string); ok && len(v) == 0 {
 			kvset["engine"] = "nginx"
+		}
+	}
+	if val, ok := kvset["environ"]; ok && val != nil {
+		if v, ok := val.(string); ok && len(v) == 0 {
+			kvset["environ"] = "local"
 		}
 	}
 	if val, ok := kvset["cmd_with_config"]; ok && val != nil {
@@ -570,6 +597,9 @@ func (a *NgingVhostServer) Upsert(mw func(db.Result) db.Result, args ...interfac
 		if len(a.Engine) == 0 {
 			a.Engine = "nginx"
 		}
+		if len(a.Environ) == 0 {
+			a.Environ = "local"
+		}
 		if len(a.CmdWithConfig) == 0 {
 			a.CmdWithConfig = "N"
 		}
@@ -585,6 +615,9 @@ func (a *NgingVhostServer) Upsert(mw func(db.Result) db.Result, args ...interfac
 		a.Id = 0
 		if len(a.Engine) == 0 {
 			a.Engine = "nginx"
+		}
+		if len(a.Environ) == 0 {
+			a.Environ = "local"
 		}
 		if len(a.CmdWithConfig) == 0 {
 			a.CmdWithConfig = "N"
@@ -654,11 +687,13 @@ func (a *NgingVhostServer) Exists(mw func(db.Result) db.Result, args ...interfac
 func (a *NgingVhostServer) Reset() *NgingVhostServer {
 	a.Id = 0
 	a.Engine = ``
+	a.Environ = ``
 	a.Ident = ``
 	a.Name = ``
 	a.ExecutableFile = ``
 	a.ConfigFile = ``
 	a.VhostConfigDir = ``
+	a.CertDir = ``
 	a.WorkDir = ``
 	a.CmdWithConfig = ``
 	a.Disabled = ``
@@ -672,11 +707,13 @@ func (a *NgingVhostServer) AsMap(onlyFields ...string) param.Store {
 	if len(onlyFields) == 0 {
 		r["Id"] = a.Id
 		r["Engine"] = a.Engine
+		r["Environ"] = a.Environ
 		r["Ident"] = a.Ident
 		r["Name"] = a.Name
 		r["ExecutableFile"] = a.ExecutableFile
 		r["ConfigFile"] = a.ConfigFile
 		r["VhostConfigDir"] = a.VhostConfigDir
+		r["CertDir"] = a.CertDir
 		r["WorkDir"] = a.WorkDir
 		r["CmdWithConfig"] = a.CmdWithConfig
 		r["Disabled"] = a.Disabled
@@ -690,6 +727,8 @@ func (a *NgingVhostServer) AsMap(onlyFields ...string) param.Store {
 			r["Id"] = a.Id
 		case "Engine":
 			r["Engine"] = a.Engine
+		case "Environ":
+			r["Environ"] = a.Environ
 		case "Ident":
 			r["Ident"] = a.Ident
 		case "Name":
@@ -700,6 +739,8 @@ func (a *NgingVhostServer) AsMap(onlyFields ...string) param.Store {
 			r["ConfigFile"] = a.ConfigFile
 		case "VhostConfigDir":
 			r["VhostConfigDir"] = a.VhostConfigDir
+		case "CertDir":
+			r["CertDir"] = a.CertDir
 		case "WorkDir":
 			r["WorkDir"] = a.WorkDir
 		case "CmdWithConfig":
@@ -722,6 +763,8 @@ func (a *NgingVhostServer) FromRow(row map[string]interface{}) {
 			a.Id = param.AsUint(value)
 		case "engine":
 			a.Engine = param.AsString(value)
+		case "environ":
+			a.Environ = param.AsString(value)
 		case "ident":
 			a.Ident = param.AsString(value)
 		case "name":
@@ -732,6 +775,8 @@ func (a *NgingVhostServer) FromRow(row map[string]interface{}) {
 			a.ConfigFile = param.AsString(value)
 		case "vhost_config_dir":
 			a.VhostConfigDir = param.AsString(value)
+		case "cert_dir":
+			a.CertDir = param.AsString(value)
 		case "work_dir":
 			a.WorkDir = param.AsString(value)
 		case "cmd_with_config":
@@ -770,6 +815,8 @@ func (a *NgingVhostServer) Set(key interface{}, value ...interface{}) {
 			a.Id = param.AsUint(vv)
 		case "Engine":
 			a.Engine = param.AsString(vv)
+		case "Environ":
+			a.Environ = param.AsString(vv)
 		case "Ident":
 			a.Ident = param.AsString(vv)
 		case "Name":
@@ -780,6 +827,8 @@ func (a *NgingVhostServer) Set(key interface{}, value ...interface{}) {
 			a.ConfigFile = param.AsString(vv)
 		case "VhostConfigDir":
 			a.VhostConfigDir = param.AsString(vv)
+		case "CertDir":
+			a.CertDir = param.AsString(vv)
 		case "WorkDir":
 			a.WorkDir = param.AsString(vv)
 		case "CmdWithConfig":
@@ -799,11 +848,13 @@ func (a *NgingVhostServer) AsRow(onlyFields ...string) param.Store {
 	if len(onlyFields) == 0 {
 		r["id"] = a.Id
 		r["engine"] = a.Engine
+		r["environ"] = a.Environ
 		r["ident"] = a.Ident
 		r["name"] = a.Name
 		r["executable_file"] = a.ExecutableFile
 		r["config_file"] = a.ConfigFile
 		r["vhost_config_dir"] = a.VhostConfigDir
+		r["cert_dir"] = a.CertDir
 		r["work_dir"] = a.WorkDir
 		r["cmd_with_config"] = a.CmdWithConfig
 		r["disabled"] = a.Disabled
@@ -817,6 +868,8 @@ func (a *NgingVhostServer) AsRow(onlyFields ...string) param.Store {
 			r["id"] = a.Id
 		case "engine":
 			r["engine"] = a.Engine
+		case "environ":
+			r["environ"] = a.Environ
 		case "ident":
 			r["ident"] = a.Ident
 		case "name":
@@ -827,6 +880,8 @@ func (a *NgingVhostServer) AsRow(onlyFields ...string) param.Store {
 			r["config_file"] = a.ConfigFile
 		case "vhost_config_dir":
 			r["vhost_config_dir"] = a.VhostConfigDir
+		case "cert_dir":
+			r["cert_dir"] = a.CertDir
 		case "work_dir":
 			r["work_dir"] = a.WorkDir
 		case "cmd_with_config":

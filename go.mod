@@ -11,6 +11,7 @@ require (
 	github.com/admpub/caddy v1.2.0
 	github.com/admpub/log v1.3.6
 	github.com/admpub/nging/v5 v5.0.0
+	github.com/admpub/null v8.0.4+incompatible
 	github.com/admpub/once v0.0.1
 	github.com/admpub/tail v1.1.0
 	github.com/admpub/useragent v0.0.1
@@ -27,7 +28,7 @@ require (
 	github.com/nging-plugins/servermanager v1.4.16
 	github.com/stretchr/testify v1.8.4
 	github.com/webx-top/client v0.8.9
-	github.com/webx-top/com v1.0.3
+	github.com/webx-top/com v1.1.2
 	github.com/webx-top/db v1.27.1
 	github.com/webx-top/echo v2.39.7+incompatible
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
@@ -77,7 +78,6 @@ require (
 	github.com/admpub/mail v0.0.0-20170408110349-d63147b0317b // indirect
 	github.com/admpub/marmot v0.0.0-20200702042226-2170d9ff59f5 // indirect
 	github.com/admpub/mysql-schema-sync v0.2.6 // indirect
-	github.com/admpub/null v8.0.4+incompatible // indirect
 	github.com/admpub/pester v0.0.0-20200411024648-005672a2bd48 // indirect
 	github.com/admpub/qrcode v0.0.3 // indirect
 	github.com/admpub/randomize v0.0.2 // indirect
@@ -94,7 +94,7 @@ require (
 	github.com/admpub/webdav/v4 v4.1.3 // indirect
 	github.com/admpub/websocket v1.0.4 // indirect
 	github.com/andybalholm/brotli v1.0.6 // indirect
-	github.com/aws/aws-sdk-go v1.46.1 // indirect
+	github.com/aws/aws-sdk-go v1.46.5 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/boombuler/barcode v1.0.1 // indirect
@@ -125,8 +125,8 @@ require (
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
-	github.com/google/pprof v0.0.0-20230926050212-f7f687d19a98 // indirect
-	github.com/google/uuid v1.3.1 // indirect
+	github.com/google/pprof v0.0.0-20231023181126-ff6d637d2a7b // indirect
+	github.com/google/uuid v1.4.0 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
@@ -138,7 +138,7 @@ require (
 	github.com/jimstudt/http-authentication v0.0.0-20140401203705-3eca13d6893a // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/klauspost/compress v1.17.1 // indirect
+	github.com/klauspost/compress v1.17.2 // indirect
 	github.com/klauspost/cpuid v1.3.1 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
@@ -172,8 +172,8 @@ require (
 	github.com/prometheus/common v0.45.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/quic-go/qpack v0.4.0 // indirect
-	github.com/quic-go/qtls-go1-20 v0.3.4 // indirect
-	github.com/quic-go/quic-go v0.39.1 // indirect
+	github.com/quic-go/qtls-go1-20 v0.4.1 // indirect
+	github.com/quic-go/quic-go v0.39.2 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/rs/xid v1.5.0 // indirect
 	github.com/russross/blackfriday v1.6.0 // indirect

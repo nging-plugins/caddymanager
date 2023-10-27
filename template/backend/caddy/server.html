@@ -24,6 +24,7 @@
                             <th style="width:60px"><strong>{{"状态"|$.T}}</strong></th>
 							<th><strong>{{"名称"|$.T}}</strong></th>
 							<th><strong>{{"引擎"|$.T}}</strong></th>
+							<th><strong>{{"环境"|$.T}}</strong></th>
 							<th><strong>{{"唯一标识"|$.T}}</strong></th>
 							<th><strong>{{"文件路径"|$.T}}</strong></th>
 							<th style="width:80px" class="text-center"><strong>{{"操作"|$.T}}</strong></th>
@@ -40,6 +41,7 @@
                             </td>
 							<td>{{$v.Name}}</td>
 							<td>{{call $.Func.engineName $v.Engine}}</td>
+							<td>{{call $.Func.environName $v.Environ}}</td>
 							<td>{{$v.Ident}}</td>
 							<td>
                                 <div class="label-group wrap">

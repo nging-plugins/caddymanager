@@ -34,6 +34,7 @@ func ServerIndex(ctx echo.Context) error {
 	err := m.ListPage(cond)
 	ctx.Set(`listData`, m.Objects())
 	ctx.SetFunc(`engineName`, engine.Engines.Get)
+	ctx.SetFunc(`environName`, engine.Environs.Get)
 	return ctx.Render(`caddy/server`, handler.Err(ctx, err))
 }
 
@@ -72,6 +73,7 @@ func setServerForm(ctx echo.Context) {
 		configDirs[eng.K] = eng.X.(engine.Enginer).DefaultConfigDir()
 	}
 	ctx.Set(`configDirs`, configDirs)
+	ctx.Set(`environList`, engine.Environs.Slice())
 }
 
 func ServerEdit(ctx echo.Context) error {
@@ -83,8 +85,8 @@ func ServerEdit(ctx echo.Context) error {
 		return ctx.Redirect(handler.URLFor(`/caddy/server`))
 	}
 	if ctx.IsPost() {
-		oldStatus := m.Disabled
-		err = ctx.MustBind(m.NgingVhostServer, echo.ExcludeFieldName(`created`, `updated`, `ident`))
+		old := *m.NgingVhostServer
+		err = ctx.MustBind(m.NgingVhostServer, echo.ExcludeFieldName(`created`, `updated`, `engine`, `ident`))
 		if err != nil {
 			goto END
 		}
@@ -93,12 +95,21 @@ func ServerEdit(ctx echo.Context) error {
 		if err != nil {
 			goto END
 		}
-		if oldStatus != m.Disabled {
+		if old.Disabled != m.Disabled {
 			if m.Disabled == `Y` {
-				err = deleteCaddyfileByServer(ctx, m.NgingVhostServer, true)
+				err = deleteCaddyfileByServer(ctx, &old, true)
 			} else {
 				err = vhostbuild(ctx, 0, ``, ``, m.NgingVhostServer)
 			}
+			if err != nil {
+				ctx.Logger().Error(err)
+			}
+		} else if old.VhostConfigDir != m.VhostConfigDir {
+			err = deleteCaddyfileByServer(ctx, &old, true)
+			if err != nil {
+				ctx.Logger().Error(err)
+			}
+			err = vhostbuild(ctx, 0, ``, ``, m.NgingVhostServer)
 			if err != nil {
 				ctx.Logger().Error(err)
 			}

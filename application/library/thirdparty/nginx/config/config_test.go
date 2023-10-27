@@ -33,7 +33,7 @@ func TestConfig(t *testing.T) {
 
 	c.ConfigInclude, err = c.getConfigIncludePath(c.ConfigPath)
 	assert.NoError(t, err)
-	assert.Equal(t, `/etc/nginx/modules-enabled/`, c.ConfigInclude)
+	assert.Equal(t, `/etc/nginx/sites-enabled/`, c.ConfigInclude)
 
 	err = c.TestConfig(ctx)
 	assert.NoError(t, err)
@@ -55,7 +55,7 @@ func _TestConfig2(t *testing.T) {
 	b, err = c.exec(ctx, `-v`)
 	assert.NoError(t, err)
 	t.Logf(`%s`, b)
-	matches := versionRegex.FindStringSubmatch(string(b))
+	matches := regexVersion.FindStringSubmatch(string(b))
 	com.Dump(matches)
 	_, _ = c, ctx
 }
