@@ -17,3 +17,5 @@
 /example/data
 tower-app-*
 *.log
+*.ngingbak
+nginx.conf

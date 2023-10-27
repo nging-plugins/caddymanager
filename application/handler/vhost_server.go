@@ -19,6 +19,8 @@
 package handler
 
 import (
+	"time"
+
 	"github.com/admpub/nging/v5/application/handler"
 	"github.com/admpub/nging/v5/application/library/common"
 	"github.com/nging-plugins/caddymanager/application/library/engine"
@@ -42,14 +44,34 @@ func ServerAdd(ctx echo.Context) error {
 	var err error
 	m := model.NewVhostServer(ctx)
 	if ctx.IsPost() {
-		err = ctx.MustBind(m.NgingVhostServer, echo.ExcludeFieldName(`created`, `updated`))
-		if err == nil {
-			_, err = m.Add()
+		err = ctx.MustBind(m.NgingVhostServer, echo.ExcludeFieldName(`created`, `updated`, `configFileUpdated`))
+		if err != nil {
+			goto END
 		}
-		if err == nil {
-			handler.SendOk(ctx, ctx.T(`操作成功`))
-			return ctx.Redirect(handler.URLFor(`/caddy/server`))
+		_, err = m.Add()
+		if err != nil {
+			goto END
 		}
+		if m.AutoModifyConfig == common.BoolY {
+			var cfg engine.Configer
+			var changed bool
+			cfg, err = getServerConfig(ctx, m.Ident, m.NgingVhostServer)
+			if err != nil {
+				goto END
+			}
+			changed, err = engine.FixEngineConfigFile(cfg)
+			if err != nil {
+				goto END
+			}
+			if changed {
+				err = m.SetConfigFileUpdated(uint(time.Now().Unix()))
+				if err != nil {
+					goto END
+				}
+			}
+		}
+		handler.SendOk(ctx, ctx.T(`操作成功`))
+		return ctx.Redirect(handler.URLFor(`/caddy/server`))
 	} else {
 		id := ctx.Formx(`copyId`).Uint()
 		if id > 0 {
@@ -59,6 +81,8 @@ func ServerAdd(ctx echo.Context) error {
 			}
 		}
 	}
+
+END:
 	ctx.Set(`activeURL`, `/caddy/server`)
 	ctx.Set(`isAdd`, true)
 	setServerForm(ctx)
@@ -86,7 +110,7 @@ func ServerEdit(ctx echo.Context) error {
 	}
 	if ctx.IsPost() {
 		old := *m.NgingVhostServer
-		err = ctx.MustBind(m.NgingVhostServer, echo.ExcludeFieldName(`created`, `updated`, `engine`, `ident`))
+		err = ctx.MustBind(m.NgingVhostServer, echo.ExcludeFieldName(`created`, `updated`, `engine`, `ident`, `configFileUpdated`))
 		if err != nil {
 			goto END
 		}
@@ -104,7 +128,7 @@ func ServerEdit(ctx echo.Context) error {
 			if err != nil {
 				ctx.Logger().Error(err)
 			}
-		} else if old.VhostConfigDir != m.VhostConfigDir {
+		} else if old.VhostConfigLocalDir != m.VhostConfigLocalDir {
 			err = deleteCaddyfileByServer(ctx, &old, true)
 			if err != nil {
 				ctx.Logger().Error(err)
@@ -112,6 +136,50 @@ func ServerEdit(ctx echo.Context) error {
 			err = vhostbuild(ctx, 0, ``, ``, m.NgingVhostServer)
 			if err != nil {
 				ctx.Logger().Error(err)
+			}
+		}
+		var cfg engine.Configer
+		var changed bool
+		if old.ConfigFileUpdated > 0 || m.AutoModifyConfig == common.BoolY {
+			cfg, err = getServerConfig(ctx, m.Ident, m.NgingVhostServer)
+			if err != nil {
+				goto END
+			}
+		}
+		if old.ConfigFileUpdated > 0 { // 以前添加过
+			if old.ConfigLocalFile != m.ConfigLocalFile || old.VhostConfigLocalDir != m.VhostConfigLocalDir {
+				// ==================================
+				//  从旧文件中删除 || 删除旧的引用
+				// ==================================
+				var oldCfg engine.Configer
+				var oldChanged bool
+				oldCfg, err = getServerConfig(ctx, old.Ident, &old)
+				if err != nil {
+					goto END
+				}
+				oldChanged, err = engine.FixEngineConfigFile(oldCfg, true)
+				if err != nil {
+					goto END
+				}
+				_ = oldChanged
+
+				if m.AutoModifyConfig == common.BoolY { // 添加新的
+					// 在新文件中添加 || 添加新的引用
+					changed, err = engine.FixEngineConfigFile(cfg)
+				} else { // 没有添加，添加时间重置为0
+					err = m.SetConfigFileUpdated(0)
+				}
+			}
+		} else if m.AutoModifyConfig == common.BoolY {
+			changed, err = engine.FixEngineConfigFile(cfg)
+		}
+		if err != nil {
+			goto END
+		}
+		if changed {
+			err = m.SetConfigFileUpdated(uint(time.Now().Unix()))
+			if err != nil {
+				goto END
 			}
 		}
 		handler.SendOk(ctx, ctx.T(`修改成功`))
@@ -154,10 +222,31 @@ END:
 func ServerDelete(ctx echo.Context) error {
 	id := ctx.Formx(`id`).Uint()
 	m := model.NewVhostServer(ctx)
-	err := m.Delete(nil, db.Cond{`id`: id})
-	if err == nil {
-		err = deleteCaddyfileByServer(ctx, m.NgingVhostServer, true)
+	err := m.Get(nil, `id`, id)
+	if err != nil {
+		goto END
 	}
+	if m.AutoModifyConfig == common.BoolY && m.ConfigFileUpdated > 0 {
+		var cfg engine.Configer
+		cfg, err = getServerConfig(ctx, m.Ident, m.NgingVhostServer)
+		if err != nil {
+			goto END
+		}
+		_, err = engine.FixEngineConfigFile(cfg, true)
+		if err != nil {
+			goto END
+		}
+	}
+	err = m.Delete(nil, db.Cond{`id`: id})
+	if err != nil {
+		goto END
+	}
+	err = deleteCaddyfileByServer(ctx, m.NgingVhostServer, true)
+	if err != nil {
+		goto END
+	}
+
+END:
 	if err == nil {
 		handler.SendOk(ctx, ctx.T(`操作成功`))
 	} else {

@@ -48,17 +48,8 @@ func (b *Engine) ListConfig(ctx echo.Context) ([]engine.Configer, error) {
 }
 
 func (b *Engine) BuildConfig(ctx echo.Context, m *dbschema.NgingVhostServer) engine.Configer {
-	cfg := &caddy2ConfigPkg.Config{
-		Command:          m.ExecutableFile,
-		Caddyfile:        m.ConfigFile,
-		ConfigInclude:    m.VhostConfigDir,
-		CmdWithConfig:    m.CmdWithConfig == common.BoolY,
-		ID:               m.Ident,
-		WorkDir:          m.WorkDir,
-		Environ:          m.Environ,
-		CertLocalDir:     m.CertLocalDir,
-		CertContainerDir: m.CertContainerDir,
-	}
+	cfg := caddy2ConfigPkg.New()
+	cfg.CopyFrom(m)
 	return cfg
 }
 

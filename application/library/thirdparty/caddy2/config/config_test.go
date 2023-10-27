@@ -23,7 +23,7 @@ func TestConfig(t *testing.T) {
 	assert.NoError(t, err)
 
 	c.CmdWithConfig = true
-	c.Caddyfile = `/not-exists.conf`
+	c.EngineConfigLocalFile = `/not-exists.conf`
 	err = c.TestConfig(ctx)
 	assert.Error(t, err)
 	_, _ = c, ctx

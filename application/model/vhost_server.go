@@ -3,6 +3,7 @@ package model
 import (
 	"strings"
 
+	"github.com/admpub/nging/v5/application/library/common"
 	"github.com/nging-plugins/caddymanager/application/dbschema"
 	"github.com/nging-plugins/caddymanager/application/library/engine"
 	"github.com/webx-top/com"
@@ -23,9 +24,11 @@ type VhostServer struct {
 
 func (f *VhostServer) check() error {
 	ctx := f.Context()
+	f.Name = strings.TrimSpace(f.Name)
 	if len(f.Name) == 0 {
 		return ctx.NewError(code.InvalidParameter, `名称不能为空`).SetZone(`name`)
 	}
+	f.Ident = strings.TrimSpace(f.Ident)
 	if len(f.Ident) == 0 {
 		return ctx.NewError(code.InvalidParameter, `唯一标识不能为空`).SetZone(`ident`)
 	}
@@ -35,6 +38,7 @@ func (f *VhostServer) check() error {
 	if !com.IsAlphaNumericUnderscoreHyphen(f.Ident) {
 		return ctx.NewError(code.InvalidParameter, `唯一标识只能包含字母、数字、下划线或短横`).SetZone(`ident`)
 	}
+	f.Engine = strings.TrimSpace(f.Engine)
 	if len(f.Engine) == 0 {
 		return ctx.NewError(code.InvalidParameter, `引擎必选`).SetZone(`engine`)
 	}
@@ -57,6 +61,17 @@ func (f *VhostServer) check() error {
 	if exists {
 		return ctx.NewError(code.DataAlreadyExists, `唯一标识“%s”已经存在`, f.Ident).SetZone(`ident`)
 	}
+	f.ExecutableFile = strings.TrimSpace(f.ExecutableFile)
+	f.ConfigLocalFile = strings.TrimSpace(f.ConfigLocalFile)
+	f.ConfigContainerFile = strings.TrimSpace(f.ConfigContainerFile)
+	f.VhostConfigLocalDir = strings.TrimSpace(f.VhostConfigLocalDir)
+	f.VhostConfigContainerDir = strings.TrimSpace(f.VhostConfigContainerDir)
+	f.CertLocalDir = strings.TrimSpace(f.CertLocalDir)
+	f.CertContainerDir = strings.TrimSpace(f.CertContainerDir)
+	f.WorkDir = strings.TrimSpace(f.WorkDir)
+	f.CmdWithConfig = common.GetBoolFlag(f.CmdWithConfig, common.BoolN)
+	f.Disabled = common.GetBoolFlag(f.Disabled, common.BoolN)
+	f.AutoModifyConfig = common.GetBoolFlag(f.AutoModifyConfig, common.BoolN)
 	return nil
 }
 
@@ -85,4 +100,8 @@ func (f *VhostServer) Edit(mw func(db.Result) db.Result, args ...interface{}) (e
 
 func (f *VhostServer) Delete(mw func(db.Result) db.Result, args ...interface{}) (err error) {
 	return f.NgingVhostServer.Delete(mw, args...)
+}
+
+func (f *VhostServer) SetConfigFileUpdated(ts uint) error {
+	return f.NgingVhostServer.UpdateField(nil, `config_file_updated`, ts, `id`, f.Id)
 }

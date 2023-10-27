@@ -2,30 +2,31 @@ package config
 
 import (
 	"context"
-	"fmt"
-	"os/exec"
+	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
+	"time"
 
-	"github.com/admpub/log"
 	"github.com/admpub/nging/v5/application/library/config"
 	"github.com/nging-plugins/caddymanager/application/library/engine"
-	"github.com/nging-plugins/caddymanager/application/library/thirdparty"
 	"github.com/webx-top/com"
+	"github.com/webx-top/echo"
 )
+
+var _ engine.EngineConfigFileFixer = New()
 
 const Name = `caddy2`
 
+func New() *Config {
+	return &Config{
+		CommonConfig: engine.NewConfig(Name, Name),
+	}
+}
+
 type Config struct {
-	Command               string
-	CmdWithConfig         bool
+	*engine.CommonConfig
 	Endpoint              string
-	Caddyfile             string
-	ConfigInclude         string
-	ID                    string
-	WorkDir               string
-	Environ               string
-	CertLocalDir          string
-	CertContainerDir      string
 	vhostConfigDirAbsPath string
 }
 
@@ -38,40 +39,16 @@ func DefaultConfigDir() string {
 }
 
 func (c *Config) GetVhostConfigDirAbsPath() (string, error) {
-	if len(c.ConfigInclude) == 0 {
-		c.ConfigInclude = filepath.Join(DefaultConfigDir(), c.ID)
+	if len(c.VhostConfigLocalDir) == 0 {
+		c.VhostConfigLocalDir = filepath.Join(DefaultConfigDir(), c.ID)
 	}
-	return c.ConfigInclude, nil
-}
-
-func (c *Config) GetTemplateFile() string {
-	return Name
-}
-
-func (c *Config) GetIdent() string {
-	return c.ID
-}
-
-func (c *Config) GetEngine() string {
-	return Name
-}
-
-func (c *Config) GetEnviron() string {
-	return c.Environ
-}
-
-func (c *Config) GetCertLocalDir() string {
-	return c.CertLocalDir
-}
-
-func (c *Config) GetCertContainerDir() string {
-	return c.CertContainerDir
+	return c.VhostConfigLocalDir, nil
 }
 
 func (c *Config) Start(ctx context.Context) error {
 	args := []string{`start`}
-	if c.CmdWithConfig && len(c.Caddyfile) > 0 {
-		args = append(args, `--config`, c.Caddyfile)
+	if c.CmdWithConfig && len(c.EngineConfigFile()) > 0 {
+		args = append(args, `--config`, c.EngineConfigFile())
 	}
 	err := c.exec(ctx, args...)
 	return err
@@ -79,8 +56,8 @@ func (c *Config) Start(ctx context.Context) error {
 
 func (c *Config) Reload(ctx context.Context) error {
 	args := []string{`reload`}
-	if c.CmdWithConfig && len(c.Caddyfile) > 0 {
-		args = append(args, `--config`, c.Caddyfile)
+	if c.CmdWithConfig && len(c.EngineConfigFile()) > 0 {
+		args = append(args, `--config`, c.EngineConfigFile())
 	}
 	err := c.exec(ctx, args...)
 	return err
@@ -88,8 +65,8 @@ func (c *Config) Reload(ctx context.Context) error {
 
 func (c *Config) TestConfig(ctx context.Context) error {
 	args := []string{`validate`}
-	if c.CmdWithConfig && len(c.Caddyfile) > 0 {
-		args = append(args, `--config`, c.Caddyfile)
+	if c.CmdWithConfig && len(c.EngineConfigFile()) > 0 {
+		args = append(args, `--config`, c.EngineConfigFile())
 	}
 	err := c.exec(ctx, args...)
 	return err
@@ -107,31 +84,82 @@ func (c *Config) exec(ctx context.Context, args ...string) error {
 			c.Command += `.exe`
 		}
 	}
-	command := c.Command
-	if c.Environ == engine.EnvironContainer {
-		rootArgs := com.ParseArgs(command)
-		if len(rootArgs) > 1 {
-			command = rootArgs[0]
-			args = append(rootArgs[1:], args...)
-		}
-	}
-	cmd := exec.CommandContext(ctx, command, args...)
-	cmd.Dir = c.WorkDir
-	if stderr := thirdparty.GetCtxStderr(ctx); stderr != nil {
-		cmd.Stderr = stderr
-	}
-	if stdout := thirdparty.GetCtxStdout(ctx); stdout != nil {
-		cmd.Stdout = stdout
-	}
-	if cmd.Stderr == nil && cmd.Stdout == nil {
-		result, err := cmd.CombinedOutput()
-		if err != nil {
-			err = fmt.Errorf(`%s: %w`, result, err)
-		} else {
-			log.Infof(`%s`, result)
-		}
-		return err
-	}
-	err := cmd.Run()
+	_, err := c.CommonConfig.Exec(ctx, args...)
 	return err
+}
+
+func (c *Config) FixEngineConfigFile(deleteMode ...bool) (bool, error) {
+	if len(c.EngineConfigLocalFile) == 0 || len(c.VhostConfigDir()) == 0 {
+		return false, nil
+	}
+	var delmode bool
+	if len(deleteMode) > 0 {
+		delmode = deleteMode[0]
+	}
+	findString := `[\s]*import[\s]+["']?` + regexp.QuoteMeta(c.VhostConfigDir()) + `[\/]?\*(\.conf)?["']?[\s]*`
+	re, err := regexp.Compile(findString)
+	if err != nil {
+		return false, err
+	}
+	var httpBlockStart bool
+	var seekedContent string
+	var hasUpdate bool
+	err = com.SeekFileLines(c.EngineConfigLocalFile, func(line string) error {
+		if httpBlockStart && strings.TrimRight(line, "\t ") == `}` {
+			if !delmode {
+				dir := c.VhostConfigDir()
+				var sep string
+				if strings.Contains(dir, `\`) {
+					sep = `\`
+				} else {
+					sep = `/`
+				}
+				if !strings.HasSuffix(dir, sep) {
+					dir += sep
+				}
+				line = "\n\timport \"" + dir + "*.conf\";\n" + line
+				hasUpdate = true
+			}
+			httpBlockStart = false
+		}
+		seekedContent += line + "\n"
+		if hasUpdate {
+			return nil
+		}
+		if !httpBlockStart && strings.TrimRight(line, "\t ") == `{` {
+			httpBlockStart = true
+			return nil
+		}
+		cleaned := strings.TrimSpace(line)
+		if len(cleaned) == 0 {
+			return nil
+		}
+		if strings.HasPrefix(cleaned, `#`) {
+			return nil
+		}
+		if httpBlockStart && re.MatchString(cleaned) {
+			if delmode {
+				seekedContent = strings.TrimSuffix(seekedContent, line+"\n")
+				hasUpdate = true
+				httpBlockStart = false
+				return nil
+			}
+			return echo.ErrExit
+		}
+		return nil
+	})
+	if err != nil {
+		if err != echo.ErrExit {
+			return hasUpdate, err
+		}
+	}
+	if hasUpdate {
+		err = com.Copy(c.EngineConfigLocalFile, c.EngineConfigLocalFile+`.`+time.Now().Format(`20060102150405.000`)+`.ngingbak`)
+		if err != nil {
+			return hasUpdate, err
+		}
+		seekedContent = strings.TrimRight(seekedContent, "\n ")
+		return hasUpdate, os.WriteFile(c.EngineConfigLocalFile, com.Str2bytes(seekedContent), 0644)
+	}
+	return hasUpdate, nil
 }

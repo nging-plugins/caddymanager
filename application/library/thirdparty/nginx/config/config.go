@@ -4,38 +4,41 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/admpub/log"
-	"github.com/admpub/nging/v5/application/library/config"
-	"github.com/nging-plugins/caddymanager/application/library/engine"
-	"github.com/nging-plugins/caddymanager/application/library/thirdparty"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
+
+	"github.com/admpub/nging/v5/application/library/config"
+	"github.com/nging-plugins/caddymanager/application/library/engine"
 )
 
 const Name = `nginx`
 
 var (
-	regexConfigFile    = regexp.MustCompile(`[\s]+configuration file (.+\.conf)[\s]+`)
-	regexConfigInclude = regexp.MustCompile(`^include[\s]+([\S]+(?:\*|\*\.conf))[\s]*;(?:[\s]*#.*)?[\s]*$`)
-	regexVersion       = regexp.MustCompile(`[\d]+\.[\d]+\.[\d]+`)
+	regexConfigFile     = regexp.MustCompile(`[\s]+configuration file (.+\.conf)[\s]+`)
+	regexConfigInclude  = regexp.MustCompile(`^include[\s]+([\S]+(?:\*|\*\.conf))[\s]*;(?:[\s]*#.*)?[\s]*$`)
+	regexVersion        = regexp.MustCompile(`[\d]+\.[\d]+\.[\d]+`)
+	regexHttpBlockStart = regexp.MustCompile(`^http[\s]*\{$`)
+
+	_ engine.EngineConfigFileFixer = New()
 )
 
+func New() *Config {
+	return &Config{
+		CommonConfig: engine.NewConfig(Name, Name),
+	}
+}
+
 type Config struct {
-	Command          string
-	CmdWithConfig    bool
-	Version          string
-	ConfigPath       string
-	ConfigInclude    string
-	ID               string
-	WorkDir          string
-	Environ          string
-	CertLocalDir     string
-	CertContainerDir string
+	Version string
+	*engine.CommonConfig
 }
 
 func (c *Config) Init() error {
@@ -47,14 +50,14 @@ func (c *Config) Init() error {
 			return err
 		}
 	}
-	if len(c.ConfigInclude) == 0 {
-		if len(c.ConfigPath) == 0 {
-			c.ConfigPath, err = c.getConfigFilePath(ctx)
+	if len(c.VhostConfigLocalDir) == 0 {
+		if len(c.EngineConfigLocalFile) == 0 {
+			c.EngineConfigLocalFile, err = c.getEngineConfigLocalFile(ctx)
 			if err != nil {
 				return err
 			}
 		}
-		c.ConfigInclude, err = c.getConfigIncludePath(c.ConfigPath)
+		c.VhostConfigLocalDir, err = c.getVhostConfigLocalDir(c.EngineConfigLocalFile)
 	}
 	return err
 }
@@ -64,45 +67,21 @@ func DefaultConfigDir() string {
 }
 
 func (c *Config) GetVhostConfigDirAbsPath() (string, error) {
-	if len(c.ConfigInclude) == 0 {
+	if len(c.VhostConfigLocalDir) == 0 {
 		if err := c.Init(); err != nil {
 			log.Error(err)
-			if len(c.ConfigInclude) == 0 {
-				c.ConfigInclude = filepath.Join(DefaultConfigDir(), c.ID)
+			if len(c.VhostConfigLocalDir) == 0 {
+				c.VhostConfigLocalDir = filepath.Join(DefaultConfigDir(), c.ID)
 			}
 		}
 	}
-	return c.ConfigInclude, nil
-}
-
-func (c *Config) GetTemplateFile() string {
-	return Name
-}
-
-func (c *Config) GetIdent() string {
-	return c.ID
-}
-
-func (c *Config) GetEngine() string {
-	return Name
-}
-
-func (c *Config) GetEnviron() string {
-	return c.Environ
-}
-
-func (c *Config) GetCertLocalDir() string {
-	return c.CertLocalDir
-}
-
-func (c *Config) GetCertContainerDir() string {
-	return c.CertContainerDir
+	return c.VhostConfigLocalDir, nil
 }
 
 func (c *Config) Start(ctx context.Context) error {
 	args := []string{}
-	if c.CmdWithConfig && len(c.ConfigPath) > 0 && strings.HasSuffix(c.ConfigPath, `.conf`) {
-		args = append(args, `-c`, c.ConfigPath)
+	if c.CmdWithConfig && len(c.EngineConfigFile()) > 0 && strings.HasSuffix(c.EngineConfigFile(), `.conf`) {
+		args = append(args, `-c`, c.EngineConfigFile())
 	}
 	_, err := c.exec(ctx)
 	return err
@@ -110,8 +89,8 @@ func (c *Config) Start(ctx context.Context) error {
 
 func (c *Config) TestConfig(ctx context.Context) error {
 	args := []string{`-t`}
-	if c.CmdWithConfig && len(c.ConfigPath) > 0 {
-		args = append(args, `-c`, c.ConfigPath)
+	if c.CmdWithConfig && len(c.EngineConfigFile()) > 0 {
+		args = append(args, `-c`, c.EngineConfigFile())
 	}
 	//nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
 	//nginx: configuration file /etc/nginx/nginx.conf test is successful
@@ -142,7 +121,7 @@ func (c *Config) getVersion(ctx context.Context) (string, error) {
 	return string(parts[1]), err
 }
 
-func (c *Config) getConfigFilePath(ctx context.Context) (string, error) {
+func (c *Config) getEngineConfigLocalFile(ctx context.Context) (string, error) {
 	result, err := c.exec(ctx, `-t`)
 	if err != nil {
 		return ``, err
@@ -160,7 +139,7 @@ func (c *Config) getConfigFilePath(ctx context.Context) (string, error) {
 	return configFilePath, err
 }
 
-func (c *Config) getConfigIncludePath(confPath string) (string, error) {
+func (c *Config) getVhostConfigLocalDir(confPath string) (string, error) {
 	if len(confPath) == 0 {
 		return ``, nil
 	}
@@ -232,42 +211,105 @@ func (c *Config) exec(ctx context.Context, args ...string) ([]byte, error) {
 			c.Command += `.exe`
 		}
 	}
-	command := c.Command
-	if c.Environ == engine.EnvironContainer {
-		rootArgs := com.ParseArgs(command)
-		if len(rootArgs) > 1 {
-			command = rootArgs[0]
-			args = append(rootArgs[1:], args...)
+	return c.CommonConfig.Exec(ctx, args...)
+}
+
+func (c *Config) FixEngineConfigFile(deleteMode ...bool) (bool, error) {
+	if len(c.EngineConfigLocalFile) == 0 || len(c.VhostConfigDir()) == 0 {
+		return false, nil
+	}
+	var delmode bool
+	if len(deleteMode) > 0 {
+		delmode = deleteMode[0]
+	}
+	findString := `[\s]*include[\s]+["']?` + regexp.QuoteMeta(c.VhostConfigDir()) + `[\/]?\*(\.conf)?["']?[\s]*;`
+	re, err := regexp.Compile(findString)
+	if err != nil {
+		return false, err
+	}
+	var httpBlockStart bool
+	var seekedContent string
+	var hasUpdate bool
+	err = com.SeekFileLines(c.EngineConfigLocalFile, func(line string) error {
+		if httpBlockStart && strings.TrimRight(line, "\t ") == `}` {
+			if !delmode {
+				dir := c.VhostConfigDir()
+				var sep string
+				if strings.Contains(dir, `\`) {
+					sep = `\`
+				} else {
+					sep = `/`
+				}
+				if !strings.HasSuffix(dir, sep) {
+					dir += sep
+				}
+				line = "\n\tinclude \"" + dir + "*.conf\";\n" + line
+				hasUpdate = true
+			}
+			httpBlockStart = false
+		}
+		seekedContent += line + "\n"
+		if hasUpdate {
+			return nil
+		}
+		cleaned := strings.TrimSpace(line)
+		if len(cleaned) == 0 {
+			return nil
+		}
+		if strings.HasPrefix(cleaned, `#`) {
+			return nil
+		}
+		if !httpBlockStart && regexHttpBlockStart.MatchString(cleaned) {
+			httpBlockStart = true
+			return nil
+		}
+		if httpBlockStart && re.MatchString(cleaned) {
+			if delmode {
+				seekedContent = strings.TrimSuffix(seekedContent, line+"\n")
+				hasUpdate = true
+				httpBlockStart = false
+				return nil
+			}
+			return echo.ErrExit
+		}
+		return nil
+	})
+	if err != nil {
+		if err != echo.ErrExit {
+			return hasUpdate, err
 		}
 	}
-	cmd := exec.CommandContext(ctx, command, args...)
-	cmd.Dir = c.WorkDir
-	if stderr := thirdparty.GetCtxStderr(ctx); stderr != nil {
-		cmd.Stderr = stderr
-	}
-	if stdout := thirdparty.GetCtxStdout(ctx); stdout != nil {
-		cmd.Stdout = stdout
-	}
-	if cmd.Stderr == nil && cmd.Stdout == nil {
-		result, err := cmd.CombinedOutput()
+	if hasUpdate {
+		err = com.Copy(c.EngineConfigLocalFile, c.EngineConfigLocalFile+`.`+time.Now().Format(`20060102150405.000`)+`.ngingbak`)
 		if err != nil {
-			err = fmt.Errorf(`%s: %w`, result, err)
+			return hasUpdate, err
 		}
-		return result, err
+		seekedContent = strings.TrimRight(seekedContent, "\n ")
+		return hasUpdate, os.WriteFile(c.EngineConfigLocalFile, com.Str2bytes(seekedContent), 0644)
 	}
-	err := cmd.Run()
-	return nil, err
+	return hasUpdate, nil
 }
 
 func (c *Config) RenewalCert(ctx context.Context, domain, email string) error {
 	command := strings.TrimSpace(c.Command)
 	command = strings.TrimSuffix(command, `.exe`)
 	command = strings.TrimSuffix(command, `nginx`)
-	command += `certbot`
 	if c.Environ == engine.EnvironContainer {
-		return RenewalCert(ctx, command, domain, email, c.CertContainerDir)
+		certDir := filepath.Join(c.CertContainerDir, `_letsencrypt`)
+		certDir = filepath.ToSlash(certDir)
+		cmd := exec.CommandContext(ctx, command+`mkdir`, `-R`, `0644`, certDir)
+		result, err := cmd.CombinedOutput()
+		if err != nil {
+			err = fmt.Errorf(`%s: %w`, result, err)
+			return err
+		}
+		command += `certbot`
+		return RenewalCert(ctx, command, domain, email, certDir)
 	}
-	return RenewalCert(ctx, command, domain, email, c.CertLocalDir)
+	command += `certbot`
+	certDir := filepath.Join(c.CertLocalDir, `_letsencrypt`)
+	com.MkdirAll(certDir, os.ModePerm)
+	return RenewalCert(ctx, command, domain, email, certDir)
 }
 
 func RenewalCert(ctx context.Context, customCmd, domain, email, certDir string) error {

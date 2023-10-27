@@ -45,6 +45,8 @@ import (
 	"github.com/admpub/nging/v5/application/library/msgbox"
 )
 
+const UnsupportedPathInfo = `unsupported-nging-default-webserver-config`
+
 var (
 	DefaultConfig = &Config{
 		Agreed:                  true,
@@ -175,11 +177,27 @@ func (c *Config) GetEnviron() string {
 }
 
 func (c *Config) GetCertLocalDir() string {
-	return ``
+	return UnsupportedPathInfo
 }
 
 func (c *Config) GetCertContainerDir() string {
-	return ``
+	return UnsupportedPathInfo
+}
+
+func (c *Config) GetVhostConfigLocalDir() string {
+	return UnsupportedPathInfo
+}
+
+func (c *Config) GetVhostConfigContainerDir() string {
+	return UnsupportedPathInfo
+}
+
+func (c *Config) GetEngineConfigLocalFile() string {
+	return UnsupportedPathInfo
+}
+
+func (c *Config) GetEngineConfigContainerFile() string {
+	return UnsupportedPathInfo
 }
 
 func (c *Config) setDefaultCaddyfile() (err error) {

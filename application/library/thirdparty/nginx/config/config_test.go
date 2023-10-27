@@ -2,6 +2,8 @@ package config
 
 import (
 	"context"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/nging-plugins/caddymanager/application/library/engine"
@@ -20,37 +22,33 @@ func TestParseConfigFilePath(t *testing.T) {
 }
 
 func TestConfig(t *testing.T) {
-	c := &Config{
-		//Environ: engine.EnvironContainer,
-		//Command: `docker exec nginx nginx`,
-	}
+	c := New()
 	ctx := context.Background()
 	var err error
 	c.Version, err = c.getVersion(ctx)
 	assert.NoError(t, err)
 	assert.Equal(t, `1.18.0`, c.Version)
-	c.ConfigPath, err = c.getConfigFilePath(ctx)
+	c.EngineConfigLocalFile, err = c.getEngineConfigLocalFile(ctx)
 	assert.NoError(t, err)
-	assert.Equal(t, `/etc/nginx/nginx.conf`, c.ConfigPath)
+	assert.Equal(t, `/etc/nginx/nginx.conf`, c.EngineConfigLocalFile)
 
-	c.ConfigInclude, err = c.getConfigIncludePath(c.ConfigPath)
+	c.VhostConfigLocalDir, err = c.getVhostConfigLocalDir(c.EngineConfigLocalFile)
 	assert.NoError(t, err)
-	assert.Equal(t, `/etc/nginx/sites-enabled/`, c.ConfigInclude)
+	assert.Equal(t, `/etc/nginx/sites-enabled/`, c.VhostConfigLocalDir)
 
 	err = c.TestConfig(ctx)
 	assert.NoError(t, err)
 
 	c.CmdWithConfig = true
-	c.ConfigPath = `/not-exists.conf`
+	c.EngineConfigLocalFile = `/not-exists.conf`
 	err = c.TestConfig(ctx)
 	assert.Error(t, err)
 }
 
 func _TestConfig2(t *testing.T) {
-	c := &Config{
-		Environ: engine.EnvironContainer,
-		Command: `docker exec nginx nginx`,
-	}
+	c := New()
+	c.Environ = engine.EnvironContainer
+	c.Command = `docker exec nginx nginx`
 	ctx := context.Background()
 	var err error
 	assert.NoError(t, err)
@@ -61,4 +59,28 @@ func _TestConfig2(t *testing.T) {
 	matches := regexVersion.FindStringSubmatch(string(b))
 	com.Dump(matches)
 	_, _ = c, ctx
+}
+
+func TestFixEngineConfigFile(t *testing.T) {
+	c := New()
+	var err error
+	os.Remove(`./testdata/nginx.conf`)
+	originalFile, err := filepath.Abs(`./testdata/nginx.conf.original`)
+	com.Copy(originalFile, `./testdata/nginx.conf`)
+	assert.NoError(t, err)
+	c.Environ = engine.EnvironLocal
+	c.VhostConfigLocalDir = `/etc/nginx/sites-nging/`
+	c.EngineConfigLocalFile, _ = filepath.Abs(`./testdata/nginx.conf`)
+	var hasUpdate bool
+	hasUpdate, err = c.FixEngineConfigFile()
+	assert.NoError(t, err)
+	assert.True(t, hasUpdate)
+
+	hasUpdate, err = c.FixEngineConfigFile()
+	assert.NoError(t, err)
+	assert.False(t, hasUpdate)
+
+	hasUpdate, err = c.FixEngineConfigFile(true)
+	assert.NoError(t, err)
+	assert.True(t, hasUpdate)
 }

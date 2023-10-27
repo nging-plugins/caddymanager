@@ -48,17 +48,8 @@ func (b *Engine) ListConfig(ctx echo.Context) ([]engine.Configer, error) {
 }
 
 func (b *Engine) BuildConfig(ctx echo.Context, m *dbschema.NgingVhostServer) engine.Configer {
-	cfg := &nginxConfigPkg.Config{
-		Command:          m.ExecutableFile,
-		ConfigPath:       m.ConfigFile,
-		ConfigInclude:    m.VhostConfigDir,
-		CmdWithConfig:    m.CmdWithConfig == common.BoolY,
-		ID:               m.Ident,
-		WorkDir:          m.WorkDir,
-		Environ:          m.Environ,
-		CertLocalDir:     m.CertLocalDir,
-		CertContainerDir: m.CertContainerDir,
-	}
+	cfg := nginxConfigPkg.New()
+	cfg.CopyFrom(m)
 	return cfg
 }
 

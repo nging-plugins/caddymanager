@@ -46,8 +46,20 @@
 							<td>
                                 <div class="label-group wrap">
                                     <span class="label label-success label-sm">{{`执行文件`|$.T}}</span> {{$v.ExecutableFile}}<br />
-                                    <span class="label label-info label-sm">{{`引擎配置`|$.T}}</span> {{$v.ConfigFile|Default `-`}}<br />
-                                    <span class="label label-primary label-sm">{{`网站配置`|$.T}}</span> {{$v.VhostConfigDir|Default `-`}}
+                                    <span class="label label-info label-sm">{{`引擎配置`|$.T}}</span> {{$v.ConfigLocalFile|Default `-` -}}
+									{{- if and (eq $v.Environ `container`) $v.ConfigContainerFile -}}
+									:{{$v.ConfigContainerFile}}
+									{{- end -}}
+									<br />
+                                    <span class="label label-primary label-sm">{{`网站配置`|$.T}}</span> {{$v.VhostConfigLocalDir|Default `-` -}}
+									{{- if and (eq $v.Environ `container`) $v.VhostConfigContainerDir -}}
+									:{{$v.VhostConfigContainerDir}}
+									{{- end -}}
+									<br />
+                                    <span class="label label-primary label-sm">{{`证书目录`|$.T}}</span> {{$v.CertLocalDir|Default `-` -}}
+									{{- if and (eq $v.Environ `container`) $v.CertContainerDir -}}
+									:{{$v.CertContainerDir}}
+									{{- end -}}
                                 </div>
                             </td>
 							<td class="text-center">
