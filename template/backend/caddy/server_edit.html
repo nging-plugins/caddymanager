@@ -213,17 +213,17 @@ $(function(){
   $('#vhostServerForm input[name=engine]').on('click',function(){
     setDefaultConfigDirTips(this);
   })
-  $('#vhostServerForm input[name=ident]').on('change',function(){
+  $('#vhostServerForm input[name=ident]').on('click',function(){
     $('#defaultConfigLocalSubdir').text(this.value);
   })
-  $('#vhostServerForm input[name=environ]').on('change',function(){
+  $('#vhostServerForm input[name=environ]').on('click',function(){
     var $form=$('#vhostServerForm');
     $form.find('.environ-'+this.value+'-show').show();
     $form.find('[class^="environ-"]:not(.environ-'+this.value+'-show)').hide();
-    $form.find('input[name=autoModifyConfig]:checked').trigger('change');
+    $form.find('input[name=autoModifyConfig]:checked').trigger('click');
   });
-  $('#vhostServerForm input[name=environ]:checked').trigger('change');
-  $('#vhostServerForm input[name=autoModifyConfig]').on('change',function(){
+  $('#vhostServerForm input[name=environ]:checked').trigger('click');
+  $('#vhostServerForm input[name=autoModifyConfig]').on('click',function(){
     var $form=$('#vhostServerForm');
     var switchR=function(name,required){
       var $e=$form.find('input[name='+name+']');
@@ -246,7 +246,7 @@ $(function(){
       switchR('configContainerFile',false);switchR('vhostConfigContainerDir',false);
     }
   });
-  $('#vhostServerForm input[name=autoModifyConfig]:checked').trigger('change');
+  $('#vhostServerForm input[name=autoModifyConfig]:checked').trigger('click');
 })
 </script>
 {{/Block}}
