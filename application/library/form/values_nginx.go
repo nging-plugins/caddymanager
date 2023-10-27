@@ -16,35 +16,18 @@ type NginxDomainInfo struct {
 	Domains []string
 }
 
-/*
-$remote_addr             客户端地址                                    211.28.65.253
-$remote_user             客户端用户名称                                --
-$time_local              访问时间和时区                                18/Jul/2012:17:00:01 +0800
-$request                 请求的URI和HTTP协议                           "GET /article-10000.html HTTP/1.1"
-$http_host               请求地址，即浏览器中你输入的地址（IP或域名）     www.wang.com 192.168.100.100
-$status                  HTTP请求状态                                  200
-$upstream_status         upstream状态                                  200
-$body_bytes_sent         发送给客户端文件内容大小                        1547
-$http_referer            url跳转来源                                   https://www.baidu.com/
-$http_user_agent         用户终端浏览器等信息                           "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; SV1; GTB7.0; .NET4.0C;
-$ssl_protocol            SSL协议版本                                   TLSv1
-$ssl_cipher              交换数据中的算法                               RC4-SHA
-$upstream_addr           后台upstream的地址，即真正提供服务的主机地址     10.10.10.100:80
-$request_time            整个请求的总时间                               0.205
-$upstream_response_time  请求过程中，upstream响应时间                    0.002
-*/
-//{remote} - {user} [{when}] "{method} {scheme} {host} {uri} {proto}" {status} {size} "{>Referer}" "{>User-Agent}" {latency}
+// {remote} - {user} [{when}] "{method} {scheme} {host} {uri} {proto}" {status} {size} "{>Referer}" "{>User-Agent}" {latency}
 var NginxLogFormatReplacer = strings.NewReplacer(
+	//`{method} {scheme} {host} {uri} {proto}`, `$request`,
+	`{method} {uri} {proto}`, `$request`,
 	`{remote}`, `$remote_addr`,
 	`{user}`, `$remote_user`,
 	`{when}`, `$time_local`,
-	//`{method}`,`$remote_addr`,
-	//`{scheme}`,`$remote_addr`,
+	`{method}`, `$request_method`,
+	`{scheme}`, `$scheme`,
 	`{host}`, `$http_host`,
 	`{uri}`, `$request_uri`,
-	`{method} {scheme} {host} {uri} {proto}`, `$request`,
-	`{method} {uri} {proto}`, `$request`,
-	//`{proto}`,`$remote_addr`,
+	`{proto}`, `$server_protocol`,
 	`{status}`, `$status`,
 	`{size}`, `$body_bytes_sent`,
 	`{>Referer}`, `$http_referer`,
@@ -224,4 +207,44 @@ func (v Values) IteratorHeaderKV(addon string, item string, plusPrefix string, m
 		return template.HTML(r)
 	}
 	return r
+}
+
+func (v Values) IteratorNginxProxyHeaderKV() interface{} {
+	addon := `proxy`
+	item := `header_downstream`
+	if len(addon) > 0 && len(item) > 0 {
+		addon += `_`
+	}
+	k := addon + item + `_k`
+	keys, _ := v.Values[k]
+
+	k = addon + item + `_v`
+	values, _ := v.Values[k]
+
+	var r, t string
+	l := len(values)
+	suffix := `;`
+	for i, k := range keys {
+		if i < l {
+			var prefix string
+			if strings.HasPrefix(k, `-`) {
+				k = strings.TrimPrefix(k, `-`)
+				prefix = `proxy_hide_header`
+				r += t + prefix + ` ` + k + suffix
+			} else {
+				k = strings.TrimPrefix(k, `+`)
+				prefix = `proxy_pass_header`
+				v := values[i]
+				if len(v) > 0 {
+					prefix = `add_header`
+					v = `"` + com.AddCSlashes(v, '"') + `"`
+					r += t + prefix + ` ` + k + ` ` + v + suffix
+				} else {
+					r += t + prefix + ` ` + k + suffix
+				}
+			}
+			t = "\n"
+		}
+	}
+	return template.HTML(r)
 }

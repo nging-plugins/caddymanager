@@ -30,19 +30,23 @@ upstream nging_proxy_{{$.Get `id`}}{
     {{end}}
 {{end}}
 
+
 {{if eq ($v.Get "log") "1"}}
 log_format nging_log_format_{{$.Get `id`}} '{{$v.AsNginxLogFormat|$v.AddSlashesSingleQuote|ToHTML}}';
 {{end}}
+
 
 server {
     listen {{$val.Port}} {{- range $val.Args}} {{.}}{{end}};
     listen [::]:{{$val.Port}} {{- range $val.Args}} {{.}}{{end}};
     server_name {{Join $val.Domains `,`}};
 
+
     {{$root := $v.Get "root"}}
     {{if $root}}
     root "{{$root|$v.AddSlashes|ToHTML}}";
     {{end}}
+
 
     {{if $v.Get "index"}}
     index {{$v.Get "index"}};
@@ -50,6 +54,7 @@ server {
     index {{$v.Get "fastcgi_index"}} index.html index.htm index.txt default.html default.htm default.txt;
     {{end}}
     
+
     {{if eq ($v.Get "gzip") "1"}}
     gzip            on;
     gzip_vary       on;
@@ -132,7 +137,7 @@ server {
         {{end}}
 
         {{$v.IteratorHeaderKV "proxy" "header_upstream" "        proxy_set_header    " "" true}}
-        {{$v.IteratorHeaderKV "proxy" "header_downstream" "        proxy_pass_header    " "        proxy_hide_header    "}}
+        {{$v.IteratorNginxProxyHeaderKV}}
 
         #proxy_socket_keepalive on;
 
@@ -156,11 +161,13 @@ server {
     }
     {{end}}
 
+
     {{if eq ($v.Get "log") "1"}}
     access_log  "{{$v.Get "log_file"|$v.AddSlashes|ToHTML}}" nging_log_format_{{$.Get `id`}} buffer=512k flush=1m;
     #error_log  /var/log/nginx/error.log warn;
     {{end}}
  
+
     {{if eq ($v.Get "tls") "1"}}
     ssl on;
         {{if and ($v.Get "tls_cert") ($v.Get "tls_key")}}
@@ -181,6 +188,40 @@ server {
     ssl off;
     {{end}}
 
+
+    {{if eq ($v.Get "cors") "1"}}
+    {{if $v.Get `cors_origin_regexp`}}
+    if ($host ~* "^{{$v.Get `cors_origin_regexp`|$v.AddSlashes}}$"){
+        add_header Access-Control-Allow-Origin $scheme://$host always;
+    }
+    {{else}}
+    add_header Access-Control-Allow-Origin {{$v.Get `cors_origin`}} always;
+    {{end}}
+
+    add_header Access-Control-Allow-Methods {{$v.Get `cors_methods`}} always;
+
+    {{if ne ($v.Get `cors_allow_credentials`) ``}}
+    add_header Access-Control-Allow-Credentials {{$v.Get `cors_allow_credentials`}} always;
+    {{end}}
+
+    {{if ne ($v.Get `cors_allowed_headers`) ``}}
+    add_header Access-Control-Allow-Headers {{$v.Get `cors_allowed_headers`}} always;
+    {{end}}
+
+    {{if ne ($v.Get `cors_exposed_headers`) ``}}
+    add_header Access-Control-Expose-Headers {{$v.Get `cors_exposed_headers`}} always;
+    {{end}}
+
+    {{if $v.Get `cors_max_age`}}
+    add_header Access-Control-Max-Age {{$v.Get `cors_max_age`}} always;
+    {{end}}
+
+    if ($request_method = OPTIONS) {
+        return 204;
+    }
+    {{end}}
+
+
     location ~* /[^/]*\.(bak|inc|lib|sh|tpl|lbi|dwt|dhp) {
         deny all;
      }
@@ -190,6 +231,8 @@ server {
      location ~ /\#[^/]*/ {
         deny all;
      }
+
+
     {{$v.Get "rewrite_rule"|ToHTML}}
 }
 {{end}}
