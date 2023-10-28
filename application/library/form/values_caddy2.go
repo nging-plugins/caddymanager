@@ -39,6 +39,16 @@ func (v Values) AddWildcardSuffix(path string) string {
 	return path + `*`
 }
 
+func (v Values) AddWildcardPrefix(path string) string {
+	if strings.HasPrefix(path, `*`) {
+		return path
+	}
+	if !strings.HasPrefix(path, `.`) {
+		path = `.` + path
+	}
+	return `*` + path
+}
+
 func (v Values) AddonAttrFullKey(fullKey string, item string, defaults ...string) string {
 	val := v.Values.Get(fullKey)
 	if len(val) == 0 {

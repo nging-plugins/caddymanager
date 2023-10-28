@@ -73,6 +73,10 @@ func (v Values) SplitBySpaceWithWildcardSuffix(content string) []string {
 	return SplitBySpace(content, v.AddWildcardSuffix)
 }
 
+func (v Values) SplitBySpaceWithWildcardPrefix(content string) []string {
+	return SplitBySpace(content, v.AddWildcardPrefix)
+}
+
 func (v Values) RegexpQuote(content string) string {
 	return regexp.QuoteMeta(content)
 }
@@ -80,6 +84,13 @@ func (v Values) RegexpQuote(content string) string {
 func (v Values) SliceAddWildcardSuffix(content []string) []string {
 	for index, value := range content {
 		content[index] = v.AddWildcardSuffix(value)
+	}
+	return content
+}
+
+func (v Values) SliceAddWildcardPrefix(content []string) []string {
+	for index, value := range content {
+		content[index] = v.AddWildcardPrefix(value)
 	}
 	return content
 }

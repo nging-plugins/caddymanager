@@ -111,11 +111,6 @@ server {
         {{if and ($v.IsEnabled "browse") (eq ($v.Get "browse_path") `/`)}}
         {{Include "caddy/makeconfig/nginx/browse" $}}
         {{end}}
-
-        {{if $v.IsEnabled "expires"}}{{range $kk,$vv := $v.GetKVList "expires" "match"}}{{if eq $vv.K `/`}}
-        expires {{$vv.V|Default `12h`}};
-        {{end}}{{end}}{{end}}
-
     }
 
     {{Include "caddy/makeconfig/nginx/gzip" $}}
@@ -138,11 +133,9 @@ server {
     
     {{if $v.IsEnabled "expires"}}
     {{range $kk,$vv := $v.GetKVList "expires" "match"}}
-    {{if ne $vv.K `/`}}
-    location ~ {{$vv.K}} {
+    location ~ "{{$vv.K|$v.AddSlashes|ToHTML}}" {
         expires {{$vv.V|Default `12h`}};
     }
-    {{end}}
     {{end}}
     {{end}}
 

@@ -18,7 +18,7 @@
             <h3>{{$.Stored.title}}</h3>
           </div>
           <div class="content">
-              <form class="form-horizontal group-border-dashed" method="POST" action="">
+              <form class="form-horizontal group-border-dashed" method="POST" action="" id="vhostForm">
               <div class="form-group">
                   <label class="col-sm-2 control-label">{{"分组"|$.T}}</label>
                   <div class="col-sm-3">
@@ -245,7 +245,7 @@
                 </div>
               </div>
               
-              <div class="form-group">
+              <div class="engine-show-default form-group">
                 <label class="col-sm-2 control-label">{{"IP过滤"|$.T}}<a href="https://caddyserver.com/docs/http.ipfilter" target="_blank" data-toggle="tooltip" title="{{"查看文档"|$.T}}" class="normal">(?)</a></label>
                 <div class="col-sm-8">
                   {{$v := $.Form "ipfilter"}}
@@ -261,7 +261,7 @@
                 </div>
               </div>
 
-              <div class="form-group">
+              <div class="engine-show-default form-group">
                 <label class="col-sm-2 control-label">{{"响应内容过滤"|$.T}}<a href="https://caddyserver.com/docs/http.filter" target="_blank" data-toggle="tooltip" title="{{"查看文档"|$.T}}" class="normal">(?)</a></label>
                 <div class="col-sm-8">
                   {{$v := $.Form "filter"}}
@@ -359,7 +359,7 @@ redir [code] {
                   </div>
                 </div>
               </div>
-              <div class="form-group">
+              <div class="engine-show-default form-group">
                 <label class="col-sm-2 control-label">{{"限流"|$.T}}</label>
                 <div class="col-sm-8">
                   {{$v := $.Form "ratelimit"}}
@@ -389,7 +389,7 @@ redir [code] {
                   </div>
                 </div>
               </div>
-              <div class="form-group">
+              <div class="engine-show-default form-group">
                 <label class="col-sm-2 control-label">{{"JWT"|$.T}}</label>
                 <div class="col-sm-8">
                   {{$v := $.Form "jwt"}}
@@ -405,7 +405,7 @@ redir [code] {
                   <div class="help-block">JSON Web Token</div>
                 </div>
               </div>
-              <div class="form-group">
+              <div class="engine-show-default form-group">
                 <label class="col-sm-2 control-label">{{"多语言"|$.T}}</label>
                 <div class="col-sm-8">
                   {{$v := $.Form "locale"}}
@@ -421,7 +421,7 @@ redir [code] {
                   <div class="help-block">{{"获取当前语言类型并设置到占位符{>Detected-Locale}中"|$.T}}</div>
                 </div>
               </div>
-              <div class="form-group">
+              <div class="engine-show-default form-group">
                 <label class="col-sm-2 control-label">{{"反爬虫"|$.T}}</label>
                 <div class="col-sm-8">
                   {{$v := $.Form "nobots"}}
@@ -436,7 +436,7 @@ redir [code] {
                   </div>
                 </div>
               </div>
-              <div class="form-group">
+              <div class="engine-show-default form-group">
                 <label class="col-sm-2 control-label">{{"Prometheus"|$.T}}</label>
                 <div class="col-sm-8">
                   {{$v := $.Form "prometheus"}}
@@ -451,7 +451,7 @@ redir [code] {
                   </div>
                 </div>
               </div>
-              <div class="form-group">
+              <div class="engine-show-default form-group">
                 <label class="col-sm-2 control-label">{{"S3Browser"|$.T}}</label>
                 <div class="col-sm-8">
                   {{$v := $.Form "s3browser"}}
@@ -467,7 +467,7 @@ redir [code] {
                   <div class="help-block">{{"浏览 Amazon S3(或其它与S3兼容的对象存储引擎) 对象目录"|$.T}}</div>
                 </div>
               </div>
-              <div class="form-group">
+              <div class="engine-show-default form-group">
                 <label class="col-sm-2 control-label">{{"WebDAV"|$.T}}</label>
                 <div class="col-sm-8">
                   {{$v := $.Form "webdav"}}
@@ -608,12 +608,12 @@ initReqPlaceholdersModal();
 $(window).on('resize',function(){
   initReqPlaceholdersModal();
 });
-$('[data-slide-settings]').each(function(){
+$('#vhostForm [data-slide-settings]').each(function(){
   var eid='#'+$(this).attr('name')+'-settings';
   if($(eid).data('history'))$(eid).data('history',null);
 });
 var requiredWWWRootPathFields=['fastcgi','browse'];//必须设置“网站位置”的模块
-$('[data-slide-settings]').on('click',function(){
+$('#vhostForm [data-slide-settings]').on('click',function(){
   var slide=$(this).data('slide-settings'),name=$(this).attr('name');
   if(slide=="")slide=$(this).val()=='1'?'show':'hide';
   var eid='#'+name+'-settings',innerid='#'+name+'-settings-inner';
@@ -654,7 +654,7 @@ $('[data-slide-settings]').on('click',function(){
     $(eid).addClass('hide');
   }
 });
-$('[data-slide-settings="show"]:checked').trigger('click');
+$('#vhostForm [data-slide-settings="show"]:checked').trigger('click');
 $('#request-placeholders-modal .modal-body table tbody td b').off().on('click',function(){
   App.insertAtCursor($(inputRequestPlaceholder)[0],$(this).text());
   $('#request-placeholders-modal').niftyModal('hide');
@@ -663,9 +663,11 @@ $('[data-popover="popover"]').on('click',function(){
   $(this).siblings('[data-popover="popover"]').popover('hide');
 });
 $('#serverIdent').on('change',function(){
-  var engine=$(this).children('option:selected').data('engine');
-  $('.engine-'+engine+'-show').show();
-  $('[class^="engine-"]:not(.engine-'+engine+'-show)').hide();
+  var engine=$(this).children('option:selected').data('engine'), $form=$('#vhostForm');
+  $form.find('.engine-show-'+engine).show();
+  $form.find('.engine-hide-'+engine).hide();
+  $form.find('[class^="engine-hide"]:not(.engine-hide-'+engine+')').show();
+  $form.find('[class^="engine-show"]:not(.engine-show-'+engine+')').hide();
 }).trigger('change');
 App.searchFS('#www-root-path',20,'dir');
 });

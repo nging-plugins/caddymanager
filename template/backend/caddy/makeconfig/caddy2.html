@@ -188,5 +188,15 @@
     }
     {{end}}
 
+    {{if $v.IsEnabled "expires"}}
+    {{range $kk,$vv := $v.GetKVList "expires" "match"}}
+    @static_{{$kk}} {
+        file
+        path_regexp "{{$vv.K|$v.AddSlashes|ToHTML}}"
+    }
+    header @static_{{$kk}} Cache-Control max-age={{$vv.K}}
+    {{end}}
+    {{end}}
+
     {{$v.Get "rewrite_rule"|ToHTML}}
 }
