@@ -226,16 +226,17 @@ server {
     }
     {{end}}
 
+    location ~ .*\.(js|css)?$ {
+        expires 12h;
+    }
 
-    location ~* /[^/]*\.(bak|inc|lib|sh|tpl|lbi|dwt|dhp) {
+    location ~ /.well-known {
+        allow all;
+    }
+
+    location ~ /\. {
         deny all;
-     }
-     location ~ /\#[^/]*\.[^.]+ {
-        deny all;
-     }
-     location ~ /\#[^/]*/ {
-        deny all;
-     }
+    }
 
 
     {{$v.Get "rewrite_rule"|ToHTML}}
