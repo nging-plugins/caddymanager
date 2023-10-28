@@ -310,7 +310,7 @@ func (c *Config) FixEngineConfigFile(deleteMode ...bool) (bool, error) {
 	return hasUpdate, nil
 }
 
-func (c *Config) RemoveVhostConfig() error {
+func (c *Config) RemoveVhostConfig(id uint) error {
 	vhostDir, err := c.GetVhostConfigLocalDirAbs()
 	if err != nil {
 		return err
@@ -319,7 +319,14 @@ func (c *Config) RemoveVhostConfig() error {
 	if !com.FileExists(dir) {
 		return nil
 	}
-	return c.CommonConfig.RemoveDir(`htpasswd`, dir, engine.NgingConfigPrefix)
+	if id > 0 {
+		filePath := filepath.Join(dir, engine.NgingConfigPrefix+strconv.FormatUint(uint64(id), 10))
+		if com.FileExists(filePath) {
+			return os.Remove(filePath)
+		}
+		return nil
+	}
+	return c.CommonConfig.RemoveDir(`htpasswd(`+c.ID+`)`, dir, engine.NgingConfigPrefix)
 }
 
 func (c *Config) OnVhostConfigSaving(id uint, formData *form.Values) error {

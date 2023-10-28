@@ -8,7 +8,7 @@ import (
 )
 
 func TestConfig(t *testing.T) {
-	c := &Config{}
+	c := New()
 	ctx := context.Background()
 	var err error
 	assert.NoError(t, err)

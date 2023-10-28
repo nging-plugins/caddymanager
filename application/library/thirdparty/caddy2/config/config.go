@@ -91,6 +91,23 @@ func (c *Config) Stop(ctx context.Context) error {
 	return err
 }
 
+// Caddy 2.4.4 and up supports adding a module directly:
+// $ caddy add-package github.com/caddyserver/transform-encoder
+func (c *Config) InstallModule(ctx context.Context, module string) error {
+	err := c.exec(ctx, `add-package`, module)
+	if err != nil {
+		return err
+	}
+	err = c.exec(ctx, `upgrade`)
+	if err == nil {
+		return nil
+	}
+	if err = c.Stop(ctx); err == nil {
+		err = c.Start(ctx)
+	}
+	return err
+}
+
 func (c *Config) exec(ctx context.Context, args ...string) error {
 	if len(c.Command) == 0 {
 		c.Command = `caddy`

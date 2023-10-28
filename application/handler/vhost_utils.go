@@ -56,6 +56,10 @@ func DeleteCaddyfileByID(ctx echo.Context, serverIdent string, id uint, serverM 
 	if err != nil || cfg == nil {
 		return err
 	}
+	err = engine.RemoveVhostConfigFile(cfg, id)
+	if err != nil {
+		return err
+	}
 	saveDir, err := cfg.GetVhostConfigLocalDirAbs()
 	if err != nil {
 		return err
@@ -83,6 +87,10 @@ func deleteCaddyfileByServer(ctx echo.Context, svr *dbschema.NgingVhostServer, r
 			continue
 		}
 		cfg := eng.BuildConfig(ctx, svr)
+		err = engine.RemoveVhostConfigFile(cfg, 0) // 0 代表删除此配置下的所有其它文件
+		if err != nil {
+			return err
+		}
 		var saveDir string
 		saveDir, err = cfg.GetVhostConfigLocalDirAbs()
 		if err != nil {

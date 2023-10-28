@@ -16,9 +16,7 @@
             add_header Access-Control-Allow-Methods {{$v.Get `cors_methods`}} always;
             {{end}}
             
-            {{if $v.Get `cors_allow_credentials`}}
-            add_header Access-Control-Allow-Credentials {{$v.Get `cors_allow_credentials`}} always;
-            {{end}}
+            add_header Access-Control-Allow-Credentials {{$v.GetAttrVal "cors" "allow_credentials" "false"}} always;
             
             {{if $v.Get `cors_allowed_headers`}}
             add_header Access-Control-Allow-Headers {{$v.Get `cors_allowed_headers`}} always;

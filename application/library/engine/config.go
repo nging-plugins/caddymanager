@@ -28,7 +28,7 @@ type EngineConfigFileFixer interface {
 }
 
 type VhostConfigRemover interface {
-	RemoveVhostConfig() error
+	RemoveVhostConfig(id uint) error
 }
 
 type CertFileRemover interface {
@@ -46,9 +46,10 @@ func FixEngineConfigFile(cfg Configer, deleteMode ...bool) (bool, error) {
 	return false, nil
 }
 
-func RemoveVhostConfigFile(cfg Configer) error {
+// 如果 id 为 0 代表删除此配置下的所有其它文件
+func RemoveVhostConfigFile(cfg Configer, id uint) error {
 	if rm, ok := cfg.(VhostConfigRemover); ok {
-		err := rm.RemoveVhostConfig()
+		err := rm.RemoveVhostConfig(id)
 		if err != nil && os.IsNotExist(err) {
 			return nil
 		}

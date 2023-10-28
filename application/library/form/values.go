@@ -69,8 +69,19 @@ func (v Values) SplitBySpaceWithRegexpQuote(content string) []string {
 	return SplitBySpace(content, v.RegexpQuote)
 }
 
+func (v Values) SplitBySpaceWithWildcardSuffix(content string) []string {
+	return SplitBySpace(content, v.AddWildcardSuffix)
+}
+
 func (v Values) RegexpQuote(content string) string {
 	return regexp.QuoteMeta(content)
+}
+
+func (v Values) SliceAddWildcardSuffix(content []string) []string {
+	for index, value := range content {
+		content[index] = v.AddWildcardSuffix(value)
+	}
+	return content
 }
 
 func (v Values) SliceRegexpQuote(content []string) []string {
