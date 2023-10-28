@@ -1,10 +1,12 @@
 {{$v := $.Get `values`}}
+{{$prefix := $v.Get `ngingPrefix`}}
+{{$id := $v.Get `id`}}
 {{- range $key,$val := $v.GetNginxDomainList}}
 
-{{if eq ($v.Get "fastcgi") "1"}}
+{{if $v.IsEnabled "fastcgi"}}
 {{$upstream := $v.Get "fastcgi_upstream"}}
     {{if $upstream}}
-upstream nging_fastcgi_{{$.Get `id`}}{
+upstream nging_fastcgi_{{$id}}{
     #ip_hash;
     server {{$v.Get "fastcgi_endpoint"}};
     {{range $v.SplitBySpace $upstream}}
@@ -15,12 +17,12 @@ upstream nging_fastcgi_{{$.Get `id`}}{
 {{end}}
 
 
-{{if eq ($v.Get "proxy") "1"}}
+{{if $v.IsEnabled "proxy"}}
 {{$upstream := $v.Get "proxy_upstream"}}
     {{if $upstream}}
-    {{$serverGroup := $v.ServerGroup "proxy_to" (printf `nging_proxy_%d` ($.Get `id`))}}
+    {{$serverGroup := $v.ServerGroup "proxy_to" (printf `nging_proxy_%d` $id)}}
     {{$.Set `proxyServerGroup` $serverGroup}}
-upstream nging_proxy_{{$.Get `id`}}{
+upstream nging_proxy_{{$id}}{
     #ip_hash;
     server {{$serverGroup.Host}};
     {{range $v.SplitBySpace $upstream}}
@@ -31,8 +33,29 @@ upstream nging_proxy_{{$.Get `id`}}{
 {{end}}
 
 
-{{if eq ($v.Get "log") "1"}}
-log_format nging_log_format_{{$.Get `id`}} '{{$v.AsNginxLogFormat|$v.AddSlashesSingleQuote|ToHTML}}';
+{{if $v.IsEnabled "log"}}
+log_format nging_log_format_{{$id}} '{{$v.AsNginxLogFormat|$v.AddSlashesSingleQuote|ToHTML}}';
+{{end}}
+
+
+{{if $v.IsEnabled "cors"}}
+{{$domains := $v.Get `cors_domains`}}
+map $http_host $allow_cors_host {
+    {{if $domains}}
+    default 0;
+    "~^{{Join ($v.SplitBySpaceWithRegexpQuote $domains) `|`|$v.AddSlashes|ToHTML}}$" 1;
+    {{else}}
+    default 1;
+    {{end}}
+}
+map $http_origin $allow_cors_origin {
+    {{if $v.Get `cors_origin_regexp`}}
+    default 0;
+    "~*{{$v.Get `cors_origin_regexp`|$v.AddSlashes|ToHTML}}" 1;
+    {{else}}
+    default 1;
+    {{end}}
+}
 {{end}}
 
 
@@ -41,6 +64,15 @@ server {
     listen [::]:{{$val.Port}} {{- range $val.Args}} {{.}}{{end}};
     server_name {{Join $val.Domains `,`}};
 
+    {{if $v.IsEnabled "basicauth"}}
+    {{$resources := $v.GetValueList "basicauth" "resources"|$v.SliceRegexpQuote}}
+    {{if gt (len $resources) 0}}
+    location ^~ "{{Join $resources `|`|$v.AddSlashes|ToHTML}}" {
+        auth_basic           "{{$v.GetAttrVal "basicauth" "realm" "Restricted"|$v.AddSlashes|ToHTML}}";
+        auth_basic_user_file "{{$v.VhostConfigDir|$v.AddSlashes|ToHTML}}/htpasswd/{{$prefix}}{{$id}}";
+    }
+    {{end}}
+    {{end}}
 
     {{$root := $v.Get "root"}}
     {{if $root}}
@@ -54,181 +86,71 @@ server {
     index {{$v.Get "fastcgi_index"}} index.html index.htm index.txt default.html default.htm default.txt;
     {{end}}
     
-
-    {{if eq ($v.Get "gzip") "1"}}
-    gzip            on;
-    gzip_vary       on;
-    gzip_proxied    any;
-    gzip_comp_level {{$v.Get "gzip_level"}};
-    gzip_types      {{Join ($v.ExtensionsToMime ($v.Get "gzip_ext")) ` `}};
-        {{$minLen := $v.Get "gzip_min_length"}}
-        {{if $minLen}}
-    gzip_min_length {{$minLen}};
+    {{$headerPath := $v.Get "header_path"}}
+    {{if and $headerPath (ne $headerPath `/`)}}
+    location {{$headerPath}} {
+        {{range $kk,$vv := $v.GetKVList "header"}}
+        add_header {{$vv.K}} "{{$vv.V|$v.AddSlashes|ToHTML}}";
         {{end}}
-    # gzip_disable "MSIE [1-6]\.";
-    {{end}}
-
-    {{if eq ($v.Get "fastcgi") "1"}}
-        {{$fastCgiPath := $v.Get "fastcgi_path"}}
-        {{if $fastCgiPath}}
-    location ~ ^{{$fastCgiPath}}.*\{{$v.Get "fastcgi_ext"}}$ {
-        {{else}}
-    location ~ \{{$v.Get "fastcgi_ext"}}$ {
-        {{end}}
-        {{if $v.Get "fastcgi_upstream"}}
-        fastcgi_pass nging_fastcgi_{{$.Get `id`}};
-        {{else}}
-        fastcgi_pass {{$v.Get "fastcgi_endpoint"}};
-        {{end}}
-
-        fastcgi_index {{$v.Get "fastcgi_index"}};
-
-        {{$fastCgiRoot := $v.Get "fastcgi_root"}}
-        {{if $fastCgiRoot}}
-        fastcgi_param SCRIPT_FILENAME {{$fastCgiRoot}}/$fastcgi_script_name;
-        {{else if $root}}
-        fastcgi_param SCRIPT_FILENAME {{$root}}/$fastcgi_script_name;
-        {{else}}
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        {{end}}
-
-        {{$fastCgiSplit := $v.Get "fastcgi_split"}}
-        #fastcgi_split_path_info ^((?U).+\{{$fastCgiSplit}})(/?.+)$; # 非贪婪模式
-        fastcgi_split_path_info ^(.+\{{$fastCgiSplit}})(/.*)$; # 贪婪模式
-        fastcgi_param PATH_INFO $fastcgi_path_info;
-
-        {{$v.IteratorKV "fastcgi" "env" "        fastcgi_param "}}
-
-        {{if $v.Get "fastcgi_connect_timeout"}}
-        fastcgi_connect_timeout {{$v.Get "fastcgi_connect_timeout"}};
-        {{end}}
-
-        {{if $v.Get "fastcgi_read_timeout"}}
-        fastcgi_read_timeout {{$v.Get "fastcgi_read_timeout"}};
-        {{end}}
-
-        {{if $v.Get "fastcgi_send_timeout"}}
-        fastcgi_send_timeout {{$v.Get "fastcgi_send_timeout"}};
-        {{end}}
-        
-        include fastcgi_params;
     }
     {{end}}
-    
 
-    {{if eq ($v.Get "proxy") "1"}}
+    location / {
+        {{if and $headerPath (eq $headerPath `/`)}}
+        {{range $kk,$vv := $v.GetKVList "header"}}
+        add_header {{$vv.K}} "{{$vv.V|$v.AddSlashes|ToHTML}}";
+        {{end}}
+        {{end}}
+
+        {{Include "caddy/makeconfig/nginx/cors" $}}
+
+        {{if and ($v.IsEnabled "proxy") (eq ($v.Get "proxy_from") `/`)}}
+        {{Include "caddy/makeconfig/nginx/proxy" $}}
+        {{end}}
+
+        {{if and ($v.IsEnabled "browse") (eq ($v.Get "browse_path") `/`)}}
+        {{Include "caddy/makeconfig/nginx/browse" $}}
+        {{end}}
+
+        {{if $v.IsEnabled "expires"}}{{range $kk,$vv := $v.GetKVList "expires" "match"}}{{if eq $vv.K `/`}}
+        expires {{$vv.V|Default `12h`}};
+        {{end}}{{end}}{{end}}
+
+    }
+
+    {{Include "caddy/makeconfig/nginx/gzip" $}}
+    {{Include "caddy/makeconfig/nginx/fastcgi" $}}
+
+
+    {{if and ($v.IsEnabled "proxy") (ne ($v.Get "proxy_from") `/`)}}
     location {{$v.Get "proxy_from"}} {
-        {{if $v.Get "proxy_upstream"}}
-        proxy_pass {{$.Get `proxyServerGroup`}};
-        {{else}}
-        proxy_pass {{$v.ServerGroup "proxy_to" ""}};
-        {{end}}
-
-        {{if $v.Get "proxy_fail_timeout"}}
-        proxy_connect_timeout {{$v.Get "proxy_fail_timeout"}};
-        {{end}}
-
-        {{if $v.Get "proxy_max_fails"}}
-        proxy_next_upstream_tries {{$v.Get "proxy_max_fails"}};
-        {{end}}
-
-        {{if $v.Get "proxy_try_duration"}}
-        proxy_next_upstream_timeout {{$v.Get "proxy_try_duration"}};
-        {{end}}
-
-        {{$v.IteratorHeaderKV "proxy" "header_upstream" "        proxy_set_header    " "" true}}
-        {{$v.IteratorNginxProxyHeaderKV}}
-
-        #proxy_socket_keepalive on;
-
-        {{range $v.Values.proxy_preset}}
-            {{if eq . "insecure_skip_verify"}}
-        proxy_ssl_verify off;
-            {{else if eq . "websocket"}}
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-            {{else if eq . "transparent"}}
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $remote_addr; 
-        #proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-            {{end}}
-        {{end}}
-
-        #proxy_limit_rate 0;
+        {{Include "caddy/makeconfig/nginx/proxy" $}}
     }
     {{end}}
 
 
-    {{if eq ($v.Get "log") "1"}}
-    access_log  "{{$v.Get "log_file"|$v.AddSlashes|ToHTML}}" nging_log_format_{{$.Get `id`}} buffer=512k flush=1m;
+    {{if $v.IsEnabled "log"}}
+    access_log  "{{$v.Get "log_file"|$v.AddSlashes|ToHTML}}" nging_log_format_{{$id}} buffer=512k flush=1m;
     #error_log  /var/log/nginx/error.log warn;
     {{end}}
  
-
-    {{if eq ($v.Get "tls") "1"}}
-    ssl on;
-        {{if and ($v.Get "tls_cert") ($v.Get "tls_key")}}
-    ssl_certificate "{{$v.Get "tls_cert"|$v.AddSlashes|ToHTML}}";
-    ssl_certificate_key "{{$v.Get "tls_key"|$v.AddSlashes|ToHTML}}";
-    ssl_session_timeout 5m;
-    ssl_ciphers ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA;
-    #ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;
-    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
-    ssl_prefer_server_ciphers on;
-        {{else if $v.Get "tls_email"|ToHTML}}
-    #{{$v.Get "tls_email"|ToHTML}}
-    # ACME-challenge
-    location ^~ /.well-known/acme-challenge/ {
-        {{if eq $v.Config.GetEnviron `container`}}
-        root {{$v.Config.GetCertContainerDir}}/_letsencrypt;
-        {{else}}
-        root {{$v.Config.GetCertLocalDir}}/_letsencrypt;
-        {{end}}
-    }
-        {{end}}
-    {{else}}
-    ssl off;
-    {{end}}
-
-
-    {{if eq ($v.Get "cors") "1"}}
-    {{if $v.Get `cors_origin_regexp`}}
-    if ($host ~* "^{{$v.Get `cors_origin_regexp`|$v.AddSlashes}}$"){
-        add_header Access-Control-Allow-Origin $scheme://$host always;
-    }
-    {{else}}
-    add_header Access-Control-Allow-Origin {{$v.Get `cors_origin`}} always;
-    {{end}}
-
-    add_header Access-Control-Allow-Methods {{$v.Get `cors_methods`}} always;
-
-    {{if ne ($v.Get `cors_allow_credentials`) ``}}
-    add_header Access-Control-Allow-Credentials {{$v.Get `cors_allow_credentials`}} always;
-    {{end}}
-
-    {{if ne ($v.Get `cors_allowed_headers`) ``}}
-    add_header Access-Control-Allow-Headers {{$v.Get `cors_allowed_headers`}} always;
-    {{end}}
-
-    {{if ne ($v.Get `cors_exposed_headers`) ``}}
-    add_header Access-Control-Expose-Headers {{$v.Get `cors_exposed_headers`}} always;
-    {{end}}
-
-    {{if $v.Get `cors_max_age`}}
-    add_header Access-Control-Max-Age {{$v.Get `cors_max_age`}} always;
-    {{end}}
-
-    if ($request_method = OPTIONS) {
-        return 204;
+    {{Include "caddy/makeconfig/nginx/tls" $}}
+    
+    {{if $v.IsEnabled "expires"}}
+    {{range $kk,$vv := $v.GetKVList "expires" "match"}}
+    {{if ne $vv.K `/`}}
+    location ~ {{$vv.K}} {
+        expires {{$vv.V|Default `12h`}};
     }
     {{end}}
+    {{end}}
+    {{end}}
 
-    location ~ .*\.(js|css)?$ {
-        expires 12h;
+    {{if and ($v.IsEnabled "browse") (ne ($v.Get "browse_path") `/`)}}
+    location {{$v.Get "browse_path"}} {
+        {{Include "caddy/makeconfig/nginx/browse" $}}
     }
+    {{end}}
 
     location ~ /.well-known {
         allow all;
@@ -237,7 +159,6 @@ server {
     location ~ /\. {
         deny all;
     }
-
 
     {{$v.Get "rewrite_rule"|ToHTML}}
 }

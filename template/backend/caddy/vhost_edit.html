@@ -662,6 +662,11 @@ $('#request-placeholders-modal .modal-body table tbody td b').off().on('click',f
 $('[data-popover="popover"]').on('click',function(){
   $(this).siblings('[data-popover="popover"]').popover('hide');
 });
+$('#serverIdent').on('change',function(){
+  var engine=$(this).children('option:selected').data('engine');
+  $('.engine-'+engine+'-show').show();
+  $('[class^="engine-"]:not(.engine-'+engine+'-show)').hide();
+}).trigger('change');
 App.searchFS('#www-root-path',20,'dir');
 });
 </script>

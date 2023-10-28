@@ -21,8 +21,10 @@ package form
 import (
 	"html/template"
 	"net/url"
+	"regexp"
 
 	"github.com/webx-top/com"
+	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/param"
 
 	"github.com/nging-plugins/caddymanager/application/library/engine"
@@ -42,6 +44,14 @@ func (v Values) GetWebdavGlobal() []*webdav.WebdavPerm {
 	return webdav.ParseGlobalForm(v.Values)
 }
 
+func (v Values) VhostConfigDir() string {
+	if v.Config.GetEnviron() == engine.EnvironContainer {
+		return v.Config.GetVhostConfigContainerDir()
+	}
+	dir, _ := v.Config.GetVhostConfigLocalDirAbs()
+	return dir
+}
+
 func (v Values) GetWebdavUser() []*webdav.WebdavUser {
 	return webdav.ParseUserForm(v.Values)
 }
@@ -49,6 +59,25 @@ func (v Values) GetWebdavUser() []*webdav.WebdavUser {
 func (v Values) GetDomainList() []string {
 	domain := v.Values.Get(`domain`)
 	return SplitBySpace(domain)
+}
+
+func (v Values) SplitBySpace(content string) []string {
+	return SplitBySpace(content)
+}
+
+func (v Values) SplitBySpaceWithRegexpQuote(content string) []string {
+	return SplitBySpace(content, v.RegexpQuote)
+}
+
+func (v Values) RegexpQuote(content string) string {
+	return regexp.QuoteMeta(content)
+}
+
+func (v Values) SliceRegexpQuote(content []string) []string {
+	for index, value := range content {
+		content[index] = v.RegexpQuote(value)
+	}
+	return content
 }
 
 func (v Values) GetSlice(key string) param.StringSlice {
@@ -130,8 +159,64 @@ func (v Values) AddonAttr(addon string, item string, defaults ...string) string 
 	return item + `   ` + val
 }
 
+func (v Values) IsEnabled(key string, expectedValue ...string) bool {
+	var expected string
+	if len(expectedValue) > 0 {
+		expected = expectedValue[0]
+	} else {
+		expected = `1`
+	}
+	return v.Get(key) == expected
+}
+
+func (v Values) GetKVList(addon string, itemOr ...string) []echo.KV {
+	var item string
+	if len(itemOr) > 0 {
+		item = itemOr[0]
+	}
+	if len(addon) > 0 && len(item) > 0 {
+		addon += `_`
+	}
+	k := addon + item + `_k`
+	keys, _ := v.Values[k]
+
+	k = addon + item + `_v`
+	values, _ := v.Values[k]
+
+	l := len(values)
+	result := make([]echo.KV, 0, len(keys))
+	for i, k := range keys {
+		if len(k) == 0 {
+			continue
+		}
+		if i < l {
+			result = append(result, echo.KV{K: k, V: values[i]})
+		}
+	}
+	return result
+}
+
+func (v Values) GetValueList(addon string, itemOr ...string) []string {
+	var item string
+	if len(itemOr) > 0 {
+		item = itemOr[0]
+	}
+	if len(addon) > 0 && len(item) > 0 {
+		addon += `_`
+	}
+	k := addon + item
+	values, _ := v.Values[k]
+	result := make([]string, 0, len(values))
+	for _, v := range values {
+		if len(v) > 0 {
+			result = append(result, v)
+		}
+	}
+	return result
+}
+
 func (v Values) Iterator(addon string, item string, prefix string, withQuotes ...bool) interface{} {
-	if len(addon) > 0 {
+	if len(addon) > 0 && len(item) > 0 {
 		addon += `_`
 	}
 	k := addon + item

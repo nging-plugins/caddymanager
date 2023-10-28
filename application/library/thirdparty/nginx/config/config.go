@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -16,6 +17,9 @@ import (
 
 	"github.com/admpub/nging/v5/application/library/config"
 	"github.com/nging-plugins/caddymanager/application/library/engine"
+	"github.com/nging-plugins/caddymanager/application/library/engine/enginevent"
+	"github.com/nging-plugins/caddymanager/application/library/form"
+	"github.com/nging-plugins/caddymanager/application/library/htpasswd"
 )
 
 const Name = `nginx`
@@ -26,7 +30,9 @@ var (
 	regexVersion        = regexp.MustCompile(`[\d]+\.[\d]+\.[\d]+`)
 	regexHttpBlockStart = regexp.MustCompile(`^http[\s]*\{$`)
 
-	_ engine.EngineConfigFileFixer = New()
+	_ engine.EngineConfigFileFixer   = (*Config)(nil)
+	_ engine.VhostConfigRemover      = (*Config)(nil)
+	_ enginevent.OnVhostConfigSaving = (*Config)(nil)
 )
 
 func New() *Config {
@@ -304,7 +310,54 @@ func (c *Config) FixEngineConfigFile(deleteMode ...bool) (bool, error) {
 	return hasUpdate, nil
 }
 
-func (c *Config) RenewalCert(ctx context.Context, domain, email string) error {
+func (c *Config) RemoveVhostConfig() error {
+	vhostDir, err := c.GetVhostConfigLocalDirAbs()
+	if err != nil {
+		return err
+	}
+	dir := filepath.Join(vhostDir, `htpasswd`)
+	if !com.FileExists(dir) {
+		return nil
+	}
+	return c.CommonConfig.RemoveDir(`htpasswd`, dir, engine.NgingConfigPrefix)
+}
+
+func (c *Config) OnVhostConfigSaving(id uint, formData *form.Values) error {
+	vhostDir, err := c.GetVhostConfigLocalDirAbs()
+	if err != nil {
+		return err
+	}
+	filePath := filepath.Join(vhostDir, `htpasswd`, engine.NgingConfigPrefix+strconv.FormatUint(uint64(id), 10))
+	if formData.IsEnabled(`basicauth`) {
+		username := strings.TrimSpace(formData.GetAttrVal("basicauth", "username"))
+		password := strings.TrimSpace(formData.GetAttrVal("basicauth", "password"))
+		if len(username) > 0 && len(password) > 0 {
+			a := htpasswd.Accounts{}
+			err = a.SetPassword(username, password, htpasswd.HashBCrypt)
+			if err != nil {
+				return err
+			}
+			if !com.FileExists(filePath) {
+				com.MkdirAll(filepath.Dir(filePath), os.ModePerm)
+			}
+			return a.WriteToFile(filePath)
+		}
+	}
+	if !com.FileExists(filePath) {
+		return nil
+	}
+	return os.Remove(filePath)
+}
+
+func (c *Config) RemoveCertFile(id uint) error {
+	if len(c.CertLocalDir) == 0 {
+		return nil
+	}
+	certDir := filepath.Join(c.CertLocalDir, engine.NgingConfigPrefix+strconv.FormatUint(uint64(id), 10))
+	return os.RemoveAll(certDir)
+}
+
+func (c *Config) RenewalCert(ctx context.Context, id uint, domain, email string) error {
 	command := strings.TrimSpace(c.Command)
 	command = strings.TrimSuffix(command, `.exe`)
 	command = strings.TrimSuffix(command, `nginx`)
@@ -312,7 +365,7 @@ func (c *Config) RenewalCert(ctx context.Context, domain, email string) error {
 		if len(c.CertContainerDir) == 0 {
 			return nil
 		}
-		certDir := filepath.Join(c.CertContainerDir, `_letsencrypt`)
+		certDir := filepath.Join(c.CertContainerDir, engine.NgingConfigPrefix+strconv.FormatUint(uint64(id), 10), `well-known`)
 		certDir = filepath.ToSlash(certDir)
 		cmd := exec.CommandContext(ctx, command+`mkdir`, `-R`, `0644`, certDir)
 		result, err := cmd.CombinedOutput()
@@ -327,7 +380,7 @@ func (c *Config) RenewalCert(ctx context.Context, domain, email string) error {
 		return nil
 	}
 	command += `certbot`
-	certDir := filepath.Join(c.CertLocalDir, `_letsencrypt`)
+	certDir := filepath.Join(c.CertLocalDir, engine.NgingConfigPrefix+strconv.FormatUint(uint64(id), 10), `well-known`)
 	com.MkdirAll(certDir, os.ModePerm)
 	return RenewalCert(ctx, command, domain, email, certDir)
 }

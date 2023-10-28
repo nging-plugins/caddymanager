@@ -38,18 +38,17 @@ import (
 	"github.com/nging-plugins/caddymanager/application/dbschema"
 	"github.com/nging-plugins/caddymanager/application/library/cmder"
 	"github.com/nging-plugins/caddymanager/application/library/engine"
+	"github.com/nging-plugins/caddymanager/application/library/engine/enginevent"
 	"github.com/nging-plugins/caddymanager/application/library/form"
 	"github.com/nging-plugins/caddymanager/application/model"
 )
-
-const configFilePrefix = `nging_`
 
 func makeConfigFileName(cfg engine.Configer, id uint) string {
 	if cfg.GetEngine() == `default` { // 默认引擎为 Nging 内置服务器，为 Nging 所独有，所以配置文件不用加前缀(同时保持对旧版的兼容)
 		return fmt.Sprint(id) + `.conf`
 	}
 	// 其它引擎由用户配置，可能会将网站配置目录指向旧系统的配置目录，通过加本系统的前缀标识“nging_”来避免删掉旧配置
-	return configFilePrefix + fmt.Sprint(id) + `.conf`
+	return engine.NgingConfigPrefix + fmt.Sprint(id) + `.conf`
 }
 
 func DeleteCaddyfileByID(ctx echo.Context, serverIdent string, id uint, serverM ...*dbschema.NgingVhostServer) error {
@@ -148,7 +147,7 @@ func removeAllConf(cfg engine.Configer, rootDir string) error {
 		if info.IsDir() {
 			return nil
 		}
-		if !strings.HasSuffix(path, `.conf`) || (!isDefaultEngine && !strings.HasPrefix(info.Name(), configFilePrefix)) {
+		if !strings.HasSuffix(path, `.conf`) || (!isDefaultEngine && !strings.HasPrefix(info.Name(), engine.NgingConfigPrefix)) {
 			return nil
 		}
 		log.Info(`Delete the WebServer configuration file: `, path)
@@ -170,9 +169,14 @@ func getSaveDir(cfg engine.Configer) (saveDir string, err error) {
 }
 
 func saveVhostConf(ctx echo.Context, cfg engine.Configer, id uint, values url.Values) error {
-	ctx.Set(`values`, form.NewValues(values, cfg))
+	v := form.NewValues(values, cfg)
+	ctx.Set(`values`, v)
 	ctx.Set(`id`, id)
 	ctx.Set(`engine`, cfg.GetEngine())
+	ctx.Set(`ngingPrefix`, engine.NgingConfigPrefix)
+	if _, ok := ctx.Get(`tlsIssuer`).(string); !ok {
+		ctx.Set(`tlsIssuer`, `letsencrypt`)
+	}
 	b, err := ctx.Fetch(`caddy/makeconfig/`+cfg.GetTemplateFile(), nil)
 	if err != nil {
 		return err
@@ -187,9 +191,17 @@ func saveVhostConf(ctx echo.Context, cfg engine.Configer, id uint, values url.Va
 	}
 	saveFile = filepath.Join(saveFile, makeConfigFileName(cfg, id))
 	log.Info(`Generate a `+cfg.GetEngine()+` configuration file: `, saveFile)
+	err = enginevent.FireVhostConfigSaving(cfg, id, v)
+	if err != nil {
+		return err
+	}
 	err = os.WriteFile(saveFile, b, os.ModePerm)
 	//jsonb, _ := caddyfile.ToJSON(b)
 	//err = os.WriteFile(saveFile+`.json`, jsonb, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	err = enginevent.FireVhostConfigSaved(cfg, id, v)
 	return err
 }
 

@@ -48,7 +48,8 @@ func (v Values) ExtensionsToMime(value string) []string {
 	extensions := SplitBySpace(value)
 	mimes := make([]string, 0, len(extensions))
 	for _, ext := range extensions {
-		mimeType := mime.TypeByExtension(ext)
+		// text/css; charset=utf-8
+		mimeType := strings.SplitN(mime.TypeByExtension(ext), `;`, 2)[0]
 		if len(mimeType) > 0 {
 			mimes = append(mimes, mimeType)
 		}

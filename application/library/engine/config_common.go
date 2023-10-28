@@ -3,12 +3,16 @@ package engine
 import (
 	"context"
 	"fmt"
+	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
+
+	"github.com/admpub/log"
+	"github.com/webx-top/com"
 
 	"github.com/admpub/nging/v5/application/library/common"
 	"github.com/nging-plugins/caddymanager/application/dbschema"
-	"github.com/webx-top/com"
 )
 
 func NewConfig(engineName, templateFile string) *CommonConfig {
@@ -126,4 +130,34 @@ func (c *CommonConfig) Exec(ctx context.Context, args ...string) ([]byte, error)
 	}
 	err := cmd.Run()
 	return nil, err
+}
+
+func (c *CommonConfig) RemoveDir(typeName string, rootDir string, prefix string, extensions ...string) error {
+	err := filepath.Walk(rootDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		if len(extensions) > 0 {
+			ext := filepath.Ext(path)
+			if !com.InSlice(ext, extensions) {
+				return nil
+			}
+		}
+		if len(prefix) > 0 && !strings.HasPrefix(info.Name(), prefix) {
+			return nil
+		}
+		log.Info(`Delete the `+typeName+` file: `, path)
+		return os.Remove(path)
+	})
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+	} else {
+		os.Remove(rootDir)
+	}
+	return err
 }

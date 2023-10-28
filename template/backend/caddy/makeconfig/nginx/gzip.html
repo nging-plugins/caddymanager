@@ -1,0 +1,19 @@
+{{$v := $.Get `values`}}
+{{if $v.IsEnabled "gzip"}}
+    gzip            on;
+    gzip_vary       on;
+    gzip_proxied    any;
+    gzip_comp_level {{$v.Get "gzip_level"}};
+    gzip_types      {{Join ($v.ExtensionsToMime ($v.Get "gzip_ext")) ` `}};
+
+    {{$minLen := $v.Get "gzip_min_length"}}
+    {{if $minLen}}
+    gzip_min_length {{$minLen}};
+    {{end}}
+
+    {{$not := $v.Get "gzip_not_ua_regexp"}}
+    {{if $not}}
+    gzip_disable "{{$not|$v.AddSlashes|ToHTML}}";
+    {{end}}
+
+{{end}}
