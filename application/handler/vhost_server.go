@@ -19,15 +19,24 @@
 package handler
 
 import (
+	"encoding/json"
+	"net/http"
+	"net/url"
+	"strings"
 	"time"
 
-	"github.com/admpub/nging/v5/application/handler"
-	"github.com/admpub/nging/v5/application/library/common"
-	"github.com/nging-plugins/caddymanager/application/library/engine"
-	"github.com/nging-plugins/caddymanager/application/model"
+	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
+	"golang.org/x/net/publicsuffix"
+
+	"github.com/admpub/nging/v5/application/handler"
+	"github.com/admpub/nging/v5/application/library/common"
+	"github.com/nging-plugins/caddymanager/application/dbschema"
+	"github.com/nging-plugins/caddymanager/application/library/engine"
+	"github.com/nging-plugins/caddymanager/application/library/form"
+	"github.com/nging-plugins/caddymanager/application/model"
 )
 
 func ServerIndex(ctx echo.Context) error {
@@ -254,4 +263,118 @@ END:
 		handler.SendFail(ctx, err.Error())
 	}
 	return ctx.Redirect(handler.URLFor(`/caddy/server`))
+}
+
+func ServerRenewalCert(ctx echo.Context) error {
+	id := ctx.Formx(`id`).Uint()
+	if id < 1 {
+		return ctx.String(code.InvalidParameter.String(), http.StatusBadRequest)
+	}
+	m := model.NewVhostServer(ctx)
+	err := m.Get(nil, `id`, id)
+	if err != nil {
+		if err == db.ErrNoMoreRows {
+			return ctx.String(err.Error(), http.StatusNotFound)
+		}
+		return ctx.String(err.Error(), http.StatusInternalServerError)
+	}
+	cfg, err := getServerConfig(ctx, m.Ident, m.NgingVhostServer)
+	if err != nil {
+		return ctx.String(err.Error(), http.StatusInternalServerError)
+	}
+	renew, ok := cfg.(engine.CertRenewaler)
+	if !ok {
+		return ctx.String(code.Unsupported.String(), http.StatusNotImplemented)
+	}
+	vhostM := model.NewVhost(ctx)
+	conds := db.And(
+		db.Cond{`server_ident`: m.Ident},
+		db.Cond{`disabled`: common.BoolN},
+	)
+	_, err = vhostM.ListByOffset(nil, nil, 0, -1, conds)
+	if err != nil {
+		return ctx.String(err.Error(), http.StatusInternalServerError)
+	}
+	var updateCount int
+	for _, row := range vhostM.Objects() {
+		n, err := renewalVhostCert(ctx, renew, row)
+		if err != nil {
+			ctx.Logger().Error(err.Error())
+		}
+		updateCount += n
+	}
+	if updateCount > 0 {
+		item := engine.Engines.GetItem(cfg.GetEngine())
+		if item != nil {
+			err = item.X.(engine.Enginer).ReloadServer(ctx, cfg)
+		}
+	}
+	if err != nil {
+		return ctx.String(err.Error(), http.StatusInternalServerError)
+	}
+	return ctx.String(ctx.T(`更新成功: %d 个`, updateCount))
+}
+
+type IDAndEmail struct {
+	ID    uint
+	Email string
+}
+
+func supportedAutoSSL(formData url.Values) bool {
+	enabledTLS := formData.Get(`tls`) == `1`
+	if !enabledTLS {
+		return false
+	}
+	tlsEmail := formData.Get(`tls_email`)
+	if len(tlsEmail) == 0 {
+		return false
+	}
+	if len(formData.Get(`tls_cert`)) > 0 && len(formData.Get(`tls_key`)) > 0 {
+		return false
+	}
+	return true
+}
+
+func renewalVhostCert(ctx echo.Context, renew engine.CertRenewaler, row *dbschema.NgingVhost) (updateCount int, err error) {
+	var formData url.Values
+	jsonBytes := []byte(row.Setting)
+	err = json.Unmarshal(jsonBytes, &formData)
+	if err != nil {
+		return 0, common.JSONBytesParseError(err, jsonBytes)
+	}
+	if !supportedAutoSSL(formData) {
+		return 0, nil
+	}
+	tlsEmail := formData.Get(`tls_email`)
+	domainAndEmails := map[string]IDAndEmail{}
+	for _, domain := range form.SplitBySpace(row.Domain) {
+		domain = com.ParseEnvVar(domain)
+		parts := strings.SplitN(domain, `://`, 2)
+		var scheme, host, port string
+		if len(parts) == 2 {
+			scheme = parts[1]
+			host, port = com.SplitHostPort(parts[1])
+		} else {
+			host, port = com.SplitHostPort(domain)
+		}
+		if len(host) == 0 || com.IsLocalhost(host) {
+			continue
+		}
+		if _, derr := publicsuffix.EffectiveTLDPlusOne(host); derr != nil {
+			ctx.Logger().Error(derr.Error())
+			continue
+		}
+		if port == `443` || scheme == `https` {
+			domainAndEmails[host] = IDAndEmail{ID: row.Id, Email: tlsEmail}
+		}
+	}
+	for domain, idAndEmail := range domainAndEmails {
+		err = renew.RenewalCert(ctx, idAndEmail.ID, domain, idAndEmail.Email)
+		if err != nil {
+			ctx.Logger().Error(err.Error())
+		} else {
+			updateCount++
+		}
+	}
+	return
 }

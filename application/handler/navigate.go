@@ -124,5 +124,11 @@ var LeftNavigate = &navigate.Item{
 			Action:  `server_delete`,
 			Icon:    ``,
 		},
+		{
+			Display: false,
+			Name:    `更新HTTPS证书`,
+			Action:  `server_renewal_cert`,
+			Icon:    ``,
+		},
 	},
 }

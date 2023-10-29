@@ -170,7 +170,7 @@
                   </div><!-- fieldset -->
                 </div>
               </div>
-              <div class="form-group">
+              <div class="engine-show-nginx form-group">
                 <label class="col-sm-2 control-label">{{"证书保存目录"|$.T}}</label>
                 <div class="col-sm-8">
                   <div class="fieldset bg-fc">
@@ -265,6 +265,12 @@ $(function(){
   $('#vhostServerForm input[name=ident]').on('click',function(){
     $('#defaultConfigLocalSubdir').text(this.value);
   })
+  $('#vhostServerForm input[name=engine]').on('click',function(){
+    var $form=$('#vhostServerForm');
+    $form.find('.engine-show-'+this.value).show();
+    $form.find('[class^="engine-show"]:not(.engine-show-'+this.value+')').hide();
+  });
+  $('#vhostServerForm input[name=engine]:checked').trigger('click');
   $('#vhostServerForm input[name=environ]').on('click',function(){
     var $form=$('#vhostServerForm');
     $form.find('.environ-show-'+this.value).show();

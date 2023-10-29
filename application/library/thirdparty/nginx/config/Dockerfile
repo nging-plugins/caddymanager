@@ -2,7 +2,6 @@ FROM ubuntu:latest
 ARG GO_VERSION
 
 ENV GO_VERSION ${GO_VERSION:-1.21.3}
-ENV FIREWALL ${FIREWALL:-iptables}
 ENV GO_INSTALL_FILE go${GO_VERSION}.linux-amd64.tar.gz
 ENV PATH "$PATH:/root/go/bin"
 ENV GOPATH "/root/go"
@@ -10,6 +9,7 @@ ENV GOPATH "/root/go"
 RUN apt update 
 #RUN apt upgrade -y
 RUN apt install wget nginx telnet -y
+RUN apt install certbot -y
 
 #RUN wget -c https://studygolang.com/dl/golang/${GO_INSTALL_FILE}
 RUN wget -c https://golang.google.cn/dl/${GO_INSTALL_FILE}

@@ -20,6 +20,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"html/template"
 	"net/url"
@@ -257,6 +258,15 @@ func saveVhostData(ctx echo.Context, m *dbschema.NgingVhost, values url.Values, 
 		err = saveVhostConf(ctx, cfg, m.Id, values)
 	}
 	if err == nil && restart {
+		if renew, ok := cfg.(engine.CertRenewaler); ok {
+			_, err := renewalVhostCert(ctx, renew, m)
+			if err != nil {
+				if !errors.Is(err, engine.ErrNotSetCertContainerDir) && !errors.Is(err, engine.ErrNotSetCertLocalDir) {
+					return err
+				}
+				log.Error(err.Error())
+			}
+		}
 		item := engine.Engines.GetItem(cfg.GetEngine())
 		if item != nil {
 			err = item.X.(engine.Enginer).ReloadServer(ctx, cfg)

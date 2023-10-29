@@ -20,7 +20,7 @@ type Configer interface {
 }
 
 type CertRenewaler interface {
-	RenewalCert(ctx context.Context, domain, email string) error
+	RenewalCert(ctx context.Context, id uint, domain, email string) error
 }
 
 type EngineConfigFileFixer interface {
@@ -61,6 +61,17 @@ func RemoveVhostConfigFile(cfg Configer, id uint) error {
 func RemoveCertFile(cfg Configer, id uint) error {
 	if rm, ok := cfg.(CertFileRemover); ok {
 		err := rm.RemoveCertFile(id)
+		if err != nil && os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+	return nil
+}
+
+func RenewalCert(cfg Configer, ctx context.Context, id uint, domain, email string) error {
+	if rm, ok := cfg.(CertRenewaler); ok {
+		err := rm.RenewalCert(ctx, id, domain, email)
 		if err != nil && os.IsNotExist(err) {
 			return nil
 		}

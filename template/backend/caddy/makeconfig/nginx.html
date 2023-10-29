@@ -1,6 +1,6 @@
 {{$v := $.Get `values`}}
-{{$prefix := $v.Get `ngingPrefix`}}
-{{$id := $v.Get `id`}}
+{{$prefix := $.Get `ngingPrefix`}}
+{{$id := $.Get `id`}}
 {{- range $key,$val := $v.GetNginxDomainList}}
 
 {{if $v.IsEnabled "fastcgi"}}

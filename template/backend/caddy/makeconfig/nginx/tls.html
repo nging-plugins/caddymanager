@@ -1,6 +1,6 @@
 {{$v := $.Get `values`}}
-{{$prefix := $v.Get `ngingPrefix`}}
-{{$id := $v.Get `id`}}
+{{$prefix := $.Get `ngingPrefix`}}
+{{$id := $.Get `id`}}
 {{if $v.IsEnabled "tls"}}
     {{if and ($v.Get "tls_cert") ($v.Get "tls_key")}}
     ssl_certificate "{{$v.Get "tls_cert"|$v.AddSlashes|ToHTML}}";

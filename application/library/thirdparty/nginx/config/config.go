@@ -12,9 +12,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/admpub/log"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 
+	"github.com/admpub/nging/v5/application/library/checkinstall"
 	"github.com/admpub/nging/v5/application/library/config"
 	"github.com/nging-plugins/caddymanager/application/library/engine"
 	"github.com/nging-plugins/caddymanager/application/library/engine/enginevent"
@@ -33,6 +35,8 @@ var (
 	_ engine.EngineConfigFileFixer   = (*Config)(nil)
 	_ engine.VhostConfigRemover      = (*Config)(nil)
 	_ enginevent.OnVhostConfigSaving = (*Config)(nil)
+	_ engine.CertRenewaler           = (*Config)(nil)
+	_ engine.CertFileRemover         = (*Config)(nil)
 )
 
 func New() *Config {
@@ -359,31 +363,53 @@ func (c *Config) RenewalCert(ctx context.Context, id uint, domain, email string)
 	command := strings.TrimSpace(c.Command)
 	command = strings.TrimSuffix(command, `.exe`)
 	command = strings.TrimSuffix(command, `nginx`)
+	certbot := `certbot`
+	if len(c.CertLocalDir) > 0 && checkinstall.DefaultChecker(certbot) {
+		command += certbot
+		certDir := filepath.Join(c.CertLocalDir, engine.NgingConfigPrefix+strconv.FormatUint(uint64(id), 10), `well-known`)
+		com.MkdirAll(certDir, os.ModePerm)
+		return RenewalCert(ctx, command, domain, email, certDir)
+	}
 	if c.Environ == engine.EnvironContainer {
 		if len(c.CertContainerDir) == 0 {
-			return nil
+			return fmt.Errorf(`[%d][%s]%w`, id, domain, engine.ErrNotSetCertContainerDir)
+		}
+		if len(c.Endpoint) > 0 {
+			err := fmt.Errorf(`[%s]Updating certificates is not supported in the API mode of the container`, c.GetIdent())
+			return err
 		}
 		certDir := filepath.Join(c.CertContainerDir, engine.NgingConfigPrefix+strconv.FormatUint(uint64(id), 10), `well-known`)
 		certDir = filepath.ToSlash(certDir)
-		cmd := exec.CommandContext(ctx, command+`mkdir`, `-R`, `0644`, certDir)
+		command = strings.TrimSpace(command)
+		parts := com.ParseArgs(command)
+		if len(parts) == 0 {
+			return fmt.Errorf(`failed to parse command %q`, command)
+		}
+		executeableFile := parts[0]
+		var args []string
+		if len(parts) > 1 {
+			args = append(args, parts[1:]...)
+		}
+		args = append(args, `mkdir`, `-p`, certDir)
+		cmd := exec.CommandContext(ctx, executeableFile, args...)
 		result, err := cmd.CombinedOutput()
+		log.Okay(cmd.String())
 		if err != nil {
 			err = fmt.Errorf(`%s: %w`, result, err)
 			return err
 		}
-		command += `certbot`
+		command += ` ` + certbot
 		return RenewalCert(ctx, command, domain, email, certDir)
 	}
+
 	if len(c.CertLocalDir) == 0 {
-		return nil
+		return fmt.Errorf(`[%d][%s]%w`, id, domain, engine.ErrNotSetCertLocalDir)
 	}
-	command += `certbot`
-	certDir := filepath.Join(c.CertLocalDir, engine.NgingConfigPrefix+strconv.FormatUint(uint64(id), 10), `well-known`)
-	com.MkdirAll(certDir, os.ModePerm)
-	return RenewalCert(ctx, command, domain, email, certDir)
+	return fmt.Errorf(`更新证书操作失败：没有在本机安装%q`, certbot)
 }
 
 func RenewalCert(ctx context.Context, customCmd, domain, email, certDir string) error {
+	//http://coscms.com/.well-known/acme-challenge/Ito***l4-Fh7O5FpaAA*************LI3vTPo
 	//certbot certonly --webroot -d example.com --email info@example.com -w /var/www/_letsencrypt -n --agree-tos --force-renewal
 	command := `certbot`
 	args := []string{
@@ -405,6 +431,7 @@ func RenewalCert(ctx context.Context, customCmd, domain, email, certDir string) 
 	}
 	cmd := exec.CommandContext(ctx, command, args...)
 	result, err := cmd.CombinedOutput()
+	log.Okay(cmd.String())
 	if err != nil {
 		err = fmt.Errorf(`%s: %w`, result, err)
 	}
