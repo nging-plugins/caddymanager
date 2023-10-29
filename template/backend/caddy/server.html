@@ -60,6 +60,11 @@
 									{{- if and (eq $v.Environ `container`) $v.CertContainerDir -}}
 									:{{$v.CertContainerDir}}
 									{{- end -}}
+									<br />
+									{{if eq $v.Environ `container` -}}
+                                    <span class="label label-success label-sm">{{`接口网址`|$.T}}</span> {{$v.Endpoint|Default `-` -}}
+									<br />
+									{{- end -}}
                                 </div>
                             </td>
 							<td class="text-center">
