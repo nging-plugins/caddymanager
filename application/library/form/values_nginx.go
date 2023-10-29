@@ -11,9 +11,10 @@ import (
 )
 
 type NginxDomainInfo struct {
-	Port    int
-	Args    []string
-	Domains []string
+	Port      int
+	Args      []string
+	Domains   []string
+	CertsPath []*CertPath
 }
 
 // {remote} - {user} [{when}] "{method} {scheme} {host} {uri} {proto}" {status} {size} "{>Referer}" "{>User-Agent}" {latency}
@@ -55,6 +56,31 @@ func (v Values) ExtensionsToMime(value string) []string {
 		}
 	}
 	return mimes
+}
+
+type CertPath struct {
+	Cert   string
+	Key    string
+	Trust  string
+	Domain string
+}
+
+func (v Values) GetCerts(domains []string) []*CertPath {
+	res := make([]*CertPath, 0, len(domains))
+	for _, domain := range domains {
+		cert := v.Get(`tls/` + domain + `/cert`)
+		certKey := v.Get(`tls/` + domain + `/cert_key`)
+		certTrust := v.Get(`tls/` + domain + `/cert_trust`)
+		if len(cert) > 0 && len(certKey) > 0 {
+			res = append(res, &CertPath{
+				Cert:   cert,
+				Key:    certKey,
+				Trust:  certTrust,
+				Domain: domain,
+			})
+		}
+	}
+	return res
 }
 
 func (v Values) GetNginxDomainList() []NginxDomainInfo {
@@ -101,7 +127,10 @@ func (v Values) GetNginxDomainList() []NginxDomainInfo {
 			Domains: portsDomains[portN],
 		}
 		if isTLS {
-			info.Args = append(info.Args, `ssl`, `http2`)
+			info.CertsPath = v.GetCerts(info.Domains)
+			if len(info.CertsPath) > 0 {
+				info.Args = append(info.Args, `ssl`, `http2`)
+			}
 		}
 		list = append(list, info)
 	}

@@ -115,6 +115,7 @@ type NgingVhostServer struct {
 	VhostConfigContainerDir string `db:"vhost_config_container_dir" bson:"vhost_config_container_dir" comment:"网站配置文件保存目录(容器)" json:"vhost_config_container_dir" xml:"vhost_config_container_dir"`
 	CertLocalDir            string `db:"cert_local_dir" bson:"cert_local_dir" comment:"证书文件保存在本机的目录" json:"cert_local_dir" xml:"cert_local_dir"`
 	CertContainerDir        string `db:"cert_container_dir" bson:"cert_container_dir" comment:"证书文件保存在容器的目录" json:"cert_container_dir" xml:"cert_container_dir"`
+	CertAutoRenew           string `db:"cert_auto_renew" bson:"cert_auto_renew" comment:"证书自动更新" json:"cert_auto_renew" xml:"cert_auto_renew"`
 	WorkDir                 string `db:"work_dir" bson:"work_dir" comment:"工作目录" json:"work_dir" xml:"work_dir"`
 	Env                     string `db:"env" bson:"env" comment:"环境变量" json:"env" xml:"env"`
 	CmdWithConfig           string `db:"cmd_with_config" bson:"cmd_with_config" comment:"命令是否(Y/N)带配置文件参数" json:"cmd_with_config" xml:"cmd_with_config"`
@@ -122,6 +123,9 @@ type NgingVhostServer struct {
 	AutoModifyConfig        string `db:"auto_modify_config" bson:"auto_modify_config" comment:"是否(Y/N)自动修改配置文件" json:"auto_modify_config" xml:"auto_modify_config"`
 	EndpointTlsCert         string `db:"endpoint_tls_cert" bson:"endpoint_tls_cert" comment:"证书内容" json:"endpoint_tls_cert" xml:"endpoint_tls_cert"`
 	EndpointTlsKey          string `db:"endpoint_tls_key" bson:"endpoint_tls_key" comment:"私钥内容" json:"endpoint_tls_key" xml:"endpoint_tls_key"`
+	CertPathFormatKey       string `db:"cert_path_format_key" bson:"cert_path_format_key" comment:"私钥路径格式" json:"cert_path_format_key" xml:"cert_path_format_key"`
+	CertPathFormatCert      string `db:"cert_path_format_cert" bson:"cert_path_format_cert" comment:"证书路径格式" json:"cert_path_format_cert" xml:"cert_path_format_cert"`
+	CertPathFormatTrust     string `db:"cert_path_format_trust" bson:"cert_path_format_trust" comment:"信任证书路径格式" json:"cert_path_format_trust" xml:"cert_path_format_trust"`
 	Disabled                string `db:"disabled" bson:"disabled" comment:"是否(Y/N)禁用" json:"disabled" xml:"disabled"`
 	Created                 uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
 	Updated                 uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
@@ -351,6 +355,9 @@ func (a *NgingVhostServer) Insert() (pk interface{}, err error) {
 	if len(a.Environ) == 0 {
 		a.Environ = "local"
 	}
+	if len(a.CertAutoRenew) == 0 {
+		a.CertAutoRenew = "N"
+	}
 	if len(a.CmdWithConfig) == 0 {
 		a.CmdWithConfig = "N"
 	}
@@ -388,6 +395,9 @@ func (a *NgingVhostServer) Update(mw func(db.Result) db.Result, args ...interfac
 	if len(a.Environ) == 0 {
 		a.Environ = "local"
 	}
+	if len(a.CertAutoRenew) == 0 {
+		a.CertAutoRenew = "N"
+	}
 	if len(a.CmdWithConfig) == 0 {
 		a.CmdWithConfig = "N"
 	}
@@ -416,6 +426,9 @@ func (a *NgingVhostServer) Updatex(mw func(db.Result) db.Result, args ...interfa
 	}
 	if len(a.Environ) == 0 {
 		a.Environ = "local"
+	}
+	if len(a.CertAutoRenew) == 0 {
+		a.CertAutoRenew = "N"
 	}
 	if len(a.CmdWithConfig) == 0 {
 		a.CmdWithConfig = "N"
@@ -446,6 +459,9 @@ func (a *NgingVhostServer) UpdateByFields(mw func(db.Result) db.Result, fields [
 	}
 	if len(a.Environ) == 0 {
 		a.Environ = "local"
+	}
+	if len(a.CertAutoRenew) == 0 {
+		a.CertAutoRenew = "N"
 	}
 	if len(a.CmdWithConfig) == 0 {
 		a.CmdWithConfig = "N"
@@ -480,6 +496,9 @@ func (a *NgingVhostServer) UpdatexByFields(mw func(db.Result) db.Result, fields 
 	}
 	if len(a.Environ) == 0 {
 		a.Environ = "local"
+	}
+	if len(a.CertAutoRenew) == 0 {
+		a.CertAutoRenew = "N"
 	}
 	if len(a.CmdWithConfig) == 0 {
 		a.CmdWithConfig = "N"
@@ -531,6 +550,11 @@ func (a *NgingVhostServer) UpdateFields(mw func(db.Result) db.Result, kvset map[
 			kvset["environ"] = "local"
 		}
 	}
+	if val, ok := kvset["cert_auto_renew"]; ok && val != nil {
+		if v, ok := val.(string); ok && len(v) == 0 {
+			kvset["cert_auto_renew"] = "N"
+		}
+	}
 	if val, ok := kvset["cmd_with_config"]; ok && val != nil {
 		if v, ok := val.(string); ok && len(v) == 0 {
 			kvset["cmd_with_config"] = "N"
@@ -574,6 +598,11 @@ func (a *NgingVhostServer) UpdatexFields(mw func(db.Result) db.Result, kvset map
 	if val, ok := kvset["environ"]; ok && val != nil {
 		if v, ok := val.(string); ok && len(v) == 0 {
 			kvset["environ"] = "local"
+		}
+	}
+	if val, ok := kvset["cert_auto_renew"]; ok && val != nil {
+		if v, ok := val.(string); ok && len(v) == 0 {
+			kvset["cert_auto_renew"] = "N"
 		}
 	}
 	if val, ok := kvset["cmd_with_config"]; ok && val != nil {
@@ -634,6 +663,9 @@ func (a *NgingVhostServer) Upsert(mw func(db.Result) db.Result, args ...interfac
 		if len(a.Environ) == 0 {
 			a.Environ = "local"
 		}
+		if len(a.CertAutoRenew) == 0 {
+			a.CertAutoRenew = "N"
+		}
 		if len(a.CmdWithConfig) == 0 {
 			a.CmdWithConfig = "N"
 		}
@@ -655,6 +687,9 @@ func (a *NgingVhostServer) Upsert(mw func(db.Result) db.Result, args ...interfac
 		}
 		if len(a.Environ) == 0 {
 			a.Environ = "local"
+		}
+		if len(a.CertAutoRenew) == 0 {
+			a.CertAutoRenew = "N"
 		}
 		if len(a.CmdWithConfig) == 0 {
 			a.CmdWithConfig = "N"
@@ -738,6 +773,7 @@ func (a *NgingVhostServer) Reset() *NgingVhostServer {
 	a.VhostConfigContainerDir = ``
 	a.CertLocalDir = ``
 	a.CertContainerDir = ``
+	a.CertAutoRenew = ``
 	a.WorkDir = ``
 	a.Env = ``
 	a.CmdWithConfig = ``
@@ -745,6 +781,9 @@ func (a *NgingVhostServer) Reset() *NgingVhostServer {
 	a.AutoModifyConfig = ``
 	a.EndpointTlsCert = ``
 	a.EndpointTlsKey = ``
+	a.CertPathFormatKey = ``
+	a.CertPathFormatCert = ``
+	a.CertPathFormatTrust = ``
 	a.Disabled = ``
 	a.Created = 0
 	a.Updated = 0
@@ -767,6 +806,7 @@ func (a *NgingVhostServer) AsMap(onlyFields ...string) param.Store {
 		r["VhostConfigContainerDir"] = a.VhostConfigContainerDir
 		r["CertLocalDir"] = a.CertLocalDir
 		r["CertContainerDir"] = a.CertContainerDir
+		r["CertAutoRenew"] = a.CertAutoRenew
 		r["WorkDir"] = a.WorkDir
 		r["Env"] = a.Env
 		r["CmdWithConfig"] = a.CmdWithConfig
@@ -774,6 +814,9 @@ func (a *NgingVhostServer) AsMap(onlyFields ...string) param.Store {
 		r["AutoModifyConfig"] = a.AutoModifyConfig
 		r["EndpointTlsCert"] = a.EndpointTlsCert
 		r["EndpointTlsKey"] = a.EndpointTlsKey
+		r["CertPathFormatKey"] = a.CertPathFormatKey
+		r["CertPathFormatCert"] = a.CertPathFormatCert
+		r["CertPathFormatTrust"] = a.CertPathFormatTrust
 		r["Disabled"] = a.Disabled
 		r["Created"] = a.Created
 		r["Updated"] = a.Updated
@@ -807,6 +850,8 @@ func (a *NgingVhostServer) AsMap(onlyFields ...string) param.Store {
 			r["CertLocalDir"] = a.CertLocalDir
 		case "CertContainerDir":
 			r["CertContainerDir"] = a.CertContainerDir
+		case "CertAutoRenew":
+			r["CertAutoRenew"] = a.CertAutoRenew
 		case "WorkDir":
 			r["WorkDir"] = a.WorkDir
 		case "Env":
@@ -821,6 +866,12 @@ func (a *NgingVhostServer) AsMap(onlyFields ...string) param.Store {
 			r["EndpointTlsCert"] = a.EndpointTlsCert
 		case "EndpointTlsKey":
 			r["EndpointTlsKey"] = a.EndpointTlsKey
+		case "CertPathFormatKey":
+			r["CertPathFormatKey"] = a.CertPathFormatKey
+		case "CertPathFormatCert":
+			r["CertPathFormatCert"] = a.CertPathFormatCert
+		case "CertPathFormatTrust":
+			r["CertPathFormatTrust"] = a.CertPathFormatTrust
 		case "Disabled":
 			r["Disabled"] = a.Disabled
 		case "Created":
@@ -861,6 +912,8 @@ func (a *NgingVhostServer) FromRow(row map[string]interface{}) {
 			a.CertLocalDir = param.AsString(value)
 		case "cert_container_dir":
 			a.CertContainerDir = param.AsString(value)
+		case "cert_auto_renew":
+			a.CertAutoRenew = param.AsString(value)
 		case "work_dir":
 			a.WorkDir = param.AsString(value)
 		case "env":
@@ -875,6 +928,12 @@ func (a *NgingVhostServer) FromRow(row map[string]interface{}) {
 			a.EndpointTlsCert = param.AsString(value)
 		case "endpoint_tls_key":
 			a.EndpointTlsKey = param.AsString(value)
+		case "cert_path_format_key":
+			a.CertPathFormatKey = param.AsString(value)
+		case "cert_path_format_cert":
+			a.CertPathFormatCert = param.AsString(value)
+		case "cert_path_format_trust":
+			a.CertPathFormatTrust = param.AsString(value)
 		case "disabled":
 			a.Disabled = param.AsString(value)
 		case "created":
@@ -931,6 +990,8 @@ func (a *NgingVhostServer) Set(key interface{}, value ...interface{}) {
 			a.CertLocalDir = param.AsString(vv)
 		case "CertContainerDir":
 			a.CertContainerDir = param.AsString(vv)
+		case "CertAutoRenew":
+			a.CertAutoRenew = param.AsString(vv)
 		case "WorkDir":
 			a.WorkDir = param.AsString(vv)
 		case "Env":
@@ -945,6 +1006,12 @@ func (a *NgingVhostServer) Set(key interface{}, value ...interface{}) {
 			a.EndpointTlsCert = param.AsString(vv)
 		case "EndpointTlsKey":
 			a.EndpointTlsKey = param.AsString(vv)
+		case "CertPathFormatKey":
+			a.CertPathFormatKey = param.AsString(vv)
+		case "CertPathFormatCert":
+			a.CertPathFormatCert = param.AsString(vv)
+		case "CertPathFormatTrust":
+			a.CertPathFormatTrust = param.AsString(vv)
 		case "Disabled":
 			a.Disabled = param.AsString(vv)
 		case "Created":
@@ -971,6 +1038,7 @@ func (a *NgingVhostServer) AsRow(onlyFields ...string) param.Store {
 		r["vhost_config_container_dir"] = a.VhostConfigContainerDir
 		r["cert_local_dir"] = a.CertLocalDir
 		r["cert_container_dir"] = a.CertContainerDir
+		r["cert_auto_renew"] = a.CertAutoRenew
 		r["work_dir"] = a.WorkDir
 		r["env"] = a.Env
 		r["cmd_with_config"] = a.CmdWithConfig
@@ -978,6 +1046,9 @@ func (a *NgingVhostServer) AsRow(onlyFields ...string) param.Store {
 		r["auto_modify_config"] = a.AutoModifyConfig
 		r["endpoint_tls_cert"] = a.EndpointTlsCert
 		r["endpoint_tls_key"] = a.EndpointTlsKey
+		r["cert_path_format_key"] = a.CertPathFormatKey
+		r["cert_path_format_cert"] = a.CertPathFormatCert
+		r["cert_path_format_trust"] = a.CertPathFormatTrust
 		r["disabled"] = a.Disabled
 		r["created"] = a.Created
 		r["updated"] = a.Updated
@@ -1011,6 +1082,8 @@ func (a *NgingVhostServer) AsRow(onlyFields ...string) param.Store {
 			r["cert_local_dir"] = a.CertLocalDir
 		case "cert_container_dir":
 			r["cert_container_dir"] = a.CertContainerDir
+		case "cert_auto_renew":
+			r["cert_auto_renew"] = a.CertAutoRenew
 		case "work_dir":
 			r["work_dir"] = a.WorkDir
 		case "env":
@@ -1025,6 +1098,12 @@ func (a *NgingVhostServer) AsRow(onlyFields ...string) param.Store {
 			r["endpoint_tls_cert"] = a.EndpointTlsCert
 		case "endpoint_tls_key":
 			r["endpoint_tls_key"] = a.EndpointTlsKey
+		case "cert_path_format_key":
+			r["cert_path_format_key"] = a.CertPathFormatKey
+		case "cert_path_format_cert":
+			r["cert_path_format_cert"] = a.CertPathFormatCert
+		case "cert_path_format_trust":
+			r["cert_path_format_trust"] = a.CertPathFormatTrust
 		case "disabled":
 			r["disabled"] = a.Disabled
 		case "created":

@@ -171,7 +171,7 @@
                 </div>
               </div>
               <div class="engine-show-nginx form-group">
-                <label class="col-sm-2 control-label">{{"证书保存目录"|$.T}}</label>
+                <label class="col-sm-2 control-label">{{"证书验签数据目录"|$.T}}</label>
                 <div class="col-sm-8">
                   <div class="fieldset bg-fc">
                     <div class="form-group">
@@ -179,7 +179,7 @@
                       <div class="col-sm-8">
                         <input type="text" class="form-control" name="certLocalDir" value="{{$.Form `certLocalDir`}}">
                         <div class="help-block">
-                          {{`这里填写用来保存网站HTTPS证书的文件夹路径，必须是本系统可以访问的文件夹`|$.T}}
+                          {{`这里填写文件夹路径，此文件夹用来保存签发机构的签名数据，必须是本系统可以访问的文件夹`|$.T}}
                         </div>
                       </div>
                     </div><!-- form-group -->
@@ -188,12 +188,60 @@
                       <div class="col-sm-8">
                         <input type="text" class="form-control" name="certContainerDir" value="{{$.Form `certContainerDir`}}">
                         <div class="help-block">
-                          {{`证书保存目录在容器内的路径`|$.T}}
+                          {{`这里填写容器内的路径，用于自动在vhost配置文件中添加 /.well-known/acme-challenge/ 路由`|$.T}}
+                        </div>
+                      </div>
+                    </div><!-- form-group -->
+                    <!-- <div class="form-group">
+                      <label class="col-sm-2 control-label">{{"自动更新证书"|$.T}}</label>
+                      <div class="col-sm-8">{{$v := $.Form "certAutoRenew" "N"}}
+                        <div class="radio radio-warning radio-inline"> 
+                          <input type="radio" value="Y" id="certAutoRenew-Y" name="certAutoRenew"{{if eq $v `Y`}} checked{{end}}><label for="certAutoRenew-Y">{{"启用"|$.T}}</label> 
+                        </div>
+                        <div class="radio radio-primary radio-inline"> 
+                          <input type="radio" value="N" id="certAutoRenew-N" name="certAutoRenew"{{if eq $v `N`}} checked{{end}}><label for="certAutoRenew-N">{{"禁用"|$.T}}</label> 
+                        </div>
+                      </div>
+                    </div> --><!-- form-group -->
+                  </div><!-- fieldset -->
+                </div><!-- - -->
+              </div>
+              <div class="engine-show-nginx form-group">
+                <label class="col-sm-2 control-label">{{"证书路径格式模板"|$.T}}</label>
+                <div class="col-sm-8">
+                  <div class="fieldset bg-fc">
+                    <div class="form-group">
+                      <label class="col-sm-2 control-label">{{"公钥路径模板"|$.T}}</label>
+                      <div class="col-sm-8">
+                        <input type="text" class="form-control" name="certPathFormatCert" value="{{$.Form `certPathFormatCert`}}">
+                        <div class="help-block">
+                          {{`用于生成 ssl_certificate 路径，支持标签：`|$.T}}<code>{domain}</code>({{`此标签最终会被替换成域名`|$.T}})<br />
+                          {{`默认为：`|$.T}} /etc/letsencrypt/live/{domain}/fullchain.pem
+                        </div>
+                      </div>
+                    </div><!-- form-group -->
+                    <div class="form-group">
+                      <label class="col-sm-2 control-label">{{"私钥路径模板"|$.T}}</label>
+                      <div class="col-sm-8">
+                        <input type="text" class="form-control" name="certPathFormatKey" value="{{$.Form `certContainerKey`}}">
+                        <div class="help-block">
+                          {{`用于生成 ssl_certificate_key 路径，支持标签：`|$.T}}<code>{domain}</code>({{`此标签最终会被替换成域名`|$.T}})<br />
+                          {{`默认为：`|$.T}} /etc/letsencrypt/live/{domain}/privkey.pem
+                        </div>
+                      </div>
+                    </div><!-- form-group -->
+                    <div class="form-group">
+                      <label class="col-sm-2 control-label">{{"信任链路径模板"|$.T}}</label>
+                      <div class="col-sm-8">
+                        <input type="text" class="form-control" name="certPathFormatTrust" value="{{$.Form `certPathFormatTrust`}}">
+                        <div class="help-block">
+                          {{`用于生成 ssl_trusted_certificate 路径，支持标签：`|$.T}}<code>{domain}</code>({{`此标签最终会被替换成域名`|$.T}})<br />
+                          {{`默认为：`|$.T}} /etc/letsencrypt/live/{domain}/chain.pem
                         </div>
                       </div>
                     </div><!-- form-group -->
                   </div><!-- fieldset -->
-                </div>
+                </div><!-- - -->
               </div>
               <div class="form-group">
                 <label class="col-sm-2 control-label">{{"环境变量"|$.T}}</label>

@@ -297,11 +297,11 @@ func ServerRenewalCert(ctx echo.Context) error {
 	}
 	var updateCount int
 	for _, row := range vhostM.Objects() {
-		n, err := renewalVhostCert(ctx, renew, row)
+		updatedDomains, err := renewalVhostCert(ctx, renew, row)
 		if err != nil {
 			ctx.Logger().Error(err.Error())
 		}
-		updateCount += n
+		updateCount += len(updatedDomains)
 	}
 	if updateCount > 0 {
 		item := engine.Engines.GetItem(cfg.GetEngine())
@@ -315,9 +315,14 @@ func ServerRenewalCert(ctx echo.Context) error {
 	return ctx.String(ctx.T(`更新成功: %d 个`, updateCount))
 }
 
-type IDAndEmail struct {
+type DomainData struct {
 	ID    uint
 	Email string
+}
+
+type RequestCertUpdate struct {
+	Domains []string
+	Email   string
 }
 
 func supportedAutoSSL(formData url.Values) bool {
@@ -335,18 +340,18 @@ func supportedAutoSSL(formData url.Values) bool {
 	return true
 }
 
-func renewalVhostCert(ctx echo.Context, renew engine.CertRenewaler, row *dbschema.NgingVhost) (updateCount int, err error) {
+func renewalVhostCert(ctx echo.Context, renew engine.CertRenewaler, row *dbschema.NgingVhost) (updatedDomains []string, err error) {
 	var formData url.Values
 	jsonBytes := []byte(row.Setting)
 	err = json.Unmarshal(jsonBytes, &formData)
 	if err != nil {
-		return 0, common.JSONBytesParseError(err, jsonBytes)
+		return nil, common.JSONBytesParseError(err, jsonBytes)
 	}
 	if !supportedAutoSSL(formData) {
-		return 0, nil
+		return nil, nil
 	}
 	tlsEmail := formData.Get(`tls_email`)
-	domainAndEmails := map[string]IDAndEmail{}
+	domainAndEmails := map[string]DomainData{}
 	for _, domain := range form.SplitBySpace(row.Domain) {
 		domain = com.ParseEnvVar(domain)
 		parts := strings.SplitN(domain, `://`, 2)
@@ -365,15 +370,24 @@ func renewalVhostCert(ctx echo.Context, renew engine.CertRenewaler, row *dbschem
 			continue
 		}
 		if port == `443` || scheme == `https` {
-			domainAndEmails[host] = IDAndEmail{ID: row.Id, Email: tlsEmail}
+			domainAndEmails[host] = DomainData{ID: row.Id, Email: tlsEmail}
 		}
 	}
-	for domain, idAndEmail := range domainAndEmails {
-		err = renew.RenewalCert(ctx, idAndEmail.ID, domain, idAndEmail.Email)
+	idDomains := map[uint]*RequestCertUpdate{}
+	for domain, info := range domainAndEmails {
+		if _, ok := idDomains[info.ID]; !ok {
+			idDomains[info.ID] = &RequestCertUpdate{
+				Email: info.Email,
+			}
+		}
+		idDomains[info.ID].Domains = append(idDomains[info.ID].Domains, domain)
+	}
+	for id, req := range idDomains {
+		err = renew.RenewalCert(ctx, id, req.Domains, req.Email)
 		if err != nil {
 			ctx.Logger().Error(err.Error())
 		} else {
-			updateCount++
+			updatedDomains = append(updatedDomains, req.Domains...)
 		}
 	}
 	return

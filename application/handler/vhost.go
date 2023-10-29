@@ -108,7 +108,10 @@ func VhostAdd(ctx echo.Context) error {
 			}
 			fallthrough
 		case 0 == 1:
-			err = saveVhostData(ctx, m.NgingVhost, ctx.Forms(), m.Disabled == common.BoolN && len(ctx.Form(`restart`)) > 0)
+			err = saveVhostData(ctx, m.NgingVhost, ctx.Forms(),
+				m.Disabled == common.BoolN && len(ctx.Form(`restart`)) > 0,
+				m.Disabled == common.BoolN && len(ctx.Form(`removeCachedCert`)) > 0,
+			)
 		}
 		if err == nil {
 			handler.SendOk(ctx, ctx.T(`操作成功`))
@@ -214,7 +217,10 @@ func VhostEdit(ctx echo.Context) error {
 			if old.ServerIdent != m.ServerIdent {
 				DeleteCaddyfileByID(ctx, old.ServerIdent, m.Id)
 			}
-			err = saveVhostData(ctx, m.NgingVhost, ctx.Forms(), len(ctx.Form(`restart`)) > 0)
+			err = saveVhostData(ctx, m.NgingVhost, ctx.Forms(),
+				len(ctx.Form(`restart`)) > 0,
+				m.Disabled == common.BoolN && removeCachedCert == `1`,
+			)
 		}
 		if err == nil {
 			handler.SendOk(ctx, ctx.T(`操作成功`))
@@ -239,7 +245,7 @@ func VhostEdit(ctx echo.Context) error {
 				var formData url.Values
 				err = json.Unmarshal([]byte(m.Setting), &formData)
 				if err == nil {
-					err = saveVhostData(ctx, m.NgingVhost, formData, true)
+					err = saveVhostData(ctx, m.NgingVhost, formData, true, false)
 				}
 			}
 			if err != nil {

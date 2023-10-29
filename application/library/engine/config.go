@@ -19,8 +19,18 @@ type Configer interface {
 	GetEngineConfigContainerFile() string
 }
 
+type CertPathFormat struct {
+	Cert  string
+	Key   string
+	Trust string
+}
+
+type CertPathFormatGetter interface {
+	GetCertPathFormat() CertPathFormat
+}
+
 type CertRenewaler interface {
-	RenewalCert(ctx context.Context, id uint, domain, email string) error
+	RenewalCert(ctx context.Context, id uint, domains []string, email string) error
 }
 
 type EngineConfigFileFixer interface {
@@ -69,9 +79,9 @@ func RemoveCertFile(cfg Configer, id uint) error {
 	return nil
 }
 
-func RenewalCert(cfg Configer, ctx context.Context, id uint, domain, email string) error {
+func RenewalCert(cfg Configer, ctx context.Context, id uint, domains []string, email string) error {
 	if rm, ok := cfg.(CertRenewaler); ok {
-		err := rm.RenewalCert(ctx, id, domain, email)
+		err := rm.RenewalCert(ctx, id, domains, email)
 		if err != nil && os.IsNotExist(err) {
 			return nil
 		}

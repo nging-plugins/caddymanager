@@ -2,7 +2,7 @@
 {{$prefix := $.Get `ngingPrefix`}}
 {{$id := $.Get `id`}}
 {{- range $key,$val := $v.GetNginxDomainList}}
-
+{{$.Set `DomainInfo` $val}}
 {{if $v.IsEnabled "fastcgi"}}
 {{$upstream := $v.Get "fastcgi_upstream"}}
     {{if $upstream}}

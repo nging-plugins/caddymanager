@@ -18,6 +18,7 @@ import (
 
 	"github.com/admpub/nging/v5/application/library/checkinstall"
 	"github.com/admpub/nging/v5/application/library/config"
+	"github.com/nging-plugins/caddymanager/application/dbschema"
 	"github.com/nging-plugins/caddymanager/application/library/engine"
 	"github.com/nging-plugins/caddymanager/application/library/engine/enginevent"
 	"github.com/nging-plugins/caddymanager/application/library/form"
@@ -37,6 +38,7 @@ var (
 	_ enginevent.OnVhostConfigSaving = (*Config)(nil)
 	_ engine.CertRenewaler           = (*Config)(nil)
 	_ engine.CertFileRemover         = (*Config)(nil)
+	_ engine.CertPathFormatGetter    = (*Config)(nil)
 )
 
 func New() *Config {
@@ -46,7 +48,8 @@ func New() *Config {
 }
 
 type Config struct {
-	Version string
+	Version        string
+	CertPathFormat engine.CertPathFormat
 	*engine.CommonConfig
 }
 
@@ -75,6 +78,17 @@ func (c *Config) Init() error {
 
 func DefaultConfigDir() string {
 	return filepath.Join(config.FromCLI().ConfDir(), `vhosts-nginx`)
+}
+
+func (c *Config) CopyFrom(m *dbschema.NgingVhostServer) {
+	c.CertPathFormat.Cert = m.CertPathFormatCert
+	c.CertPathFormat.Key = m.CertPathFormatKey
+	c.CertPathFormat.Trust = m.CertPathFormatTrust
+	c.CommonConfig.CopyFrom(m)
+}
+
+func (c *Config) GetCertPathFormat() engine.CertPathFormat {
+	return c.CertPathFormat
 }
 
 func (c *Config) GetVhostConfigLocalDirAbs() (string, error) {
@@ -359,7 +373,7 @@ func (c *Config) RemoveCertFile(id uint) error {
 	return os.RemoveAll(certDir)
 }
 
-func (c *Config) RenewalCert(ctx context.Context, id uint, domain, email string) error {
+func (c *Config) RenewalCert(ctx context.Context, id uint, domains []string, email string) error {
 	command := strings.TrimSpace(c.Command)
 	command = strings.TrimSuffix(command, `.exe`)
 	command = strings.TrimSuffix(command, `nginx`)
@@ -368,11 +382,11 @@ func (c *Config) RenewalCert(ctx context.Context, id uint, domain, email string)
 		command += certbot
 		certDir := filepath.Join(c.CertLocalDir, engine.NgingConfigPrefix+strconv.FormatUint(uint64(id), 10), `well-known`)
 		com.MkdirAll(certDir, os.ModePerm)
-		return RenewalCert(ctx, command, domain, email, certDir)
+		return RenewalCert(ctx, command, domains, email, certDir)
 	}
 	if c.Environ == engine.EnvironContainer {
 		if len(c.CertContainerDir) == 0 {
-			return fmt.Errorf(`[%d][%s]%w`, id, domain, engine.ErrNotSetCertContainerDir)
+			return fmt.Errorf(`[%d][%s]%w`, id, strings.Join(domains, `,`), engine.ErrNotSetCertContainerDir)
 		}
 		if len(c.Endpoint) > 0 {
 			err := fmt.Errorf(`[%s]Updating certificates is not supported in the API mode of the container`, c.GetIdent())
@@ -399,29 +413,36 @@ func (c *Config) RenewalCert(ctx context.Context, id uint, domain, email string)
 			return err
 		}
 		command += ` ` + certbot
-		return RenewalCert(ctx, command, domain, email, certDir)
+		return RenewalCert(ctx, command, domains, email, certDir)
 	}
 
 	if len(c.CertLocalDir) == 0 {
-		return fmt.Errorf(`[%d][%s]%w`, id, domain, engine.ErrNotSetCertLocalDir)
+		return fmt.Errorf(`[%d][%s]%w`, id, strings.Join(domains, `,`), engine.ErrNotSetCertLocalDir)
 	}
 	return fmt.Errorf(`更新证书操作失败：没有在本机安装%q`, certbot)
 }
 
-func RenewalCert(ctx context.Context, customCmd, domain, email, certDir string) error {
+func RenewalCert(ctx context.Context, customCmd string, domains []string, email string, certDir string) error {
+	if len(domains) == 0 {
+		return nil
+	}
 	//http://coscms.com/.well-known/acme-challenge/Ito***l4-Fh7O5FpaAA*************LI3vTPo
 	//certbot certonly --webroot -d example.com --email info@example.com -w /var/www/_letsencrypt -n --agree-tos --force-renewal
 	command := `certbot`
 	args := []string{
 		`certonly`,
 		`--webroot`,
-		`-d`, domain,
+	}
+	for _, domain := range domains {
+		args = append(args, `-d`, domain)
+	}
+	args = append(args,
 		`--email`, email,
 		`-w`, certDir,
 		`-n`,
 		`--agree-tos`,
 		`--force-renewal`,
-	}
+	)
 	if len(customCmd) > 0 {
 		rootArgs := com.ParseArgs(customCmd)
 		if len(rootArgs) > 1 {

@@ -26,7 +26,6 @@ func New() *Config {
 
 type Config struct {
 	*engine.CommonConfig
-	Endpoint              string
 	vhostConfigDirAbsPath string
 }
 

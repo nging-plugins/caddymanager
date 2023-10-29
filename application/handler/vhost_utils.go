@@ -31,6 +31,7 @@ import (
 
 	"github.com/admpub/log"
 	"github.com/admpub/nging/v5/application/handler"
+	"github.com/admpub/nging/v5/application/library/config"
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/db/lib/factory"
@@ -238,7 +239,7 @@ func getServerConfig(ctx echo.Context, serverIdent string, serverM ...*dbschema.
 	return cfg, nil
 }
 
-func saveVhostData(ctx echo.Context, m *dbschema.NgingVhost, values url.Values, restart bool) (err error) {
+func saveVhostData(ctx echo.Context, m *dbschema.NgingVhost, values url.Values, restart bool, renewalCert bool) (err error) {
 	var cfg engine.Configer
 	cfg, err = getServerConfig(ctx, m.ServerIdent)
 	if err != nil || cfg == nil {
@@ -254,25 +255,70 @@ func saveVhostData(ctx echo.Context, m *dbschema.NgingVhost, values url.Values, 
 		if err = os.Remove(saveFile); os.IsNotExist(err) {
 			err = nil
 		}
-	} else {
-		err = saveVhostConf(ctx, cfg, m.Id, values)
-	}
-	if err == nil && restart {
+	} else if renewalCert {
 		if renew, ok := cfg.(engine.CertRenewaler); ok {
-			_, err := renewalVhostCert(ctx, renew, m)
+			updatedDomains, err := renewalVhostCert(ctx, renew, m)
 			if err != nil {
 				if !errors.Is(err, engine.ErrNotSetCertContainerDir) && !errors.Is(err, engine.ErrNotSetCertLocalDir) {
 					return err
 				}
 				log.Error(err.Error())
+			} else if len(updatedDomains) > 0 {
+				setCertPathForDomains(ctx, cfg, values, updatedDomains)
 			}
 		}
+		err = saveVhostConf(ctx, cfg, m.Id, values)
+	}
+	if err == nil && restart {
 		item := engine.Engines.GetItem(cfg.GetEngine())
 		if item != nil {
 			err = item.X.(engine.Enginer).ReloadServer(ctx, cfg)
 		}
 	}
 	return
+}
+
+func setCertPathForDomains(ctx echo.Context, cfg engine.Configer, values url.Values, domains []string) {
+	/**
+	# SSL
+	ssl_certificate         /etc/letsencrypt/live/example.com/fullchain.pem;
+	ssl_certificate_key     /etc/letsencrypt/live/example.com/privkey.pem;
+	ssl_trusted_certificate /etc/letsencrypt/live/example.com/chain.pem;
+	*/
+	var pathCert, pathKey, pathTrust string
+	if config.FromFile() != nil && config.FromFile().Extend != nil {
+		customCfg := config.FromFile().Extend.Children(cfg.GetEngine())
+		certPathFormat := customCfg.GetStore(`certPathFormat`)
+		pathCert = certPathFormat.String(`cert`)
+		pathKey = certPathFormat.String(`key`)
+		pathTrust = certPathFormat.String(`trust`)
+	}
+	if format, ok := cfg.(engine.CertPathFormatGetter); ok {
+		fm := format.GetCertPathFormat()
+		if len(fm.Cert) > 0 {
+			pathCert = fm.Cert
+		}
+		if len(fm.Key) > 0 {
+			pathKey = fm.Key
+		}
+		if len(fm.Trust) > 0 {
+			pathTrust = fm.Trust
+		}
+	}
+	if len(pathCert) == 0 {
+		pathCert = `/etc/letsencrypt/live/{domain}/fullchain.pem`
+	}
+	if len(pathKey) == 0 {
+		pathKey = `/etc/letsencrypt/live/{domain}/privkey.pem`
+	}
+	if len(pathTrust) == 0 {
+		pathTrust = `/etc/letsencrypt/live/{domain}/chain.pem`
+	}
+	for _, domain := range domains {
+		values.Set(`tls/`+domain+`/cert`, strings.ReplaceAll(pathCert, `{domain}`, domain))
+		values.Set(`tls/`+domain+`/cert_key`, strings.ReplaceAll(pathKey, `{domain}`, domain))
+		values.Set(`tls/`+domain+`/cert_trust`, strings.ReplaceAll(pathTrust, `{domain}`, domain))
+	}
 }
 
 func receiveFormData(ctx echo.Context, m *dbschema.NgingVhost) {

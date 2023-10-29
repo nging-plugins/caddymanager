@@ -80,10 +80,14 @@ func (f *VhostServer) check() error {
 	f.VhostConfigContainerDir = strings.TrimSpace(f.VhostConfigContainerDir)
 	f.CertLocalDir = strings.TrimSpace(f.CertLocalDir)
 	f.CertContainerDir = strings.TrimSpace(f.CertContainerDir)
+	f.CertPathFormatCert = strings.TrimSpace(f.CertPathFormatCert)
+	f.CertPathFormatKey = strings.TrimSpace(f.CertPathFormatKey)
+	f.CertPathFormatTrust = strings.TrimSpace(f.CertPathFormatTrust)
 	f.WorkDir = strings.TrimSpace(f.WorkDir)
 	f.CmdWithConfig = common.GetBoolFlag(f.CmdWithConfig, common.BoolN)
 	f.Disabled = common.GetBoolFlag(f.Disabled, common.BoolN)
 	f.AutoModifyConfig = common.GetBoolFlag(f.AutoModifyConfig, common.BoolN)
+	f.CertAutoRenew = common.GetBoolFlag(f.CertAutoRenew, common.BoolN)
 	return nil
 }
 
