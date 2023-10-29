@@ -118,8 +118,16 @@
     }
     encode @gzip_matcher gzip {
         gzip {{$v.Get "gzip_level"|Default "6"}}
-        {{if $v.Get "gzip_min_length"}}
-        minimum_length {{$v.Get "gzip_min_length"}}
+        {{if $v.Get "gzip_min_bytes"}}
+        minimum_length {{$v.Get "gzip_min_bytes"}}
+        {{end}}
+        {{$mimes := $v.SplitBySpaceWithPrefixAndSuffix ($v.Get `gzip_mime`) `` `*`}}
+        {{if $mimes}}
+        match {
+            {{range $mimes}}
+            header Content-Type {{.}}
+            {{end}}
+        }
         {{end}}
     }
     {{end}}

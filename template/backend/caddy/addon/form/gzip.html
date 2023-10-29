@@ -8,13 +8,13 @@
                             </div>
                           </div>
                         </div>
-                        <div class="engine-show-nginx form-group">
+                        <div class="engine-hide-default form-group">
                           <label class="col-sm-2 control-label">{{"MIME类型"|$.T}}</label>
                           <div class="col-sm-10">
                              <input type="text" class="form-control" value="{{$.Form `gzip_mime` `text/css text/javascript text/html`}}" name="gzip_mime">
                              <div class="help-block">
                               {{"例如: "|$.T}} text/css text/javascript text/html<br />
-                              {{`仅 Nginx 支持此设置`|$.T}}
+                              {{`仅 Nginx、Caddy2 支持此设置`|$.T}}
                             </div>
                           </div>
                         </div>
