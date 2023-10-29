@@ -101,9 +101,11 @@ func VhostAdd(ctx echo.Context) error {
 		b, err = json.Marshal(ctx.Forms())
 		switch {
 		case err == nil:
+			ctx.Begin()
 			m.Setting = string(b)
 			_, err = m.Add()
 			if err != nil {
+				ctx.Rollback()
 				break
 			}
 			fallthrough
@@ -112,6 +114,7 @@ func VhostAdd(ctx echo.Context) error {
 				m.Disabled == common.BoolN && len(ctx.Form(`restart`)) > 0,
 				m.Disabled == common.BoolN && len(ctx.Form(`removeCachedCert`)) > 0,
 			)
+			ctx.End(err == nil)
 		}
 		if err == nil {
 			handler.SendOk(ctx, ctx.T(`操作成功`))
@@ -203,9 +206,11 @@ func VhostEdit(ctx echo.Context) error {
 		b, err = json.Marshal(ctx.Forms())
 		switch {
 		case err == nil:
+			ctx.Begin()
 			m.Setting = string(b)
 			err = m.Edit(nil, db.Cond{`id`: id})
 			if err != nil {
+				ctx.Rollback()
 				break
 			}
 			fallthrough
@@ -221,6 +226,7 @@ func VhostEdit(ctx echo.Context) error {
 				len(ctx.Form(`restart`)) > 0,
 				m.Disabled == common.BoolN && removeCachedCert == `1`,
 			)
+			ctx.End(err == nil)
 		}
 		if err == nil {
 			handler.SendOk(ctx, ctx.T(`操作成功`))
