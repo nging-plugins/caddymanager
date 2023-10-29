@@ -3,9 +3,13 @@ package form
 import (
 	"regexp"
 	"strings"
+	"time"
+
+	"github.com/webx-top/echo/param"
 )
 
 var spaceSeperate = regexp.MustCompile(`[\s]+`)
+var durationRegex = regexp.MustCompile(`(?P<years>\d+y)?(?P<months>\d+m)?(?P<days>\d+d)?T?(?P<hours>\d+h)?(?P<minutes>\d+i)?(?P<seconds>\d+s)?`)
 
 func SplitBySpace(value string, formatter ...func(string) string) []string {
 	value = strings.TrimSpace(value)
@@ -27,4 +31,23 @@ func SplitBySpace(value string, formatter ...func(string) string) []string {
 
 func ExplodeCombinedLogFormat(value string) string {
 	return strings.Replace(value, `{combined}`, `{remote} - {user} [{when}] "{method} {uri} {proto}" {status} {size}`, 1)
+}
+
+func ParseDuration(str string) time.Duration {
+	matches := durationRegex.FindStringSubmatch(str)
+	if len(matches) < 7 {
+		return 0
+	}
+
+	years := param.AsInt64(matches[1])
+	months := param.AsInt64(matches[2])
+	days := param.AsInt64(matches[3])
+	hours := param.AsInt64(matches[4])
+	minutes := param.AsInt64(matches[5])
+	seconds := param.AsInt64(matches[6])
+
+	hour := int64(time.Hour)
+	minute := int64(time.Minute)
+	second := int64(time.Second)
+	return time.Duration(years*24*365*hour + months*30*24*hour + days*24*hour + hours*hour + minutes*minute + seconds*second)
 }

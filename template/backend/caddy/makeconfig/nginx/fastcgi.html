@@ -35,8 +35,8 @@
         {{end}}
 
         {{$fastCgiSplit := $v.Get "fastcgi_split"}}
-        #fastcgi_split_path_info ^((?U).+\{{$fastCgiSplit}})(/?.+)$; {{/* # 非贪婪模式 */}}
-        fastcgi_split_path_info ^(.+\{{$fastCgiSplit}})(/.*)$; {{/* # 贪婪模式 */}}
+        #fastcgi_split_path_info ^((?U).+{{$fastCgiSplit|$v.RegexpQuote}})(/?.+)$; {{/* # 非贪婪模式 */}}
+        fastcgi_split_path_info ^(.+{{$fastCgiSplit|$v.RegexpQuote}})(/.*)$; {{/* # 贪婪模式 */}}
         fastcgi_param PATH_INFO $fastcgi_path_info;
 
         {{$v.IteratorKV "fastcgi" "env" "        fastcgi_param "}}

@@ -65,6 +65,12 @@ func (v Values) SplitBySpace(content string) []string {
 	return SplitBySpace(content)
 }
 
+func (v Values) SplitBySpaceWithPrefixAndSuffix(content string, prefix string, suffix string) []string {
+	return SplitBySpace(content, func(v string) string {
+		return prefix + v + suffix
+	})
+}
+
 func (v Values) SplitBySpaceWithRegexpQuote(content string) []string {
 	return SplitBySpace(content, v.RegexpQuote)
 }

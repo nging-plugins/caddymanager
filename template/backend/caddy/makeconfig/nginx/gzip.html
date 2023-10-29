@@ -3,8 +3,10 @@
     gzip            on;
     gzip_vary       on;
     gzip_proxied    any;
-    gzip_comp_level {{$v.Get "gzip_level"}};
-    gzip_types      {{Join ($v.ExtensionsToMime ($v.Get "gzip_ext")) ` `}};
+    gzip_comp_level {{$v.Get "gzip_level"|Default "6"}};
+    {{if $v.Get "gzip_mime"}}
+    gzip_types      {{$v.Get "gzip_mime"}};
+    {{end}}
 
     {{$minLen := $v.Get "gzip_min_length"}}
     {{if $minLen}}

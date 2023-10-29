@@ -1,6 +1,9 @@
 package form
 
-import "strings"
+import (
+	"strings"
+	"time"
+)
 
 // {remote} - {user} [{when}] "{method} {scheme} {host} {uri} {proto}" {status} {size} "{>Referer}" "{>User-Agent}" {latency}
 var Caddy2LogFormatReplacer = strings.NewReplacer(
@@ -23,6 +26,10 @@ var Caddy2LogFormatReplacer = strings.NewReplacer(
 func AsCaddy2LogFormat(value string) string {
 	value = ExplodeCombinedLogFormat(value)
 	return Caddy2LogFormatReplacer.Replace(value)
+}
+
+func (v Values) AsDuration(str string) time.Duration {
+	return ParseDuration(str)
 }
 
 func (v Values) AsCaddy2LogFormat() string {

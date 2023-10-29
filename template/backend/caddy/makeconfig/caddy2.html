@@ -104,15 +104,25 @@
     {{end}}
 
     {{if $v.IsEnabled "gzip"}}
-    {{$exts := $v.SliptBySpace ($v.Get "gzip_ext")}}
-    {{range $kk, $vv := $ext}}
-    encode *{{$vv}} gzip {
-        gzip {{$v.Get "gzip_level"}}
+    {{$exts := $v.SliptBySpaceWithWildcardPrefix ($v.Get "gzip_ext")}}
+    {{$notPaths := $v.SliptBySpaceWithWildcardPrefix ($v.Get "gzip_not")}}
+    {{$notUARegexp := $v.Get "gzip_not_ua_regexp"}}
+    @gzip_matcher {
+        path {{Join $exts ` `}}
+        {{if $notPaths}}
+        not path {{Join $notPaths ` `}}
+        {{end}}
+        {{if $notUARegexp}}
+        not header_regexp User-Agent {{$notUARegexp|ToHTML}}
+        {{end}}
+        {{/* #expression {err.status_code} == 404 */}}
+    }
+    encode @gzip_matcher gzip {
+        gzip {{$v.Get "gzip_level"|Default "6"}}
         {{if $v.Get "gzip_min_length"}}
         minimum_length {{$v.Get "gzip_min_length"}}
         {{end}}
     }
-    {{end}}
     {{end}}
 
     {{if $v.IsEnabled "fastcgi"}}
@@ -190,11 +200,14 @@
 
     {{if $v.IsEnabled "expires"}}
     {{range $kk,$vv := $v.GetKVList "expires" "match"}}
+    {{$duration := $v.AsDuration $vv.V}}
+    {{if $duration}}
     @static_{{$kk}} {
         file
         path_regexp "{{$vv.K|$v.AddSlashes|ToHTML}}"
     }
-    header @static_{{$kk}} Cache-Control max-age={{$vv.K}}
+    header @static_{{$kk}} Cache-Control max-age={{$duration.Seconds}}
+    {{end}}
     {{end}}
     {{end}}
 
