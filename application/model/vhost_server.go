@@ -48,6 +48,19 @@ func (f *VhostServer) check() error {
 	if !engine.Environs.Has(f.Environ) {
 		return ctx.NewError(code.InvalidParameter, `环境选项值无效`).SetZone(`environ`)
 	}
+	f.ExecutableFile = strings.TrimSpace(f.ExecutableFile)
+	f.Endpoint = strings.TrimSpace(f.Endpoint)
+	f.Env = strings.TrimSpace(f.Env)
+	if len(f.ExecutableFile) == 0 {
+		return ctx.NewError(code.InvalidParameter, `执行文件路径不能为空`).SetZone(`executableFile`)
+	}
+	if f.Environ == engine.EnvironContainer {
+		if len(f.Endpoint) > 0 && (strings.HasPrefix(f.Endpoint, `ftp`) || !com.IsURL(f.Endpoint)) {
+			return ctx.NewError(code.InvalidParameter, `API接口网址无效`).SetZone(`endpoint`)
+		}
+	} else {
+		f.Endpoint = ``
+	}
 	var exists bool
 	var err error
 	if f.Id > 0 {
@@ -61,7 +74,6 @@ func (f *VhostServer) check() error {
 	if exists {
 		return ctx.NewError(code.DataAlreadyExists, `唯一标识“%s”已经存在`, f.Ident).SetZone(`ident`)
 	}
-	f.ExecutableFile = strings.TrimSpace(f.ExecutableFile)
 	f.ConfigLocalFile = strings.TrimSpace(f.ConfigLocalFile)
 	f.ConfigContainerFile = strings.TrimSpace(f.ConfigContainerFile)
 	f.VhostConfigLocalDir = strings.TrimSpace(f.VhostConfigLocalDir)

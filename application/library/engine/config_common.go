@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -19,18 +20,20 @@ func NewConfig(engineName, templateFile string) *CommonConfig {
 	return &CommonConfig{engineName: engineName, templateFile: templateFile}
 }
 
-type ParsedCommand struct{
-	Command string
-	Args string
-	ContainerEnging string
-	ContainerName string
+type ParsedCommand struct {
+	Command         string
+	Args            []string
+	ContainerEngine string
+	ContainerName   string
 }
 
 type CommonConfig struct {
 	ID                        string
 	Command                   string
+	Endpoint                  string
 	CmdWithConfig             bool
 	WorkDir                   string
+	EnvVars                   []string
 	Environ                   string
 	EngineConfigLocalFile     string
 	EngineConfigContainerFile string
@@ -39,9 +42,11 @@ type CommonConfig struct {
 	CertLocalDir              string
 	CertContainerDir          string
 
-	engineName   string
-	templateFile string
-	parsedCommand *ParsedCommand
+	endpointTLSCert []byte
+	endpointTLSKey  []byte
+	engineName      string
+	templateFile    string
+	parsedCommand   *ParsedCommand
 }
 
 func (c *CommonConfig) GetIdent() string {
@@ -103,6 +108,15 @@ func (c *CommonConfig) CopyFrom(m *dbschema.NgingVhostServer) {
 	c.Command = m.ExecutableFile
 	c.CmdWithConfig = m.CmdWithConfig == common.BoolY
 	c.WorkDir = m.WorkDir
+	kvs := strings.Split(m.Env, com.StrLF)
+	c.EnvVars = make([]string, 0, len(kvs))
+	for _, kv := range kvs {
+		kv = strings.TrimSpace(kv)
+		if len(kv) == 0 {
+			continue
+		}
+		c.EnvVars = append(c.EnvVars, kv)
+	}
 	c.Environ = m.Environ
 	c.EngineConfigLocalFile, _ = filepath.Abs(m.ConfigLocalFile)
 	c.EngineConfigContainerFile = m.ConfigContainerFile
@@ -110,32 +124,71 @@ func (c *CommonConfig) CopyFrom(m *dbschema.NgingVhostServer) {
 	c.VhostConfigContainerDir = m.VhostConfigContainerDir
 	c.CertLocalDir, _ = filepath.Abs(m.CertLocalDir)
 	c.CertContainerDir = m.CertContainerDir
+	c.Endpoint = m.Endpoint
+	c.endpointTLSCert = com.Str2bytes(m.EndpointTlsCert)
+	c.endpointTLSKey = com.Str2bytes(m.EndpointTlsKey)
 }
 
-func ParseContainerInfo(parts []string) string, string {
-	return "", ""
+func ParseContainerInfo(parts []string) (string, string) {
+	return parts[0], parts[len(parts)-1]
 }
 
 func (c *CommonConfig) Exec(ctx context.Context, args ...string) ([]byte, error) {
-	command := c.Command
-	if c.Environ == EnvironContainer {
-		if c.parsedCommand=nil{
-			c.parsedCommand=&ParsedCommand{}
-		rootArgs := com.ParseArgs(command)
+	if c.Environ == EnvironContainer && len(c.Endpoint) > 0 {
+		return c.execEndpoint(ctx, args...)
+	}
+	return c.execCommand(ctx, args...)
+}
+
+func (c *CommonConfig) execEndpoint(ctx context.Context, args ...string) ([]byte, error) {
+	client, err := NewAPIClient(c.endpointTLSCert, c.endpointTLSKey)
+	if err != nil {
+		return nil, err
+	}
+	if c.parsedCommand == nil {
+		c.parsedCommand = &ParsedCommand{
+			Command: c.Command,
+		}
+		rootArgs := com.ParseArgs(c.Command)
 		if len(rootArgs) > 1 {
-			c.parsedCommand.ContainerEngine, c.parsedCommand.ContainerName = ParseContainerInfo(rootArgs)
+			c.parsedCommand.ContainerEngine = ``
+			c.parsedCommand.ContainerName = path.Base(strings.SplitN(c.Endpoint, `/exec`, 2)[0])
 			c.parsedCommand.Command = rootArgs[0]
 			c.parsedCommand.Args = rootArgs[1:]
 		}
+	}
+	data := RequestDockerExec{
+		Cmd: append([]string{c.parsedCommand.Command}, c.parsedCommand.Args...),
+		Env: c.EnvVars,
+	}
+	err = client.Post(c.Endpoint, data)
+	return nil, err
+}
+
+func (c *CommonConfig) execCommand(ctx context.Context, args ...string) ([]byte, error) {
+	command := c.Command
+	if c.Environ == EnvironContainer {
+		if c.parsedCommand == nil {
+			c.parsedCommand = &ParsedCommand{
+				Command: c.Command,
+			}
+			rootArgs := com.ParseArgs(command)
+			if len(rootArgs) > 1 {
+				c.parsedCommand.ContainerEngine, c.parsedCommand.ContainerName = ParseContainerInfo(rootArgs)
+				c.parsedCommand.Command = rootArgs[0]
+				c.parsedCommand.Args = rootArgs[1:]
+			}
 		}
-		if len(c.parsedCommand.Command)>0{
-			command=c.parsedCommand.Command
-			rootArgs:=append([]string{},c.parsedCommand.Args...)
-			args=append(rootArgs,args)
+		if len(c.parsedCommand.Command) > 0 {
+			command = c.parsedCommand.Command
+			rootArgs := append([]string{}, c.parsedCommand.Args...)
+			args = append(rootArgs, args...)
 		}
 	}
 	cmd := exec.CommandContext(ctx, command, args...)
 	cmd.Dir = c.WorkDir
+	cmd.Env = append(cmd.Env, c.EnvVars...)
+	cmd.Env = append(cmd.Env, os.Environ()...)
 	if stderr := GetCtxStderr(ctx); stderr != nil {
 		cmd.Stderr = stderr
 	}
