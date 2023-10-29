@@ -19,6 +19,13 @@ func NewConfig(engineName, templateFile string) *CommonConfig {
 	return &CommonConfig{engineName: engineName, templateFile: templateFile}
 }
 
+type ParsedCommand struct{
+	Command string
+	Args string
+	ContainerEnging string
+	ContainerName string
+}
+
 type CommonConfig struct {
 	ID                        string
 	Command                   string
@@ -34,6 +41,7 @@ type CommonConfig struct {
 
 	engineName   string
 	templateFile string
+	parsedCommand *ParsedCommand
 }
 
 func (c *CommonConfig) GetIdent() string {
@@ -104,13 +112,26 @@ func (c *CommonConfig) CopyFrom(m *dbschema.NgingVhostServer) {
 	c.CertContainerDir = m.CertContainerDir
 }
 
+func ParseContainerInfo(parts []string) string, string {
+	return "", ""
+}
+
 func (c *CommonConfig) Exec(ctx context.Context, args ...string) ([]byte, error) {
 	command := c.Command
 	if c.Environ == EnvironContainer {
+		if c.parsedCommand=nil{
+			c.parsedCommand=&ParsedCommand{}
 		rootArgs := com.ParseArgs(command)
 		if len(rootArgs) > 1 {
-			command = rootArgs[0]
-			args = append(rootArgs[1:], args...)
+			c.parsedCommand.ContainerEngine, c.parsedCommand.ContainerName = ParseContainerInfo(rootArgs)
+			c.parsedCommand.Command = rootArgs[0]
+			c.parsedCommand.Args = rootArgs[1:]
+		}
+		}
+		if len(c.parsedCommand.Command)>0{
+			command=c.parsedCommand.Command
+			rootArgs:=append([]string{},c.parsedCommand.Args...)
+			args=append(rootArgs,args)
 		}
 	}
 	cmd := exec.CommandContext(ctx, command, args...)
