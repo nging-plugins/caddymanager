@@ -235,3 +235,17 @@ func (c *CommonConfig) RemoveDir(typeName string, rootDir string, prefix string,
 	}
 	return err
 }
+
+func (c *CommonConfig) FixVhostDirPath(vhostDir string) string {
+	dir := vhostDir
+	var sep string
+	if strings.Contains(dir, `\`) {
+		sep = `\`
+	} else {
+		sep = `/`
+	}
+	if !strings.HasSuffix(dir, sep) {
+		dir += sep
+	}
+	return dir
+}

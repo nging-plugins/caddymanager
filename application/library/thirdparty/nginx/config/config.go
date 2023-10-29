@@ -253,16 +253,7 @@ func (c *Config) FixEngineConfigFile(deleteMode ...bool) (bool, error) {
 	err = com.SeekFileLines(c.EngineConfigLocalFile, func(line string) error {
 		if httpBlockStart && strings.TrimRight(line, "\t ") == `}` {
 			if !delmode {
-				dir := vhostDir
-				var sep string
-				if strings.Contains(dir, `\`) {
-					sep = `\`
-				} else {
-					sep = `/`
-				}
-				if !strings.HasSuffix(dir, sep) {
-					dir += sep
-				}
+				dir := c.FixVhostDirPath(vhostDir)
 				line = "\n\tinclude \"" + dir + "*.conf\";\n" + line
 				hasUpdate = true
 			}

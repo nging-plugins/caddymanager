@@ -131,6 +131,15 @@ func (c *Config) FixEngineConfigFile(deleteMode ...bool) (bool, error) {
 	if len(deleteMode) > 0 {
 		delmode = deleteMode[0]
 	}
+	if !delmode && !com.FileExists(c.EngineConfigLocalFile) {
+		com.MkdirAll(filepath.Dir(c.EngineConfigLocalFile), os.ModePerm)
+		dir := c.FixVhostDirPath(vhostDir)
+		err = os.WriteFile(c.EngineConfigLocalFile, []byte("{\n\timport \""+dir+"*.conf\";\n}\n"), 0644)
+		if err != nil {
+			return false, err
+		}
+		return true, nil
+	}
 	findString := `[\s]*import[\s]+["']?` + regexp.QuoteMeta(vhostDir) + `[\/]?\*(\.conf)?["']?[\s]*`
 	re, err := regexp.Compile(findString)
 	if err != nil {
@@ -142,16 +151,7 @@ func (c *Config) FixEngineConfigFile(deleteMode ...bool) (bool, error) {
 	err = com.SeekFileLines(c.EngineConfigLocalFile, func(line string) error {
 		if httpBlockStart && strings.TrimRight(line, "\t ") == `}` {
 			if !delmode {
-				dir := vhostDir
-				var sep string
-				if strings.Contains(dir, `\`) {
-					sep = `\`
-				} else {
-					sep = `/`
-				}
-				if !strings.HasSuffix(dir, sep) {
-					dir += sep
-				}
+				dir := c.FixVhostDirPath(vhostDir)
 				line = "\n\timport \"" + dir + "*.conf\";\n" + line
 				hasUpdate = true
 			}
