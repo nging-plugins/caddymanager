@@ -134,7 +134,7 @@ func (c *Config) FixEngineConfigFile(deleteMode ...bool) (bool, error) {
 	if !delmode && !com.FileExists(c.EngineConfigLocalFile) {
 		com.MkdirAll(filepath.Dir(c.EngineConfigLocalFile), os.ModePerm)
 		dir := c.FixVhostDirPath(vhostDir)
-		err = os.WriteFile(c.EngineConfigLocalFile, []byte("{\n\timport \""+dir+"*.conf\";\n}\n"), 0644)
+		err = os.WriteFile(c.EngineConfigLocalFile, []byte("import \""+dir+"*.conf\";\n"), 0644)
 		if err != nil {
 			return false, err
 		}
@@ -145,38 +145,17 @@ func (c *Config) FixEngineConfigFile(deleteMode ...bool) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	var httpBlockStart bool
 	var seekedContent string
 	var hasUpdate bool
 	err = com.SeekFileLines(c.EngineConfigLocalFile, func(line string) error {
-		if httpBlockStart && strings.TrimRight(line, "\t ") == `}` {
-			if !delmode {
-				dir := c.FixVhostDirPath(vhostDir)
-				line = "\n\timport \"" + dir + "*.conf\";\n" + line
-				hasUpdate = true
-			}
-			httpBlockStart = false
-		}
 		seekedContent += line + "\n"
 		if hasUpdate {
 			return nil
 		}
-		if !httpBlockStart && strings.TrimRight(line, "\t ") == `{` {
-			httpBlockStart = true
-			return nil
-		}
-		cleaned := strings.TrimSpace(line)
-		if len(cleaned) == 0 {
-			return nil
-		}
-		if strings.HasPrefix(cleaned, `#`) {
-			return nil
-		}
-		if httpBlockStart && re.MatchString(cleaned) {
+		if re.MatchString(line) {
 			if delmode {
 				seekedContent = strings.TrimSuffix(seekedContent, line+"\n")
 				hasUpdate = true
-				httpBlockStart = false
 				return nil
 			}
 			return echo.ErrExit
@@ -187,6 +166,10 @@ func (c *Config) FixEngineConfigFile(deleteMode ...bool) (bool, error) {
 		if err != echo.ErrExit {
 			return hasUpdate, err
 		}
+	} else if !hasUpdate {
+		dir := c.FixVhostDirPath(vhostDir)
+		seekedContent += "import \"" + dir + "*.conf\";\n"
+		hasUpdate = true
 	}
 	if hasUpdate {
 		err = com.Copy(c.EngineConfigLocalFile, c.EngineConfigLocalFile+`.`+time.Now().Format(`20060102150405.000`)+`.ngingbak`)

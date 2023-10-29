@@ -1,14 +1,14 @@
 version: '3'
 services:
   nginx: 
-    image: test-ubuntu-caddy
+    image: caddy
     container_name: caddy
     expose:
       - 80
     ports:
       - 81:80
     volumes:
-      - /Users/hank/go/src/github.com/nging-plugins/caddymanager/example/data/test/caddy2/Caddy2file:/Caddy2file:rw
+      - /Users/hank/go/src/github.com/nging-plugins/caddymanager/example/data/test/caddy2/Caddy2file:/etc/caddy/Caddyfile:rw
       - /Users/hank/go/src/github.com/nging-plugins/caddymanager/example/data/test/caddy2/vhosts/:/vhosts/:rw
       - /Users/hank/go/src/github.com/nging-plugins/caddymanager/example/data/test/caddy2/certs/:/certs/:rw
     restart: always

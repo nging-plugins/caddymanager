@@ -30,21 +30,20 @@
     @cors_origin_matcher {
         header_regexp Origin "{{$originRegexp|$v.AddSlashes|ToHTML}}" 
     }
-    vars @cors_origin_matcher origin requeset>headers>Origin
+    vars @cors_origin_matcher r_origin "{request>headers>Origin}"
     {{$origin := $v.Get `cors_origin`}}
-    vars origin "{{Join ($v.SplitBySpace $origin) `,`}}"
+    vars r_origin "{{Join ($v.SplitBySpace $origin) `,`}}"
     {{end}}
 
     header @cors_matcher {
-        Access-Control-Allow-Origin "{vars.origin}"
+        Access-Control-Allow-Origin "{vars.r_origin}"
         {{Include "caddy/makeconfig/caddy2/cors" $}}
     }
     @cors_preflight {
         method OPTIONS
-        #expression {err.status_code} == 404
     }
     header @cors_preflight {
-        Access-Control-Allow-Origin "{vars.origin}"
+        Access-Control-Allow-Origin "{vars.r_origin}"
         {{Include "caddy/makeconfig/caddy2/cors" $}}
     }
     respond @cors_preflight 204
@@ -65,7 +64,7 @@
         format filter {
             wrap console
             fields {
-                # request>remote_ip / request>client_ip / request>headers>X-Forwarded-For
+                {{/* # request>remote_ip / request>client_ip / request>headers>X-Forwarded-For */}}
                 request>remote_ip ip_mask {
                     {{if $ipv4mask}}
                     ipv4 {{$ipv4mask}}
@@ -104,8 +103,8 @@
     {{end}}
 
     {{if $v.IsEnabled "gzip"}}
-    {{$exts := $v.SliptBySpaceWithWildcardPrefix ($v.Get "gzip_ext")}}
-    {{$notPaths := $v.SliptBySpaceWithWildcardPrefix ($v.Get "gzip_not")}}
+    {{$exts := $v.SplitBySpaceWithWildcardPrefix ($v.Get "gzip_ext")}}
+    {{$notPaths := $v.SplitBySpaceWithWildcardSuffix ($v.Get "gzip_not")}}
     {{$notUARegexp := $v.Get "gzip_not_ua_regexp"}}
     @gzip_matcher {
         path {{Join $exts ` `}}
@@ -158,6 +157,7 @@
     }
     reverse_proxy @reverse_proxy_matcher {{$v.Get "proxy_to"}} {
         {{$v.AddonAttrFullKey "proxy_upstream" "to"}}
+        {{if $.Get `proxy_upstream`}}
         {{$v.AddonAttrFullKey "proxy_policy" "lb_policy"}}
         {{$v.AddonAttrFullKey "proxy_fail_timeout" "fail_duration"}}
         {{$v.AddonAttrFullKey "proxy_max_fails" "lb_retries"}}
@@ -166,6 +166,7 @@
         {{$v.AddonAttrFullKey "proxy_health_check" "health_uri"}}
         {{$v.AddonAttrFullKey "proxy_health_check_interval" "health_interval"}}
         {{$v.AddonAttrFullKey "proxy_health_check_timeout" "health_timeout"}}
+        {{end}}
         {{$v.IteratorKV "proxy" "header_upstream" "        header_up    " true}}
         {{$v.IteratorKV "proxy" "header_downstream" "        header_down    " true}}
 
@@ -173,9 +174,9 @@
         uri strip_prefix {{$v.Get "proxy_without"}}
         {{end}}
 
-        {{$insecureSkipVerify := InSlice `insecure_skip_verify` ($v.GetValueList `proxy`,`preset`)}}
+        {{$insecureSkipVerify := InSlice `insecure_skip_verify` ($v.GetValueList `proxy` `preset`)}}
         {{$keepalive := $v.Get "proxy_keepalive"}}
-        {{if or $insecureSkipVerify $keepalive}}
+        {{if or $insecureSkipVerify (and $keepalive (ne $keepalive `0`))}}
         transport http {
             {{if $insecureSkipVerify}}
             tls_insecure_skip_verify

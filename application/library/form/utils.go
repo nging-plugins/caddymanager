@@ -39,15 +39,22 @@ func ParseDuration(str string) time.Duration {
 		return 0
 	}
 
-	years := param.AsInt64(matches[1])
-	months := param.AsInt64(matches[2])
-	days := param.AsInt64(matches[3])
-	hours := param.AsInt64(matches[4])
-	minutes := param.AsInt64(matches[5])
-	seconds := param.AsInt64(matches[6])
+	years := parseInt64ForDuration(matches[1])
+	months := parseInt64ForDuration(matches[2])
+	days := parseInt64ForDuration(matches[3])
+	hours := parseInt64ForDuration(matches[4])
+	minutes := parseInt64ForDuration(matches[5])
+	seconds := parseInt64ForDuration(matches[6])
 
 	hour := int64(time.Hour)
 	minute := int64(time.Minute)
 	second := int64(time.Second)
 	return time.Duration(years*24*365*hour + months*30*24*hour + days*24*hour + hours*hour + minutes*minute + seconds*second)
+}
+
+func parseInt64ForDuration(str string) int64 {
+	if len(str) == 0 {
+		return 0
+	}
+	return param.AsInt64(str[:len(str)-1])
 }
