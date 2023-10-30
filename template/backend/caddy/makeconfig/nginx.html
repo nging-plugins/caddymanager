@@ -90,7 +90,11 @@ server {
     {{$defs := index $locations.GroupByPath $path}}
     location {{$path}} {
     {{range $dk, $def := $defs}}
-        {{if eq $def.Module `header`}}
+        {{if gt (len $def.Items) 0}}
+        {{range $_k, $item := $def.Items}}
+        {{$item.Key}} {{$item.Val}} {{- range $item.Args}} {{.}}{{end}};
+        {{end}}
+        {{else if eq $def.Module `header`}}
         {{range $kk,$vv := $v.GetKVList "header"}}
         add_header {{$vv.K}} "{{$vv.V|$v.AddSlashes|ToHTML}}";
         {{end}}
@@ -107,8 +111,14 @@ server {
     {{$defs := index $locations.GroupByPath $path}}
     location ~ {{$path}} {
     {{range $dk, $def := $defs}}
+        {{if gt (len $def.Items) 0}}
+        {{range $_k, $item := $def.Items}}
+        {{$item.Key}} {{$item.Val}} {{- range $item.Args}} {{.}}{{end}};
+        {{end}}
+        {{else}}
         {{$.Set `currentPath` $path}}
         {{$.Fetch (printf `caddy/makeconfig/nginx/%s` $def.Module) $}}
+        {{end}}
     {{end}}
     }
     {{end}}

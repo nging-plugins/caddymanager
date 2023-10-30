@@ -24,6 +24,13 @@ type LocationDef struct {
 	Module   string
 	Location string
 	IsRegexp bool
+	Items    []*Item
+}
+
+type Item struct {
+	Key  interface{}
+	Val  interface{}
+	Args []interface{}
 }
 
 type Locations struct {
