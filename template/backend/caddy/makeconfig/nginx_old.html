@@ -66,9 +66,10 @@ server {
 
     {{if $v.IsEnabled "basicauth"}}
     {{$resources := $v.GetValueList "basicauth" "resources"|$v.SliceRegexpQuote}}
-    {{if gt (len $resources) 1}}
+    {{if gt (len $resources) 0}}
     location ^~ "{{Join $resources `|`|$v.AddSlashes|ToHTML}}" {
-        {{Include "caddy/makeconfig/nginx/basicauth" $}}    
+        auth_basic           "{{$v.GetAttrVal "basicauth" "realm" "Restricted"|$v.AddSlashes|ToHTML}}";
+        auth_basic_user_file "{{$v.VhostConfigDir|$v.AddSlashes|ToHTML}}/htpasswd/{{$prefix}}{{$id}}";
     }
     {{end}}
     {{end}}
@@ -84,37 +85,44 @@ server {
     {{else}}
     index {{$v.Get "fastcgi_index"}} index.html index.htm index.txt default.html default.htm default.txt;
     {{end}}
-
-    {{$locations := $v.NginxLocations}}
-    {{range $kk, $path := $locations.SortedStaticPath}}
-    {{$defs := index $locations.GroupByPath $path}}
-    location {{$path}} {
-    {{range $dk, $def := $defs}}
-        {{if eq $def.Module `header`}}
+    
+    {{$headerPath := $v.Get "header_path"}}
+    {{if and $headerPath (ne $headerPath `/`)}}
+    location {{$headerPath}} {
         {{range $kk,$vv := $v.GetKVList "header"}}
         add_header {{$vv.K}} "{{$vv.V|$v.AddSlashes|ToHTML}}";
         {{end}}
+    }
+    {{end}}
 
-        {{else}}
-        {{$.Set `currentPath` $path}}
-        {{$.Fetch (printf `caddy/makeconfig/nginx/%s` $def.Module) $}}
+    location / {
+        {{if and $headerPath (eq $headerPath `/`)}}
+        {{range $kk,$vv := $v.GetKVList "header"}}
+        add_header {{$vv.K}} "{{$vv.V|$v.AddSlashes|ToHTML}}";
         {{end}}
-    {{end}}
-    }
-    {{end}}
+        {{end}}
 
-    {{range $kk, $path := $locations.SortedRegexpPath}}
-    {{$defs := index $locations.GroupByPath $path}}
-    location ~ {{$path}} {
-    {{range $dk, $def := $defs}}
-        {{$.Set `currentPath` $path}}
-        {{$.Fetch (printf `caddy/makeconfig/nginx/%s` $def.Module) $}}
-    {{end}}
+        {{Include "caddy/makeconfig/nginx/cors" $}}
+
+        {{if and ($v.IsEnabled "proxy") (eq ($v.Get "proxy_from") `/`)}}
+        {{Include "caddy/makeconfig/nginx/proxy" $}}
+        {{end}}
+
+        {{if and ($v.IsEnabled "browse") (eq ($v.Get "browse_path") `/`)}}
+        {{Include "caddy/makeconfig/nginx/browse" $}}
+        {{end}}
     }
-    {{end}}
-    
+
     {{Include "caddy/makeconfig/nginx/gzip" $}}
     {{Include "caddy/makeconfig/nginx/fastcgi" $}}
+
+
+    {{if and ($v.IsEnabled "proxy") (ne ($v.Get "proxy_from") `/`)}}
+    location {{$v.Get "proxy_from"}} {
+        {{Include "caddy/makeconfig/nginx/proxy" $}}
+    }
+    {{end}}
+
 
     {{if $v.IsEnabled "log"}}
     access_log  "{{$v.Get "log_file"|$v.AddSlashes|ToHTML}}" nging_log_format_{{$id}} buffer=512k flush=1m;
@@ -124,14 +132,17 @@ server {
     {{Include "caddy/makeconfig/nginx/tls" $}}
     
     {{if $v.IsEnabled "expires"}}
-    {{$matchRules := $v.GetKVList "expires" "match"}}
-    {{if gt (len $matchRules) 1}}
-    {{range $kk,$vv := $matchRules}}
+    {{range $kk,$vv := $v.GetKVList "expires" "match"}}
     location ~ "{{$vv.K|$v.AddSlashes|ToHTML}}" {
         expires {{$vv.V|Default `12h`}};
     }
     {{end}}
     {{end}}
+
+    {{if and ($v.IsEnabled "browse") (ne ($v.Get "browse_path") `/`)}}
+    location {{$v.Get "browse_path"}} {
+        {{Include "caddy/makeconfig/nginx/browse" $}}
+    }
     {{end}}
 
     location ~ /.well-known {

@@ -255,17 +255,30 @@ func saveVhostData(ctx echo.Context, m *dbschema.NgingVhost, values url.Values, 
 		if err = os.Remove(saveFile); os.IsNotExist(err) {
 			err = nil
 		}
-	} else if renewalCert {
-		if renew, ok := cfg.(engine.CertRenewaler); ok {
-			updatedDomains, err := renewalVhostCert(ctx, renew, m)
-			if err != nil {
-				if !errors.Is(err, engine.ErrNotSetCertContainerDir) && !errors.Is(err, engine.ErrNotSetCertLocalDir) {
-					return err
+	} else {
+		var httpsDomains []string
+		if renewalCert {
+			if renew, ok := cfg.(engine.CertRenewaler); ok {
+				httpsDomains, err = renewalVhostCert(ctx, renew, m, values)
+				if err != nil {
+					if !errors.Is(err, engine.ErrNotSetCertContainerDir) && !errors.Is(err, engine.ErrNotSetCertLocalDir) {
+						return err
+					}
+					log.Error(err.Error())
 				}
-				log.Error(err.Error())
-			} else if len(updatedDomains) > 0 {
-				setCertPathForDomains(ctx, cfg, values, updatedDomains)
 			}
+		} else {
+			idDomains, err := parseVhostEnabledHTTPSDomains(ctx, m, values)
+			if err != nil {
+				return err
+			}
+
+			for _, req := range idDomains {
+				httpsDomains = append(httpsDomains, req.Domains...)
+			}
+		}
+		if len(httpsDomains) > 0 {
+			setCertPathForDomains(ctx, cfg, values, httpsDomains)
 		}
 		err = saveVhostConf(ctx, cfg, m.Id, values)
 	}

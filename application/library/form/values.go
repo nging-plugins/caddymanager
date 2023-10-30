@@ -224,6 +224,33 @@ func (v Values) GetKVList(addon string, itemOr ...string) []echo.KV {
 	return result
 }
 
+func (v Values) GetKVData(addon string, itemOr ...string) *echo.KVData {
+	var item string
+	if len(itemOr) > 0 {
+		item = itemOr[0]
+	}
+	if len(addon) > 0 && len(item) > 0 {
+		addon += `_`
+	}
+	k := addon + item + `_k`
+	keys, _ := v.Values[k]
+
+	k = addon + item + `_v`
+	values, _ := v.Values[k]
+
+	l := len(values)
+	result := echo.NewKVData()
+	for i, k := range keys {
+		if len(k) == 0 {
+			continue
+		}
+		if i < l {
+			result.Add(k, values[i])
+		}
+	}
+	return result
+}
+
 func (v Values) GetValueList(addon string, itemOr ...string) []string {
 	var item string
 	if len(itemOr) > 0 {

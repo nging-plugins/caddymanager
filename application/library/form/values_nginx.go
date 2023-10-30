@@ -17,6 +17,90 @@ type NginxDomainInfo struct {
 	CertsPath []*CertPath
 }
 
+var allPathFieldsForNginx = []string{`header_path` /*`fastcgi_path`,*/, `proxy_from`, `browse_path`, `expires_match_k[]`, `basicauth_resources[]`, `cors_path`}
+
+type LocationDef struct {
+	PathKey  string
+	Module   string
+	Location string
+	IsRegexp bool
+}
+
+type Locations struct {
+	SortedStaticPath []string
+	SortedRegexpPath []string
+	GroupByPath      map[string][]*LocationDef
+}
+
+type SortByLen []string
+
+func (s SortByLen) Len() int { return len(s) }
+func (s SortByLen) Less(i, j int) bool {
+	return len(s[i]) < len(s[j])
+}
+func (s SortByLen) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
+
+func (v Values) NginxLocations() Locations {
+	var staticPathList []string
+	var regexpPathList []string
+	groupByPath := map[string][]*LocationDef{}
+	for _, pathKey := range allPathFieldsForNginx {
+		if strings.HasSuffix(pathKey, `[]`) {
+			pathKey = strings.TrimSuffix(pathKey, `[]`)
+			moduleName := strings.SplitN(pathKey, `_`, 2)[0]
+			if !v.IsEnabled(moduleName) {
+				continue
+			}
+			if len(v.Values[pathKey]) != 1 {
+				continue
+			}
+			var isRegexp bool
+			if pathKey == `expires_match_k` {
+				isRegexp = true
+			}
+			for _, path := range v.Values[pathKey] {
+				data := &LocationDef{
+					PathKey:  pathKey,
+					Module:   moduleName,
+					Location: path,
+				}
+				if _, ok := groupByPath[path]; !ok {
+					groupByPath[path] = []*LocationDef{}
+					if isRegexp {
+						regexpPathList = append(regexpPathList, path)
+					} else {
+						staticPathList = append(staticPathList, path)
+					}
+				}
+				groupByPath[path] = append(groupByPath[path], data)
+			}
+		} else {
+			moduleName := strings.SplitN(pathKey, `_`, 2)[0]
+			if !v.IsEnabled(moduleName) {
+				continue
+			}
+			path := v.Get(pathKey)
+			if _, ok := groupByPath[path]; !ok {
+				groupByPath[path] = []*LocationDef{}
+				staticPathList = append(staticPathList, path)
+			}
+			data := &LocationDef{
+				PathKey:  pathKey,
+				Module:   moduleName,
+				Location: path,
+			}
+			groupByPath[path] = append(groupByPath[path], data)
+		}
+	}
+	sort.Sort(SortByLen(regexpPathList))
+	sort.Sort(SortByLen(staticPathList))
+	return Locations{
+		SortedStaticPath: staticPathList,
+		SortedRegexpPath: regexpPathList,
+		GroupByPath:      groupByPath,
+	}
+}
+
 // {remote} - {user} [{when}] "{method} {scheme} {host} {uri} {proto}" {status} {size} "{>Referer}" "{>User-Agent}" {latency}
 var NginxLogFormatReplacer = strings.NewReplacer(
 	//`{method} {scheme} {host} {uri} {proto}`, `$request`,
