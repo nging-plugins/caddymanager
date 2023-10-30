@@ -23,20 +23,20 @@ func (a Accounts) WriteToFile(file string) error {
 }
 
 // SetPassword set a password for a user with a hashing algo
-func (a Accounts) SetPassword(name, password string, hashAlgorithm HashAlgorithm) (err error) {
+func (a Accounts) SetPassword(name, password string, algo Algorithm) (err error) {
 	if len(password) == 0 {
 		return errors.New("passwords must not be empty, if you want to delete a user call RemoveUser")
 	}
 	var hash string
 	var prefix string
-	switch hashAlgorithm {
-	case HashAPR1:
-		hash, err = hashApr1(password)
-	case HashBCrypt:
-		hash, err = hashBcrypt(password)
-	case HashSHA:
+	switch algo {
+	case AlgoAPR1:
+		hash, err = HashApr1(password)
+	case AlgoBCrypt:
+		hash, err = HashBCrypt(password)
+	case AlgoSHA:
 		prefix = "{SHA}"
-		hash = hashSha(password)
+		hash = HashSha(password)
 
 	}
 	if err != nil {

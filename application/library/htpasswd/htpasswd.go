@@ -88,12 +88,12 @@ func SetPasswordHash(file, user, hash string) error {
 }
 
 // SetPassword set password for a user with a given hashing algorithm
-func SetPassword(file, name, password string, hashAlgorithm HashAlgorithm) error {
+func SetPassword(file, name, password string, algo Algorithm) error {
 	passwords, err := ParseHtpasswdFile(file)
 	if err != nil {
 		return err
 	}
-	err = passwords.SetPassword(name, password, hashAlgorithm)
+	err = passwords.SetPassword(name, password, algo)
 	if err != nil {
 		return err
 	}

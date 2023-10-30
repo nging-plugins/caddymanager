@@ -58,3 +58,26 @@ func parseInt64ForDuration(str string) int64 {
 	}
 	return param.AsInt64(str[:len(str)-1])
 }
+
+func AddCSlashesIngoreSlash(s string, b ...rune) string {
+	var builder strings.Builder
+	var cnt int
+	for _, v := range s {
+		if v == '\\' {
+			cnt++
+		} else {
+			cnt = 0
+		}
+		for _, f := range b {
+			if v == f {
+				builder.WriteRune('\\')
+				break
+			}
+		}
+		builder.WriteRune(v)
+	}
+	if cnt%2 != 0 {
+		builder.WriteRune('\\')
+	}
+	return builder.String()
+}

@@ -8,11 +8,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func hashApr1(password string) (string, error) {
+func HashApr1(password string) (string, error) {
 	return apr1_crypt.New().Generate([]byte(password), nil)
 }
 
-func hashBcrypt(password string) (string, error) {
+func HashBCrypt(password string) (string, error) {
 	passwordBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return ``, err
@@ -20,20 +20,20 @@ func hashBcrypt(password string) (string, error) {
 	return string(passwordBytes), nil
 }
 
-func hashSha(password string) string {
+func HashSha(password string) string {
 	s := sha1.New()
 	s.Write([]byte(password))
 	passwordSum := []byte(s.Sum(nil))
 	return base64.StdEncoding.EncodeToString(passwordSum)
 }
 
-type HashAlgorithm string
+type Algorithm string
 
 const (
-	// HashAPR1 Apache MD5 crypt - legacy
-	HashAPR1 HashAlgorithm = "apr1"
-	// HashBCrypt bcrypt - recommended
-	HashBCrypt HashAlgorithm = "bcrypt"
-	// HashSHA sha5 insecure - do not use
-	HashSHA HashAlgorithm = "sha"
+	// AlgoAPR1 Apache MD5 crypt - legacy
+	AlgoAPR1 Algorithm = "apr1"
+	// AlgoBCrypt bcrypt - recommended
+	AlgoBCrypt Algorithm = "bcrypt"
+	// AlgoSHA sha5 insecure - do not use
+	AlgoSHA Algorithm = "sha"
 )

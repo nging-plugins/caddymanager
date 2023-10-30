@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/webx-top/com"
 )
 
 func TestParseDuration(t *testing.T) {
@@ -20,4 +21,11 @@ func TestParseDuration(t *testing.T) {
 	}, matches)
 	v := ParseDuration(`1h`)
 	assert.Equal(t, time.Hour, v)
+}
+
+func TestAddCSlashes(t *testing.T) {
+	assert.Equal(t, `\\.html$`, com.AddCSlashes(`\.html$`, '"'))
+	assert.Equal(t, `\.html$`, AddCSlashesIngoreSlash(`\.html$`, '"'))
+	assert.Equal(t, `\.html\"$`, AddCSlashesIngoreSlash(`\.html"$`, '"'))
+	assert.Equal(t, `\.html\\`, AddCSlashesIngoreSlash(`\.html\`, '"'))
 }

@@ -349,7 +349,7 @@ func (c *Config) OnVhostConfigSaving(id uint, formData *form.Values) error {
 		password := strings.TrimSpace(formData.GetAttrVal("basicauth", "password"))
 		if len(username) > 0 && len(password) > 0 {
 			a := htpasswd.Accounts{}
-			err = a.SetPassword(username, password, htpasswd.HashBCrypt)
+			err = a.SetPassword(username, password, htpasswd.AlgoBCrypt)
 			if err != nil {
 				return err
 			}

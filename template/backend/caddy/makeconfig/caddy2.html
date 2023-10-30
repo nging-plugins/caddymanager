@@ -10,10 +10,10 @@
     {{$resources := $v.GetValueList "basicauth" "resources"}}
     {{if gt (len $resources) 0}}
     @basicauth_matcher {
-        path {{Join ($v.SliceAddWildcardSuffix $resources) ` `}}
+        path {{Join ($v.SliceAddPathWildcardSuffix $resources) ` `}}
     }
     basicauth @basicauth_matcher bcrypt "{{$v.GetAttrVal "basicauth" "realm" "Restricted"|$v.AddSlashes|ToHTML}}" {
-        "{{$v.GetAttrVal "basicauth" "username"|$v.AddSlashes|ToHTML}}" "{{$v.GetAttrVal "basicauth" "password"|Base64Encode|ToHTML}}"
+        "{{$v.GetAttrVal "basicauth" "username"|$v.AddSlashes|ToHTML}}" "{{$v.GetAttrVal "basicauth" "password"|$v.BCrypt|Base64Encode|ToHTML}}"
     }
     {{end}}
     {{end}}
@@ -89,7 +89,7 @@
     {{end}}
 
     {{if $v.Get "header_path"}}
-    header {{$v.Get "header_path"|$v.AddWildcardSuffix}} {
+    header {{$v.Get "header_path"|$v.AddPathWildcardSuffix}} {
         {{$v.IteratorKV "header" "" "        " true}}
     }
     {{end}}
@@ -103,8 +103,8 @@
     {{end}}
 
     {{if $v.IsEnabled "gzip"}}
-    {{$exts := $v.SplitBySpaceWithWildcardPrefix ($v.Get "gzip_ext")}}
-    {{$notPaths := $v.SplitBySpaceWithWildcardSuffix ($v.Get "gzip_not")}}
+    {{$exts := $v.SplitBySpaceWithExtWildcardPrefix ($v.Get "gzip_ext")}}
+    {{$notPaths := $v.SplitBySpaceWithPathWildcardSuffix ($v.Get "gzip_not")}}
     {{$notUARegexp := $v.Get "gzip_not_ua_regexp"}}
     @gzip_matcher {
         path {{Join $exts ` `}}
@@ -134,7 +134,7 @@
 
     {{if $v.IsEnabled "fastcgi"}}
     @php_fastcgi_matcher {
-        path {{$v.Get "fastcgi_path"|$v.AddWildcardSuffix}}
+        path {{$v.Get "fastcgi_path"|$v.AddPathWildcardSuffix}}
         {{if $v.Get `fastcgi_ext`}}
         path_regexp {{$v.Get "fastcgi_ext"|$v.RegexpQuote}}
         {{end}}
@@ -157,8 +157,8 @@
     
     {{if $v.IsEnabled "proxy"}}
     @reverse_proxy_matcher {
-        path {{$v.Get "proxy_from"|$v.AddWildcardSuffix}}
-        {{$excepts := $v.SplitBySpaceWithWildcardSuffix "proxy_except"}}
+        path {{$v.Get "proxy_from"|$v.AddPathWildcardSuffix}}
+        {{$excepts := $v.SplitBySpaceWithPathWildcardSuffix "proxy_except"}}
         {{if gt (len $excepts) 0}}
         not path {{Join $excepts ` `}}
         {{end}}
@@ -198,7 +198,7 @@
     {{end}}
 
     {{if $v.IsEnabled "browse"}}
-    file_server {{$v.Get "browse_path"|$v.AddWildcardSuffix}} {{$v.Get "browse_tmpl"|Default `browse`}} {
+    file_server {{$v.Get "browse_path"|$v.AddPathWildcardSuffix}} {{$v.Get "browse_tmpl"|Default `browse`}} {
         {{$root := $v.Get `root`}}
         {{if $root}}
         root "{{$root|$v.AddSlashes|ToHTML}}"

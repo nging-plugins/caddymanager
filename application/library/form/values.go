@@ -77,28 +77,28 @@ func (v Values) SplitBySpaceWithRegexpQuote(content string) []string {
 	return SplitBySpace(content, v.RegexpQuote)
 }
 
-func (v Values) SplitBySpaceWithWildcardSuffix(content string) []string {
-	return SplitBySpace(content, v.AddWildcardSuffix)
+func (v Values) SplitBySpaceWithPathWildcardSuffix(content string) []string {
+	return SplitBySpace(content, v.AddPathWildcardSuffix)
 }
 
-func (v Values) SplitBySpaceWithWildcardPrefix(content string) []string {
-	return SplitBySpace(content, v.AddWildcardPrefix)
+func (v Values) SplitBySpaceWithExtWildcardPrefix(content string) []string {
+	return SplitBySpace(content, v.AddExtWildcardPrefix)
 }
 
 func (v Values) RegexpQuote(content string) string {
 	return regexp.QuoteMeta(content)
 }
 
-func (v Values) SliceAddWildcardSuffix(content []string) []string {
+func (v Values) SliceAddPathWildcardSuffix(content []string) []string {
 	for index, value := range content {
-		content[index] = v.AddWildcardSuffix(value)
+		content[index] = v.AddPathWildcardSuffix(value)
 	}
 	return content
 }
 
-func (v Values) SliceAddWildcardPrefix(content []string) []string {
+func (v Values) SliceAddExtWildcardPrefix(content []string) []string {
 	for index, value := range content {
-		content[index] = v.AddWildcardPrefix(value)
+		content[index] = v.AddExtWildcardPrefix(value)
 	}
 	return content
 }
@@ -116,11 +116,11 @@ func (v Values) GetSlice(key string) param.StringSlice {
 }
 
 func (v Values) AddSlashes(val string) string {
-	return com.AddCSlashes(val, '"')
+	return AddCSlashesIngoreSlash(val, '"')
 }
 
 func (v Values) AddSlashesSingleQuote(val string) string {
-	return com.AddCSlashes(val, '\'')
+	return AddCSlashesIngoreSlash(val, '\'')
 }
 
 func (v Values) IteratorKV(addon string, item string, prefix string, withQuotes ...bool) interface{} {

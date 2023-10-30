@@ -6,9 +6,10 @@ services:
     expose:
       - 80
     ports:
-      - 81:80
+      - 10081:80
     volumes:
       - /Users/hank/go/src/github.com/nging-plugins/caddymanager/example/data/test/caddy2/Caddy2file:/etc/caddy/Caddyfile:rw
       - /Users/hank/go/src/github.com/nging-plugins/caddymanager/example/data/test/caddy2/vhosts/:/vhosts/:rw
       - /Users/hank/go/src/github.com/nging-plugins/caddymanager/example/data/test/caddy2/certs/:/certs/:rw
+      - /Users/hank/go/src/github.com/nging-plugins/caddymanager/example/data/test/caddy2/html/:/usr/share/html:ro
     restart: always
