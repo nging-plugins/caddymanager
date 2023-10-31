@@ -1,8 +1,10 @@
 package form
 
 import (
+	"fmt"
 	"html/template"
 	"mime"
+	"path"
 	"sort"
 	"strconv"
 	"strings"
@@ -176,6 +178,7 @@ type UpstreamInfo struct {
 	Host         string
 	Path         string
 	UpstreamName string
+	Rewrite      string // rewrite ^/user/(.*)$ /$1 break;
 	withQuote    bool
 }
 
@@ -206,7 +209,7 @@ func (v Values) ServerGroup(key string, customHost string, withQuotes ...bool) i
 	sh := strings.SplitN(val, `://`, 2)
 	var scheme string
 	var host string
-	var path string
+	var ppath string
 	if len(sh) == 2 {
 		scheme = sh[0]
 		host = sh[1]
@@ -223,30 +226,37 @@ func (v Values) ServerGroup(key string, customHost string, withQuotes ...bool) i
 	hp := strings.SplitN(host, `/`, 2)
 	if len(hp) == 2 {
 		host = hp[0]
-		path = `/` + hp[1]
+		ppath = `/` + hp[1]
 	}
+	var rewrite string
 	if scheme == `http` || scheme == `https` {
 		stripPrefix := v.Get(`proxy_without`)
 		if len(stripPrefix) > 0 {
 			proxyPath := v.Get(`proxy_from`)
 			if stripPrefix == proxyPath {
-				path = `/`
-			} else if strings.HasPrefix(proxyPath, stripPrefix) {
-				path = stripPrefix
-				if !strings.HasPrefix(path, `/`) {
-					path = `/` + path
+				ppath = `/`
+			} else {
+				if !strings.HasPrefix(stripPrefix, `/`) {
+					stripPrefix = `/` + stripPrefix
 				}
-				if !strings.HasSuffix(path, `/`) {
-					path += `/`
+				var targetPrefix string
+				if len(ppath) > 0 && path.Join(proxyPath, ppath) != strings.TrimSuffix(stripPrefix, `/`) {
+					targetPrefix = strings.TrimSuffix(ppath, `/`)
 				}
+				rewrite = fmt.Sprintf(
+					`rewrite %q %s/$1 break;`,
+					`^`+v.AddSlashes(stripPrefix)+`(.*)`,
+					targetPrefix,
+				)
 			}
 		}
 	}
 	return UpstreamInfo{
 		Scheme:       scheme,
 		Host:         host,
-		Path:         path,
+		Path:         ppath,
 		UpstreamName: customHost,
+		Rewrite:      rewrite,
 		withQuote:    withQuote,
 	}
 }

@@ -7,9 +7,13 @@
         {{end}}
 
         {{if $v.Get "proxy_upstream"}}
-        proxy_pass {{$.Get `proxyServerGroup`}};
+        {{$upstreamInfo := $.Get `proxyServerGroup`}}
+        {{$upstreamInfo.Rewrite|ToHTML}}
+        proxy_pass {{$upstreamInfo.String}};
         {{else}}
-        proxy_pass {{$v.ServerGroup "proxy_to" ""}};
+        {{$upstreamInfo := $v.ServerGroup "proxy_to" ""}}
+        {{$upstreamInfo.Rewrite|ToHTML}}
+        proxy_pass {{$upstreamInfo.String}};
         {{end}}
         
         {{if $v.Get "proxy_fail_timeout"}}
