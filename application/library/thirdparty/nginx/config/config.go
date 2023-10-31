@@ -427,7 +427,19 @@ func RenewalCert(ctx context.Context, customCmd string, domains []string, email 
 		return nil
 	}
 	//http://coscms.com/.well-known/acme-challenge/Ito***l4-Fh7O5FpaAA*************LI3vTPo
+	// === certbot ===
+	// 申请：
 	//certbot certonly --webroot -d example.com --email info@example.com -w /var/www/_letsencrypt -n --agree-tos --force-renewal
+	// 更新
+	//certbot renew 更新所有
+	//certbot renew --cert-name example.com --force-renewal
+	// === lego ===
+	// 申请：
+	//lego --accept-tos --email you@example.com --http --http.webroot /path/to/webroot --domains example.com run
+	//https://go-acme.github.io/lego/usage/cli/obtain-a-certificate/
+	// 更新：
+	//lego --email="you@example.com" --domains="example.com" --http renew
+	//https://go-acme.github.io/lego/usage/cli/renew-a-certificate/
 	command := `certbot`
 	args := []string{
 		`certonly`,
