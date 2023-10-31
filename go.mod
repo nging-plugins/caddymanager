@@ -14,6 +14,7 @@ require (
 	github.com/admpub/nging/v5 v5.0.0
 	github.com/admpub/null v8.0.4+incompatible
 	github.com/admpub/once v0.0.1
+	github.com/admpub/resty/v2 v2.7.1
 	github.com/admpub/tail v1.1.0
 	github.com/admpub/useragent v0.0.1
 	github.com/caddy-plugins/caddy-expires v1.1.2
@@ -32,7 +33,9 @@ require (
 	github.com/webx-top/com v1.1.2
 	github.com/webx-top/db v1.27.1
 	github.com/webx-top/echo v2.39.7+incompatible
+	github.com/webx-top/restyclient v0.0.4
 	golang.org/x/crypto v0.14.0
+	golang.org/x/net v0.17.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
@@ -86,7 +89,6 @@ require (
 	github.com/admpub/realip v0.0.0-20210421084339-374cf5df122d // indirect
 	github.com/admpub/redistore v1.2.1 // indirect
 	github.com/admpub/regexp2 v1.1.7 // indirect
-	github.com/admpub/resty/v2 v2.7.1 // indirect
 	github.com/admpub/securecookie v1.2.0 // indirect
 	github.com/admpub/service v0.0.5 // indirect
 	github.com/admpub/sessions v0.1.3 // indirect
@@ -96,7 +98,7 @@ require (
 	github.com/admpub/webdav/v4 v4.1.3 // indirect
 	github.com/admpub/websocket v1.0.4 // indirect
 	github.com/andybalholm/brotli v1.0.6 // indirect
-	github.com/aws/aws-sdk-go v1.46.5 // indirect
+	github.com/aws/aws-sdk-go v1.46.7 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/boombuler/barcode v1.0.1 // indirect
@@ -104,7 +106,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/coscms/forms v1.12.2 // indirect
 	github.com/coscms/go-imgparse v0.0.0-20150925144422-3e3a099f7856 // indirect
-	github.com/creack/pty v1.1.18 // indirect
+	github.com/creack/pty v1.1.20 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/disintegration/imaging v1.6.2 // indirect
 	github.com/dsoprea/go-logging v0.0.0-20200710184922-b02d349568dd // indirect
@@ -175,7 +177,7 @@ require (
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/quic-go/qpack v0.4.0 // indirect
 	github.com/quic-go/qtls-go1-20 v0.4.1 // indirect
-	github.com/quic-go/quic-go v0.39.2 // indirect
+	github.com/quic-go/quic-go v0.39.3 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/rs/xid v1.5.0 // indirect
 	github.com/russross/blackfriday v1.6.0 // indirect
@@ -199,7 +201,6 @@ require (
 	github.com/webx-top/image v0.1.0 // indirect
 	github.com/webx-top/pagination v0.2.7 // indirect
 	github.com/webx-top/poolx v0.0.0-20210912044716-5cfa2d58e380 // indirect
-	github.com/webx-top/restyclient v0.0.4 // indirect
 	github.com/webx-top/tagfast v0.0.0-20161020041435-9a2065ce3dd2 // indirect
 	github.com/webx-top/validation v0.0.3 // indirect
 	github.com/webx-top/validator v0.2.0 // indirect
@@ -208,7 +209,6 @@ require (
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
 	golang.org/x/image v0.13.0 // indirect
 	golang.org/x/mod v0.13.0 // indirect
-	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sync v0.4.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/text v0.13.0 // indirect

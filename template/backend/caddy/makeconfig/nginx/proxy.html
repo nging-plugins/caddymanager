@@ -1,11 +1,11 @@
 {{$v := $.Get `values`}}
 {{$except := $v.Get "proxy_except"}}
         {{if $except}}
-        location ^~ "({{Join ($v.SplitBySpaceWithRegexpQuote $except) `|`|$v.AddSlashes|ToHTML}})" {
+        location ~ "^({{Join ($v.SplitBySpaceWithRegexpQuote $except) `|`|$v.AddSlashes|ToHTML}})" {
             return 404;
         }
         {{end}}
-        
+
         {{if $v.Get "proxy_upstream"}}
         proxy_pass {{$.Get `proxyServerGroup`}};
         {{else}}

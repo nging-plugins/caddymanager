@@ -67,7 +67,7 @@ server {
     {{if $v.IsEnabled "basicauth"}}
     {{$resources := $v.GetValueList "basicauth" "resources"|$v.SliceRegexpQuote}}
     {{if gt (len $resources) 1}}
-    location ^~ "{{Join $resources `|`|$v.AddSlashes|ToHTML}}" {
+    location ~ "^({{Join $resources `|`|$v.AddSlashes|ToHTML}})" {
         {{Include "caddy/makeconfig/nginx/basicauth" $}}    
     }
     {{end}}
@@ -144,7 +144,7 @@ server {
     {{end}}
     {{end}}
 
-    location ~ /.well-known {
+    location ^~ /.well-known {
         allow all;
     }
 

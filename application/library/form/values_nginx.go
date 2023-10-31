@@ -184,7 +184,13 @@ func (u UpstreamInfo) String() string {
 	if len(u.UpstreamName) > 0 {
 		host = u.UpstreamName
 	}
-	value := u.Scheme + `://` + host + u.Path
+	value := u.Scheme
+	if u.Scheme == `unix` {
+		value += `:/`
+	} else {
+		value += `://`
+	}
+	value += host + u.Path
 	if u.withQuote {
 		value = `"` + com.AddCSlashes(value, '"') + `"`
 	}
@@ -205,13 +211,36 @@ func (v Values) ServerGroup(key string, customHost string, withQuotes ...bool) i
 		scheme = sh[0]
 		host = sh[1]
 	} else {
-		scheme = `http`
-		host = val
+		parts := strings.SplitN(val, `:`, 2)
+		if len(parts) == 2 {
+			scheme = parts[0]
+			host = strings.TrimLeft(parts[1], "/")
+		} else {
+			scheme = `http`
+			host = val
+		}
 	}
 	hp := strings.SplitN(host, `/`, 2)
 	if len(hp) == 2 {
 		host = hp[0]
 		path = `/` + hp[1]
+	}
+	if scheme == `http` || scheme == `https` {
+		stripPrefix := v.Get(`proxy_without`)
+		if len(stripPrefix) > 0 {
+			proxyPath := v.Get(`proxy_from`)
+			if stripPrefix == proxyPath {
+				path = `/`
+			} else if strings.HasPrefix(proxyPath, stripPrefix) {
+				path = stripPrefix
+				if !strings.HasPrefix(path, `/`) {
+					path = `/` + path
+				}
+				if !strings.HasSuffix(path, `/`) {
+					path += `/`
+				}
+			}
+		}
 	}
 	return UpstreamInfo{
 		Scheme:       scheme,

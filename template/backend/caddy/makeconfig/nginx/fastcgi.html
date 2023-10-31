@@ -12,7 +12,7 @@
 
         {{$except := $v.Get "fastcgi_except"}}
         {{if $except}}
-        location ^~ "({{Join ($v.SplitBySpaceWithRegexpQuote $except) `|`|$v.AddSlashes|ToHTML}})" {
+        location ~ "^({{Join ($v.SplitBySpaceWithRegexpQuote $except) `|`|$v.AddSlashes|ToHTML}})" {
             return 404;
         }
         {{end}}
