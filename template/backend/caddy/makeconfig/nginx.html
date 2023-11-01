@@ -65,7 +65,7 @@ map $http_origin $allow_cors_origin_{{$id}} {
 
 
 {{if $v.IsEnabled "ratelimit"}}
-limit_req_zone $binary_remote_addr zone=limit_zone_{{$id}}:10m rate={{$v.GetAttrVal "ratelimit" "rate"}}r/{{$v.GetAttrVal "ratelimit" "unit"}};
+limit_req_zone $binary_remote_addr zone=limit_zone_{{$id}}:10m rate={{$v.NginxLimitRateWithUnit}};
 {{end}}
 
 
