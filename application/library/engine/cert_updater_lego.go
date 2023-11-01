@@ -29,12 +29,12 @@ func init() {
 // 更新：
 // lego --email="you@example.com" --domains="example.com" --http renew
 // https://go-acme.github.io/lego/usage/cli/renew-a-certificate/
-func RenewCertByLego(ctx context.Context, customCmd string, domains []string, email string, certDir string, isObtain bool) error {
+func RenewCertByLego(ctx context.Context, cmdPathPrefix string, domains []string, email string, certDir string, isObtain bool) error {
 	if len(domains) == 0 {
 		return nil
 	}
 	command := `lego`
-	var args []string
+	var args = []string{command}
 	saveDir := `/etc/letsencrypt`
 	if sv, ok := ctx.Value(CtxCertDir).(string); ok && len(sv) > 0 {
 		saveDir = sv
@@ -53,8 +53,8 @@ func RenewCertByLego(ctx context.Context, customCmd string, domains []string, em
 	} else {
 		args = append(args, `renew`)
 	}
-	if len(customCmd) > 0 {
-		rootArgs := com.ParseArgs(customCmd)
+	if len(cmdPathPrefix) > 0 {
+		rootArgs := com.ParseArgs(cmdPathPrefix)
 		if len(rootArgs) > 1 {
 			command = rootArgs[0]
 			args = append(rootArgs[1:], args...)
