@@ -364,7 +364,7 @@ func receiveFormData(ctx echo.Context, m *dbschema.NgingVhost) {
 	m.GroupId = ctx.Formx(`groupId`).Uint()
 	m.ServerIdent = ctx.Form(`serverIdent`)
 	m.SslEnabled = common.BoolToFlag(ctx.Form(`tls`) == `1`)
-	if (m.SslEnabled != common.BoolY || !supportedAutoSSL(ctx.Forms())) || ctx.Form(`removeCachedCert`) == `1` {
+	if m.SslEnabled != common.BoolY || !supportedAutoSSL(ctx.Forms()) {
 		m.SslObtained = 0
 		m.SslRenewed = 0
 	}
