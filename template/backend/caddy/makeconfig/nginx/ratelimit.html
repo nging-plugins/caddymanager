@@ -1,2 +1,3 @@
 {{$v := $.Get "values"}}
 {{$id := $.Get "id"}}
+        limit_req zone=limit_zone_{{$id}} burst={{$v.GetAttrVal "ratelimit" "burst"}};
