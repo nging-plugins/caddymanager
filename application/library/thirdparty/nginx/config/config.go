@@ -395,12 +395,12 @@ func (c *Config) RenewCert(ctx echo.Context, id uint, domains []string, email st
 	up := item.X.(engine.CertUpdater)
 
 	var stdCtx context.Context = ctx
-	if len(c.CertPathFormat.SaveDir) > 0 {
-		stdCtx = context.WithValue(ctx, engine.CtxCertDir, c.CertPathFormat.SaveDir)
-	}
 	if len(c.CertLocalDir) > 0 && len(c.CertPathFormat.CertLocalUpdater()) > 0 {
 		certDir := filepath.Join(c.CertLocalDir, engine.NgingConfigPrefix+strconv.FormatUint(uint64(id), 10), `well-known`)
 		com.MkdirAll(certDir, os.ModePerm)
+		if len(c.CertPathFormat.SaveDir) > 0 && c.Environ == engine.EnvironLocal {
+			stdCtx = context.WithValue(ctx, engine.CtxCertDir, c.CertPathFormat.SaveDir)
+		}
 		return up.Update(stdCtx, ``, domains, email, certDir, isObtain)
 	}
 	if c.Environ == engine.EnvironContainer {
@@ -433,6 +433,9 @@ func (c *Config) RenewCert(ctx echo.Context, id uint, domains []string, email st
 		if err != nil {
 			err = fmt.Errorf(`%s: %w`, result, err)
 			return err
+		}
+		if len(c.CertPathFormat.SaveDir) > 0 {
+			stdCtx = context.WithValue(ctx, engine.CtxCertDir, c.CertPathFormat.SaveDir)
 		}
 		return up.Update(stdCtx, command, domains, email, certDir, isObtain)
 	}
