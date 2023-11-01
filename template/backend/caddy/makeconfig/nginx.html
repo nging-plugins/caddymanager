@@ -28,6 +28,11 @@ upstream nging_proxy_{{$id}}{
     {{range $v.SplitBySpace $upstream}}
     server {{.}};
     {{end}}
+
+    {{$keepalive := $v.Get "proxy_keepalive"}}
+    {{if and $keepalive (ne $keepalive `0`)}}
+    keepalive $keepalive;
+    {{end}}
 }
     {{end}}
 {{end}}
