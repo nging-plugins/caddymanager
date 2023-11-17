@@ -26,6 +26,7 @@ type APIClient struct {
 	client *resty.Client
 }
 
+// Post url=/v1.43/containers/{id}/exec
 func (a *APIClient) Post(url string, data interface{}) error {
 	var idResp IDResponse
 	resp, err := a.client.R().SetBody(data).SetResult(&idResp).Post(url)
