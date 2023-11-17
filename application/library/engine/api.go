@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/admpub/resty/v2"
 )
@@ -26,12 +27,30 @@ type APIClient struct {
 }
 
 func (a *APIClient) Post(url string, data interface{}) error {
-	resp, err := a.client.R().SetBody(data).Post(url)
+	var idResp IDResponse
+	resp, err := a.client.R().SetBody(data).SetResult(&idResp).Post(url)
 	if err != nil {
 		return err
 	}
 	if resp.IsError() {
 		err = fmt.Errorf(`%s`, resp.Body())
+		return err
+	}
+	if len(idResp.ID) == 0 {
+		return err
+	}
+	parts := strings.SplitN(url, `/containers/`, 2)
+	if len(parts) != 2 {
+		return err
+	}
+	url = parts[0] + `/exec/` + idResp.ID + `/start`
+	resp, err = a.client.R().SetBody(RequestDockerExecStart{}).Post(url)
+	if err != nil {
+		return err
+	}
+	if resp.IsError() {
+		err = fmt.Errorf(`%s`, resp.Body())
+		return err
 	}
 	return err
 }
@@ -46,4 +65,14 @@ type RequestDockerExec struct {
 	Tty          bool     `json:",omitempty"`
 	Cmd          []string `json:",omitempty"` // ["date"],
 	Env          []string `json:",omitempty"` // ["FOO=bar","BAZ=quux"]
+}
+type IDResponse struct {
+	// The id of the newly created object.
+	// Required: true
+	ID string `json:"Id"`
+}
+
+type RequestDockerExecStart struct {
+	Detach bool
+	Tty    bool
 }
