@@ -31,7 +31,7 @@ require (
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
 	github.com/webx-top/client v0.8.10
-	github.com/webx-top/com v1.2.5
+	github.com/webx-top/com v1.2.6
 	github.com/webx-top/db v1.27.1
 	github.com/webx-top/echo v2.42.6+incompatible
 	github.com/webx-top/restyclient v0.0.4
