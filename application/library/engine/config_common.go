@@ -166,17 +166,19 @@ func (c *CommonConfig) execEndpoint(ctx context.Context, args ...string) ([]byte
 
 func (c *CommonConfig) APIPost(ctx context.Context, data RequestDockerExec) error {
 	parts := strings.SplitN(c.Endpoint, `/containers/`, 2)
-	if len(parts) == 2 {
+	if len(parts) == 2 && len(parts[0]) == 0 { // /containers/nginx/exec
 		containerID := strings.SplitN(parts[1], `/`, 2)[0]
-		if len(containerID) > 0 {
-			err := PostDocker(containerID, data)
-			if err == nil {
-				return err
-			}
-			if err != echo.ErrNotImplemented {
-				return err
-			}
+		if len(containerID) == 0 {
+			return fmt.Errorf(`containerID is empty: %s`, c.Endpoint)
 		}
+		err := PostDocker(containerID, data)
+		if err == nil {
+			return err
+		}
+		if err != echo.ErrNotImplemented {
+			return fmt.Errorf(`%w: unsupported url %q`, err, c.Endpoint)
+		}
+		return err
 	}
 	client, err := NewAPIClient(c.endpointTLSCert, c.endpointTLSKey)
 	if err != nil {
