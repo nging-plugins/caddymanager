@@ -16,7 +16,7 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package logcool
+package logcounter
 
 type Counter struct {
 	Views       map[string]uint64  //每个网址的浏览器
@@ -30,4 +30,32 @@ type Counter struct {
 	//200/301/302/400/403/404/499/500/502/503/504
 	StatusCode map[int]uint64    //状态码次数
 	Browsers   map[string]uint64 //浏览器访问次数
+}
+
+type URLCounter struct {
+	URL      string  // 网址
+	Views    uint64  // 浏览量
+	Elapsed  float64 // 耗时(秒)
+	BodySize uint64  // 响应Body尺寸(字节)
+	IPCount  uint64  // IP数量
+	Code2xx  uint64  // 状态码 2xx 数量
+	Code3xx  uint64  // 状态码 3xx 数量
+	Code4xx  uint64  // 状态码 4xx 数量
+	Code5xx  uint64  // 状态码 5xx 数量
+}
+
+type CodeCounter struct {
+	Code  uint   // 状态码
+	Count uint64 // 数量
+}
+
+type IPCounter struct {
+	IP     string // IP
+	Region string // 地区
+	Views  uint64 // 浏览量
+}
+
+type RegionCounter struct {
+	Region  string // 地区
+	IPCount uint64 // IP数量
 }
