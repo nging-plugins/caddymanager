@@ -666,8 +666,8 @@ github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5/go.mod h1:wHh0iHkY
 github.com/aws/aws-sdk-go v1.37.27/go.mod h1:hcU610XS61/+aQV88ixoOzUoG7v3b31pl2zKMmprdro=
 github.com/aws/aws-sdk-go v1.39.0/go.mod h1:hcU610XS61/+aQV88ixoOzUoG7v3b31pl2zKMmprdro=
 github.com/aws/aws-sdk-go v1.40.10/go.mod h1:585smgzpB/KqRA+K3y/NL/oYRqQvpNJYvLm+LY1U59Q=
-github.com/aws/aws-sdk-go v1.48.0 h1:1SeJ8agckRDQvnSCt1dGZYAwUaoD2Ixj6IaXB4LCv8Q=
-github.com/aws/aws-sdk-go v1.48.0/go.mod h1:LF8svs817+Nz+DmiMQKTO3ubZ/6IaTpq3TjupRn3Eqk=
+github.com/aws/aws-sdk-go v1.48.3 h1:btYjT+opVFxUbRz+qSCjJe07cdX82BHmMX/FXYmoL7g=
+github.com/aws/aws-sdk-go v1.48.3/go.mod h1:LF8svs817+Nz+DmiMQKTO3ubZ/6IaTpq3TjupRn3Eqk=
 github.com/aws/aws-sdk-go-v2 v1.19.0/go.mod h1:uzbQtefpm44goOPmdKyAlXSNcwlRgF3ePWVW6EtJvvw=
 github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.10/go.mod h1:VeTZetY5KRJLuD/7fkQXMU6Mw7H5m/KP2J5Iy9osMno=
 github.com/aws/aws-sdk-go-v2/config v1.18.28/go.mod h1:nIL+4/8JdAuNHEjn/gPEXqtnS02Q3NXB/9Z7o5xE4+A=
@@ -1869,8 +1869,8 @@ github.com/webx-top/com v1.2.10/go.mod h1:DDfATzu1w5+vD5XmG3YRTfLjaIqZWi/yeJ7HQE
 github.com/webx-top/db v1.27.1 h1:qu/x/0Olg9C0fykz5k2YROmLGBlBTqkZ9swrm/XsBLs=
 github.com/webx-top/db v1.27.1/go.mod h1:roceE5x2EX0eKOcQpW4URy+8iNfqKGiP6n+wrgjktPk=
 github.com/webx-top/echo v2.33.3+incompatible/go.mod h1:ufVP//GwP1suggBSQW7l8G9XcKxZM+FIfCMElLAQqF8=
-github.com/webx-top/echo v2.42.7+incompatible h1:D2KhIv6onFBh7ki7dS7l7wB8+xLyP1zExJ1F+R4mU4w=
-github.com/webx-top/echo v2.42.7+incompatible/go.mod h1:ufVP//GwP1suggBSQW7l8G9XcKxZM+FIfCMElLAQqF8=
+github.com/webx-top/echo v2.42.8+incompatible h1:q/sMuEVfIixpg+yOXinheQn3BotZ8YpGP8l8EH9bSNE=
+github.com/webx-top/echo v2.42.8+incompatible/go.mod h1:ufVP//GwP1suggBSQW7l8G9XcKxZM+FIfCMElLAQqF8=
 github.com/webx-top/image v0.1.0 h1:c01ZtTP3yjwok7nXzjm6pS6zL50z9m/9ax6D/iwfSJc=
 github.com/webx-top/image v0.1.0/go.mod h1:+h1W1x6ci+EqAlbnKSEdpflMWrCGNlLqB0OcmfglzMg=
 github.com/webx-top/pagination v0.2.7/go.mod h1:5jelnjgnc0GwTVBhX0SjlSKMGFOym3IoXpnmvB+1LQo=

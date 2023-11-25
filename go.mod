@@ -31,7 +31,7 @@ require (
 	github.com/webx-top/client v0.8.10
 	github.com/webx-top/com v1.2.10
 	github.com/webx-top/db v1.27.1
-	github.com/webx-top/echo v2.42.7+incompatible
+	github.com/webx-top/echo v2.42.8+incompatible
 	github.com/webx-top/restyclient v0.0.4
 	golang.org/x/crypto v0.15.0
 	golang.org/x/net v0.18.0
@@ -97,7 +97,7 @@ require (
 	github.com/admpub/webdav/v4 v4.1.3 // indirect
 	github.com/admpub/websocket v1.0.4 // indirect
 	github.com/andybalholm/brotli v1.0.6 // indirect
-	github.com/aws/aws-sdk-go v1.48.0 // indirect
+	github.com/aws/aws-sdk-go v1.48.3 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/boombuler/barcode v1.0.1 // indirect
