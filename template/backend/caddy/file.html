@@ -33,12 +33,12 @@
                         <i class="fa fa-upload"></i>
                         {{"上传文件到当前目录"|$.T}}
                     </button>
-					<button type="button" id="uploadZipBtn" class="btn btn-warning" data-popover="popover" data-content="{{"仅支持上传zip压缩包。成功解压到当前目录后，该压缩包会被自动删除"|$.T}}" data-container="body" data-placement="top" data-trigger="hover">
+					<button type="button" id="uploadZipBtn" class="btn btn-warning" data-popover="popover" data-content="{{`仅支持上传zip压缩包。成功解压到当前目录后，该压缩包会被自动删除`|$.T}}" data-container="body" data-placement="top" data-trigger="hover">
                         <i class="fa fa-upload"></i>
                         {{"打包上传到当前目录"|$.T}}
                     </button>
                     <span class="input-group" style="padding-left:10px">
-                        <input type="text" id="query-current-path" name="query" class="form-control typeahead" required="required" value="{{$.Form "query"}}" data-provide="typeahead">
+                        <input type="text" id="query-current-path" name="query" class="form-control typeahead" required="required" value="{{$.Form `query`}}" data-provide="typeahead">
                         <span class="input-group-btn"><button class="btn btn-default" type="button" id="btn-query-current-path"><i class="fa fa-search"></i></button></span>
                     </span>
 				</div>
@@ -61,8 +61,9 @@
                         <tr>
 							<td>
                                 <i class="fa fa-folder-o"></i>
-                                <a title="{{"点击回到上一级"|$.T}}" href="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&path={{$path}}/.." style="font-size:18px;font-weight:bold" data-toggle="tooltip">..</a>
+                                <a title="{{`点击回到上一级`|$.T}}" href="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&path={{$path}}/.." style="font-size:18px;font-weight:bold" data-toggle="tooltip">..</a>
                             </td>
+							<td></td>
 							<td></td>
 							<td></td>
 							<td></td>
@@ -89,7 +90,7 @@
                                 {{end}}
                                 <a href="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&path={{if $path}}{{$path}}/{{end}}{{$v.Name}}">{{$v.Name}}</a>
                                 &nbsp;
-                                <a href="javascript:;" title="{{"重命名"|$.T}}" data-url="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&do=rename&path={{if $path}}{{$path}}/{{end}}{{$v.Name}}" onclick="fileRename(this,'{{$v.Name}}',{{if $v.IsDir}}true{{else}}false{{end}})" data-toggle="tooltip">
+                                <a href="javascript:;" title="{{`重命名`|$.T}}" data-url="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&do=rename&path={{if $path}}{{$path}}/{{end}}{{$v.Name}}" onclick="fileRename(this,'{{$v.Name}}',{{if $v.IsDir}}true{{else}}false{{end}})" data-toggle="tooltip">
                                 <i class="fa fa-pencil"></i>
                                 </a>
                             </td>
@@ -105,20 +106,20 @@
 							<td>{{if $v.IsDir}}-{{else}}{{$v.Size|FormatByte}}{{end}}</td>
 							<td>{{$mode}}</td>
 							<td>
-                                <a title="{{"删除"|$.T}}" class="label label-danger" href="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&do=delete&path={{if $path}}{{$path}}/{{end}}{{$v.Name}}" onclick="return confirm('{{$.T "真的要删除“%v”吗？" $v.Name}}');" data-toggle="tooltip">
+                                <a title="{{`删除`|$.T}}" class="label label-danger" href="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&do=delete&path={{if $path}}{{$path}}/{{end}}{{$v.Name}}" onclick="return confirm('{{$.T `真的要删除“%v”吗？` $v.Name}}');" data-toggle="tooltip">
                                 <i class="fa fa-times"></i>
                                 </a>
                                 {{- if not $v.IsDir -}}
                                 {{- if call $.Func.Editable $v.Name -}}
                                 &nbsp;
-                                <a title="{{"编辑"|$.T}}" class="label label-success" href="javascript:;" data-url="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&do=edit&path={{if $path}}{{$path}}/{{end}}{{$v.Name}}" onclick="fileEdit(this,'{{$v.Name}}')" data-toggle="tooltip">
+                                <a title="{{`编辑`|$.T}}" class="label label-success" href="javascript:;" data-url="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&do=edit&path={{if $path}}{{$path}}/{{end}}{{$v.Name}}" onclick="fileEdit(this,'{{$v.Name}}')" data-toggle="tooltip">
                                 <i class="fa fa-pencil"></i>
                                 </a>
                                 {{- end -}}
                                 {{- $mediaMime:= call $.Func.Playable $v.Name -}}
                                 {{- if $mediaMime -}}
                                 &nbsp;
-                                <a title="{{"播放"|$.T}}" class="label label-primary" href="javascript:;" playable data-mime="{{$mediaMime}}" data-name="{{$v.Name}}" data-url="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&path={{if $path}}{{$path}}/{{end}}{{$v.Name}}" onclick="filePlay(this)" data-toggle="tooltip">
+                                <a title="{{`播放`|$.T}}" class="label label-primary" href="javascript:;" playable data-mime="{{$mediaMime}}" data-name="{{$v.Name}}" data-url="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&path={{if $path}}{{$path}}/{{end}}{{$v.Name}}" onclick="filePlay(this)" data-toggle="tooltip">
                                 <i class="fa fa-play"></i>
                                 </a>
                                 {{- end -}}
