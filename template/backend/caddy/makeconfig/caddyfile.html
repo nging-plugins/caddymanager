@@ -71,8 +71,8 @@
     {{if $v.IsEnabled "nobots"}}
     nobots "{{$v.GetAttrVal "nobots" "bomb" "bomb.gz"|$v.AddSlashes|ToHTML}}" {
         {{$v.Iterator "nobots" "userAgent" "        " true}}
-        {{$v.Iterator "nobots" "userAgentRegexp" "        regexp " true}}
-        {{$v.Iterator "nobots" "publicPathRegexp" "        public " true}}
+        {{$v.Iterator "nobots" "userAgentRegexp" "        regexp " true true}}
+        {{$v.Iterator "nobots" "publicPathRegexp" "        public " true true}}
     }
     {{end}}
 

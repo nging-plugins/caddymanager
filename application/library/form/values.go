@@ -135,8 +135,12 @@ func (v Values) IteratorKV(addon string, item string, prefix string, withQuotes 
 
 	var r, t string
 	var withQuote bool
+	var ignoreSlash bool
 	if len(withQuotes) > 0 {
 		withQuote = withQuotes[0]
+		if len(withQuotes) > 1 {
+			ignoreSlash = withQuotes[1]
+		}
 	}
 	l := len(values)
 	var suffix string
@@ -145,11 +149,15 @@ func (v Values) IteratorKV(addon string, item string, prefix string, withQuotes 
 	}
 	for i, k := range keys {
 		if i < l {
-			v := values[i]
+			val := values[i]
 			if withQuote {
-				v = `"` + com.AddCSlashes(v, '"') + `"`
+				if ignoreSlash {
+					val = `"` + v.AddSlashes(val) + `"`
+				} else {
+					val = `"` + com.AddCSlashes(val, '"') + `"`
+				}
 			}
-			r += t + prefix + k + `   ` + v + suffix
+			r += t + prefix + k + `   ` + val + suffix
 			t = "\n"
 		}
 	}
@@ -280,14 +288,22 @@ func (v Values) Iterator(addon string, item string, prefix string, withQuotes ..
 	values, _ := v.Values[k]
 	var r, t string
 	var withQuote bool
+	var ignoreSlash bool
 	if len(withQuotes) > 0 {
 		withQuote = withQuotes[0]
-	}
-	for _, v := range values {
-		if withQuote {
-			v = `"` + com.AddCSlashes(v, '"') + `"`
+		if len(withQuotes) > 1 {
+			ignoreSlash = withQuotes[1]
 		}
-		r += t + prefix + v
+	}
+	for _, val := range values {
+		if withQuote {
+			if ignoreSlash {
+				val = `"` + v.AddSlashes(val) + `"`
+			} else {
+				val = `"` + com.AddCSlashes(val, '"') + `"`
+			}
+		}
+		r += t + prefix + val
 		t = "\n"
 	}
 	if withQuote {
