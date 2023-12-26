@@ -22,7 +22,7 @@
 {{- $path := $.Stored.Get "path" -}}
 <div class="row">
 	<div class="col-md-12">
-		<div class="block-flat">
+		<div class="block-flat no-padding">
 			<div class="header">
 				<div class="btn-group">
 					<button type="button" id="mkdirBtn" class="btn btn-success" data-url="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&do=mkdir&path={{if $path}}{{$path}}/{{end}}" onclick="fileMkdir(this)">
