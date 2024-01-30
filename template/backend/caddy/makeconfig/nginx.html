@@ -24,7 +24,7 @@ upstream nging_fastcgi_{{$id}}{
     {{end}}
 
     {{$keepalive := $v.Get "fastcgi_policy"}}
-    {{if and $keepalive (ne $keepalive `0`}}
+    {{if and $keepalive (ne $keepalive `0`)}}
     keepalive {{$keepalive}};
     {{end}}
 }
