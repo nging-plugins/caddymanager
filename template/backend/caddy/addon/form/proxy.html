@@ -182,7 +182,7 @@
                           <div class="col-sm-9">
                              <input type="text" class="form-control" name="proxy_upstream" value="{{$.Form `proxy_upstream`}}">
                              <div class="help-block">
-                              {{"可以使用端口范围，像这样“:8080-8085”。对于 Nginx 如果要对某个后端地址指定参数，可以用半角引号“"”括起来，例如:"|$.T}}
+                              {{`可以使用端口范围，像这样“:8080-8085”。对于 Nginx 如果要对某个后端地址指定参数，可以用半角引号“"”括起来，例如:`|$.T}}
                               <code>"192.168.10.1 down" 192.168.10.2 "192.168.10.3 weight=5" "192.168.10.4 backup"</code>
                             </div>
                           </div>
