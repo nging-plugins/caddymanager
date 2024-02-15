@@ -5,10 +5,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/webx-top/com"
 	"github.com/webx-top/echo/param"
 )
 
-var spaceSeperate = regexp.MustCompile(`[\s]+`)
 var durationRegex = regexp.MustCompile(`(?P<years>\d+y)?(?P<months>\d+m)?(?P<days>\d+d)?T?(?P<hours>\d+h)?(?P<minutes>\d+i)?(?P<seconds>\d+s)?`)
 
 func SplitBySpace(value string, formatter ...func(string) string) []string {
@@ -16,7 +16,7 @@ func SplitBySpace(value string, formatter ...func(string) string) []string {
 	if len(value) == 0 {
 		return nil
 	}
-	values := spaceSeperate.Split(value, -1)
+	values := com.ParseArgs(value)
 	if len(formatter) == 0 {
 		return values
 	}
