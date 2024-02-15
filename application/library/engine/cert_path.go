@@ -79,7 +79,7 @@ func (c *CertPathFormatWithUpdater) AutoDetect(ctx echo.Context) {
 				ctx.Internal().Set(`installed.`+v.K, installed)
 			}
 			if installed {
-				c.CertPathFormat = v.X.(CertPathFormat)
+				c.CertPathFormat = v.X.(CertUpdater).PathFormat
 				if len(c.CertLocalUpdater()) > 0 {
 					parts := strings.SplitN(c.CertLocalUpdater(), `:`, 2)
 					if len(parts) == 2 {
