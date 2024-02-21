@@ -40,7 +40,10 @@
     <label class="col-sm-2 control-label">{{"Header名"|$.T}}</label>
     <div class="col-sm-10">
        <input type="text" class="form-control" value="{{$.Form `ratelimit_limit_by_header`}}" id="ratelimit_limit_by_header" name="ratelimit_limit_by_header">
-       <div class="help-block">{{"指定依据的Header名。例如："|$.T}}<code onclick="App.insertAtCursor($('#ratelimit_limit_by_header')[0],$(this).text());">X-Real-Ip</code>、<code onclick="App.insertAtCursor($('#ratelimit_limit_by_header')[0],$(this).text());">X-Forwarded-For</code>、<code onclick="App.insertAtCursor($('#ratelimit_limit_by_header')[0],$(this).text());">Forwarded</code>. {{`如果不指定则默认使用 Request.RemoteAddr 中的 IP`|$.T}}</div>
+       <div class="help-block">
+        {{`指定依据的Header名。如果不指定则默认使用 Request.RemoteAddr 中的 IP 作为判定依据。`|$.T}}<br />
+        {{"例如："|$.T}}<code onclick="App.insertAtCursor($('#ratelimit_limit_by_header')[0],$(this).text());">X-Real-Ip</code>、<code onclick="App.insertAtCursor($('#ratelimit_limit_by_header')[0],$(this).text());">X-Forwarded-For</code>、<code onclick="App.insertAtCursor($('#ratelimit_limit_by_header')[0],$(this).text());">Forwarded</code>, ({{`支持通过环境变量 REALIP_TRUSTED_PROXIES 来设置信任代理，多个 IP 地址用半角逗号“,”隔开`|$.T}})
+      </div>
     </div>
   </div>
 <div class="engine-hide-nginx form-group">
