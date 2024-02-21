@@ -36,7 +36,7 @@
        <div class="help-block">{{"支持CIDR,CIDR格式IP地址，如有多个用逗号“,”隔开。例如："|$.T}}<code>1.2.3.4/32,192.168.1.0/30</code></div>
     </div>
   </div>
-<div class="engine-hide-nginx form-group">
+<div class="engine-show-default form-group">
     <label class="col-sm-2 control-label">{{"Header名"|$.T}}</label>
     <div class="col-sm-10">
        <input type="text" class="form-control" value="{{$.Form `ratelimit_limit_by_header`}}" id="ratelimit_limit_by_header" name="ratelimit_limit_by_header">
