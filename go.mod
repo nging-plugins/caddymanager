@@ -7,7 +7,7 @@ replace github.com/admpub/nging/v5 => ../../admpub/nging
 require (
 	gitee.com/admpub/certmagic v0.8.8
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
-	github.com/admpub/caddy v1.2.4
+	github.com/admpub/caddy v1.2.6
 	github.com/admpub/log v1.3.6
 	github.com/admpub/nging/v5 v5.3.1
 	github.com/admpub/null v8.0.4+incompatible
