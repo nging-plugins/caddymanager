@@ -84,7 +84,10 @@
         {{$v.AddonAttr "login" "cookie_name" "jwt_token"}}
         {{$v.AddonAttr "login" "cookie_secure" "1"}}
         {{$v.AddonAttr "login" "cookie_expiry" "0s"}}
-        {{$v.Get "login_oauth_type"}} client_id={{$v.Get "login_oauth_client_id"}},client_secret={{$v.Get "login_oauth_client_secret"}},host_url={{$v.Get "login_oauth_host_url"}}
+        {{$oAuthType := $v.Get "login_oauth_type"}}
+        {{if $oAuthType}}
+        {{$oAuthType}} client_id={{$v.Get "login_oauth_client_id"}},client_secret={{$v.Get "login_oauth_client_secret"}},host_url={{$v.Get "login_oauth_host_url"}}
+        {{end}}
         {{$htpasswdFile := $v.Get "login_htpasswd_file"}}
         {{if $htpasswdFile}}htpasswd    file={{$htpasswdFile}}{{end}}
         {{if $v.IsEnabled "login_httpupstream"}}

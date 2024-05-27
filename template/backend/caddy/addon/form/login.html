@@ -123,6 +123,7 @@
    <div class="col-sm-10">
       {{- $v := $.Form `login_oauth_type` -}}
       <select name="login_oauth_type" class="form-control" style="margin-bottom:2px" onchange="if(this.value=='nging'){$('.login-oauth-nging').removeClass('hide');}else{$('.login-oauth-nging').addClass('hide');}">
+         <option value="">- {{`未选择`|$.T}} -</option>
          <option value="nging"{{if eq $v `nging`}} selected{{end}}>Nging</option>
          <option value="github"{{if eq $v `github`}} selected{{end}}>Github</option>
          <option value="google"{{if eq $v `google`}} selected{{end}}>Google</option>
@@ -156,9 +157,10 @@
    <label class="col-sm-2 control-label">{{"htpasswd认证"|$.T}}</label>
    <div class="col-sm-10">
       <div class="form-group">
-         <label class="col-sm-2 control-label">{{"htpasswd文件路径"|$.T}}</label>
+         <label class="col-sm-2 control-label">{{"文件路径"|$.T}}</label>
          <div class="col-sm-10">
             <input type="text" name="login_htpasswd_file" class="form-control" value="{{$.Form `login_htpasswd_file`}}">
+            <div class="help-block">{{`htpasswd文件路径`|$.T}}</div>
          </div>
       </div>
     </div>
