@@ -440,7 +440,7 @@ rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;</pre>
                   <div class="fieldset bg-fc hide" id="login-settings">
                     {{if eq $v "1"}}{{Include "caddy/addon/form/login"}}{{end}}
                   </div>
-                  <div class="help-block">{{`登录验证方式。此功能必须与上面的JWT一同使用`|$.T}}</div>
+                  <div class="help-block">{{`登录认证。此功能必须与上面的JWT一同使用`|$.T}}</div>
                 </div>
               </div>
               <div class="engine-show-default form-group">
