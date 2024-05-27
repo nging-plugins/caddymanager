@@ -1,14 +1,128 @@
 <div class="form-group">
-    <label class="col-sm-2 control-label">{{"路径"|$.T}}</label>
+    <label class="col-sm-2 control-label">{{"成功后网址"|$.T}}</label>
     <div class="col-sm-10">
-       <input type="text" class="form-control" value="{{$.Form "jwt_path" "/"}}" name="jwt_path" required="required" placeholder="">
-       <div class="help-block">{{"访问路径，默认为“/”"|$.T}}</div>
+       <input type="text" class="form-control" value="{{$.Form `login_success_url`}}" name="login_success_url" placeholder="/">
+       <div class="help-block">{{"认证成功后跳转的路径或网址"|$.T}}</div>
     </div>
-  </div>
+</div>
 <div class="form-group">
-    <label class="col-sm-2 control-label">{{"跳转网址"|$.T}}</label>
+   <label class="col-sm-2 control-label">{{"登录路径"|$.T}}</label>
+   <div class="col-sm-10">
+      <input type="text" class="form-control" value="{{$.Form `login_login_path`}}" name="login_login_path" placeholder="/login">
+      <div class="help-block">{{"认证成功后跳转的路径或网址"|$.T}}</div>
+   </div>
+</div>
+<div class="form-group">
+   <label class="col-sm-2 control-label">{{"登出网址"|$.T}}</label>
+   <div class="col-sm-10">
+      <input type="text" class="form-control" value="{{$.Form `login_logout_url`}}" name="login_success_url" placeholder="">
+      <div class="help-block">{{"进行登出操作的路径或网址"|$.T}}</div>
+   </div>
+</div>
+<div class="form-group">
+   <label class="col-sm-2 control-label">{{"登录页面模板"|$.T}}</label>
+   <div class="col-sm-10">
+      <input type="text" class="form-control" value="{{$.Form `login_template`}}" name="login_template" placeholder="">
+      <div class="help-block">{{"设置登录页的模板文件路径。如果不设置，则使用默认模板"|$.T}}</div>
+   </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-2 control-label">{{"JWT设置"|$.T}}</label>
     <div class="col-sm-10">
-       <input type="text" class="form-control" value="{{$.Form "jwt_redirect"}}" name="jwt_redirect" placeholder="">
-       <div class="help-block">{{"验证失败后的跳转网址，如果不设置，则返回带访问受限状态码的页面"|$.T}}</div>
+      <div class="fieldset">
+       <div class="form-group">
+          <label class="col-sm-2 control-label">{{"密码"|$.T}}</label>
+          <div class="col-sm-4">
+             <input type="text" class="form-control" value="{{$.Form `login_jwt_secret`}}" name="login_jwt_secret" placeholder="">
+             <div class="help-block">{{"JWT密码。如果不设置，则默认随机生成一个密码"|$.T}}</div>
+          </div>
+          <label class="col-sm-2 control-label">{{"密码文件"|$.T}}</label>
+          <div class="col-sm-4">
+             <input type="text" class="form-control" value="{{$.Form `login_jwt_secret_file`}}" name="login_jwt_secret_file" placeholder="">
+             <div class="help-block">{{"保存JWT密码的文件"|$.T}}</div>
+          </div>
+        </div><!-- form-group -->
+        <div class="form-group">
+           <label class="col-sm-2 control-label">{{"加密算法"|$.T}}</label>
+           <div class="col-sm-10">
+              <input type="text" class="form-control" value="{{$.Form `login_jwt_algo`}}" name="login_jwt_algo" placeholder="HS512">
+              <div class="help-block">{{"如果不设置，默认为HS512"|$.T}}</div>
+           </div>
+         </div><!-- form-group -->
+         <div class="form-group">
+            <label class="col-sm-2 control-label">{{"刷新上限"|$.T}}</label>
+            <div class="col-sm-10">
+               <input type="number" class="form-control" value="{{$.Form `login_jwt_refreshes`}}" name="login_jwt_refreshes" placeholder="0">
+               <div class="help-block">{{"允许JWT的最大刷新次数"|$.T}}</div>
+            </div>
+          </div><!-- form-group -->
+      </div><!-- fieldset -->
+   </div><!-- col-sm-10 -->
+</div>
+<div class="form-group">
+    <label class="col-sm-2 control-label">{{"网址跳转"|$.T}}</label>
+    <div class="col-sm-10">
+      <div class="radio radio-success radio-inline">
+        <input type="radio" id="login_redirect" name="login_redirect" value="1"{{if eq ($.Form `login_redirect`) `1`}} checked{{end}}> <label for="login_redirect">{{`启用`|$.T}}</label>
+      </div><!-- radio -->
+      <div class="radio radio-danger radio-inline">
+        <input type="radio" id="login_redirect" name="login_redirect" value="0"{{if ne ($.Form `login_redirect`) `1`}} checked{{end}}> <label for="login_redirect">{{`禁用`|$.T}}</label>
+      </div><!-- radio -->
+      <div class="fieldset">
+       <div class="form-group">
+          <label class="col-sm-2 control-label">{{"跳转网址参数"|$.T}}</label>
+          <div class="col-sm-10">
+             <input type="text" class="form-control" value="{{$.Form `login_redirect_query_parameter`}}" name="login_redirect_query_parameter" placeholder="backTo">
+             <div class="help-block">{{"跳转网址参数，默认为“backTo”"|$.T}}</div>
+          </div>
+        </div><!-- form-group -->
+        <div class="form-group">
+           <label class="col-sm-2 control-label">{{"白名单文件"|$.T}}</label>
+           <div class="col-sm-10">
+              <input type="text" class="form-control" value="{{$.Form `login_redirect_host_file`}}" name="login_redirect_host_file" placeholder="">
+              <div class="help-block">{{"输入包含白名单根网址的文件路径，在文件内每行一个根网址"|$.T}}</div>
+           </div>
+         </div><!-- form-group -->
+         <div class="form-group">
+            <div class="checkbox checkbox-primary checkbox-inline">
+              <input type="checkbox" id="login_redirect_check_referer" name="login_redirect_check_referer" value="1"{{if eq ($.Form `login_redirect_check_referer`) `1`}} checked{{end}}> <label for="login_redirect_check_referer">{{`检查来源网址`|$.T}}</label>
+            </div>
+          </div><!-- form-group -->
+      </div><!-- fieldset -->
+   </div><!-- col-sm-10 -->
+</div>
+<div class="form-group">
+   <label class="col-sm-2 control-label">{{"Cookie名称"|$.T}}</label>
+   <div class="col-sm-4">
+      <input type="text" class="form-control" value="{{$.Form `login_cookie_name`}}" name="login_cookie_name" placeholder="jwt_token">
+      <div class="help-block">{{"保存JWT数据的Cookie名称"|$.T}}</div>
+   </div>
+   <div class="col-sm-6">
+      <div class="checkbox checkbox-primary checkbox-inline">
+        <input type="checkbox" id="login_cookie_secure" name="login_cookie_secure" value="1"{{if eq ($.Form `login_cookie_secure`) `1`}} checked{{end}}> <label for="login_cookie_secure">Secure</label>
+      </div>
+   </div>
+</div>
+<div class="form-group">
+   <label class="col-sm-2 control-label">{{"认证方式"|$.T}}</label>
+   <div class="col-sm-10">
+      <span class="input-group">
+         <span class="input-group-addon">{{`方式`|$.T}}</span>
+         {{- $v := $.Form `login_oauth_type` -}}
+         <select name="login_oauth_type" class="form-control">
+            <option value="nging"{{eq $v `nging`}}>Nging</option>
+            <option value="github"{{eq $v `github`}}>Github</option>
+            <option value="google"{{eq $v `google`}}>Google</option>
+            <option value="gitlab"{{eq $v `google`}}>Gitlab</option>
+            <option value="gitea"{{eq $v `google`}}>Gitea</option>
+            <option value="wechat"{{eq $v `Wechat`}}>Gitea</option>
+         </select>
+         <span class="input-group-addon">{{`Client ID`|$.T}}</span>
+         <input type="text" name="login_oauth_client_id" class="form-control">
+         <span class="input-group-addon">{{`Client Secret`|$.T}}</span>
+         <input type="text" name="login_oauth_client_secret" class="form-control">
+         <span class="input-group-addon login-oauth-nging">{{`Nging后台网址`|$.T}}</span>
+         <input type="text" name="login_oauth_host_url" class="form-control login-oauth-nging">
+      </span><!-- input-group -->
     </div>
-  </div>
+</div>

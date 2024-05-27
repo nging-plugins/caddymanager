@@ -58,6 +58,25 @@
     }
     {{end}}
     
+    {{if $v.IsEnabled "login"}}
+    login {
+        {{$v.AddonAttr "login" "success_url" "/"}}
+        {{$v.AddonAttr "login" "login_path" "/login"}}
+        {{$v.AddonAttr "login" "logout_url" ""}}
+        {{$v.AddonAttr "login" "template" ""}}
+        {{$v.AddonAttr "login" "jwt_secret" ""}}
+        {{$v.AddonAttr "login" "jwt_secret_file" ""}}
+        {{$v.AddonAttr "login" "jwt_algo" "HS512"}}
+        {{$v.AddonAttr "login" "jwt_refreshes" "0"}}
+        {{$v.AddonAttr "login" "redirect" "1"}}
+        {{$v.AddonAttr "login" "redirect_query_parameter" ""}}
+        {{$v.AddonAttr "login" "redirect_host_file" ""}}
+        {{$v.AddonAttr "login" "redirect_check_referer" ""}}
+        {{$v.AddonAttr "login" "cookie_name" "jwt_token"}}
+        {{$v.AddonAttr "login" "cookie_secure" "1"}}
+    }
+    {{end}}
+    
     {{if $v.IsEnabled "locale"}}
     locale {{$v.GetAttrVal "locale" "available" "en zh-CN"}} {
         {{$v.AddonAttr "locale" "detect" "header"}}
