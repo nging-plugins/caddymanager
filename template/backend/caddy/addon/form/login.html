@@ -44,14 +44,12 @@
         </div><!-- form-group -->
         <div class="form-group">
            <label class="col-sm-2 control-label">{{"加密算法"|$.T}}</label>
-           <div class="col-sm-10">
+           <div class="col-sm-4">
               <input type="text" class="form-control" value="{{$.Form `login_jwt_algo`}}" name="login_jwt_algo" placeholder="HS512">
               <div class="help-block">{{"如果不设置，默认为HS512"|$.T}}</div>
            </div>
-         </div><!-- form-group -->
-         <div class="form-group">
             <label class="col-sm-2 control-label">{{"刷新上限"|$.T}}</label>
-            <div class="col-sm-10">
+            <div class="col-sm-4">
                <input type="number" class="form-control" value="{{$.Form `login_jwt_refreshes`}}" name="login_jwt_refreshes" placeholder="0">
                <div class="help-block">{{"允许JWT的最大刷新次数"|$.T}}</div>
             </div>
