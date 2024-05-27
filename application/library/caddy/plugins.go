@@ -28,6 +28,7 @@ import (
 	_ "github.com/caddy-plugins/caddy-s3browser"
 	_ "github.com/caddy-plugins/cors/caddy"
 	_ "github.com/caddy-plugins/ipfilter"
+	_ "github.com/caddy-plugins/loginsrv/caddy"
 	_ "github.com/caddy-plugins/nobots"
 	_ "github.com/caddy-plugins/webdav"
 	//_ "github.com/caddy-plugins/caddy-iplimit/iplimit"
