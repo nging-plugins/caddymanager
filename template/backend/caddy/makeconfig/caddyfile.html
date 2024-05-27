@@ -82,7 +82,7 @@
         {{$v.AddonAttr "login" "redirect_host_file" ""}}
         {{$v.AddonAttr "login" "redirect_check_referer" ""}}
         {{$v.AddonAttr "login" "cookie_name" "jwt_token"}}
-        {{$v.AddonAttr "login" "cookie_secure" "1"}}
+        {{$v.AddonAttr "login" "cookie_secure" "0"}}
         {{$v.AddonAttr "login" "cookie_expiry" "0s"}}
         {{$oAuthType := $v.Get "login_oauth_type"}}
         {{if $oAuthType}}
@@ -91,7 +91,7 @@
         {{$htpasswdFile := $v.Get "login_htpasswd_file"}}
         {{if $htpasswdFile}}htpasswd    file={{$htpasswdFile}}{{end}}
         {{if $v.IsEnabled "login_httpupstream"}}
-        httpupstream    upstream={{$v.Get "login_httpupstream_upstream"}},skipverify={{$v.Get "login_httpupstream_skipverify" "0"}},timeout={{$v.Get "login_httpupstream_timeout" "0s"}}
+        httpupstream    upstream={{$v.Get "login_httpupstream_upstream"}},skipverify={{$v.Get "login_httpupstream_skipverify" | Default "0"}},timeout={{$v.Get "login_httpupstream_timeout" | Default "0s"}}
         {{end}}
         {{if $v.IsEnabled "login_osiam"}}
         osiam    endpoint={{$v.Get "login_osiam_endpoint"}},client_id={{$v.Get "login_osiam_client_id"}},client_secret={{$v.Get "login_osiam_client_secret"}}
