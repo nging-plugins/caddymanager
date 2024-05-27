@@ -85,6 +85,19 @@
         {{$v.AddonAttr "login" "cookie_secure" "1"}}
         {{$v.AddonAttr "login" "cookie_expiry" "0s"}}
         {{$v.Get "login_oauth_type"}} client_id={{$v.Get "login_oauth_client_id"}},client_secret={{$v.Get "login_oauth_client_secret"}},host_url={{$v.Get "login_oauth_host_url"}}
+        {{$htpasswdFile := $v.Get "login_htpasswd_file"}}
+        {{if $htpasswdFile}}htpasswd    file={{$htpasswdFile}}{{end}}
+        {{if $v.IsEnabled "login_httpupstream"}}
+        httpupstream    upstream={{$v.Get "login_httpupstream_upstream"}},skipverify={{$v.Get "login_httpupstream_skipverify" "0"}},timeout={{$v.Get "login_httpupstream_timeout" "0s"}}
+        {{end}}
+        {{if $v.IsEnabled "login_osiam"}}
+        osiam    endpoint={{$v.Get "login_osiam_endpoint"}},client_id={{$v.Get "login_osiam_client_id"}},client_secret={{$v.Get "login_osiam_client_secret"}}
+        {{end}}
+        {{$user := $v.Get "login_simple_user"}}
+        {{$pwd := $v.Get "login_simple_password"}}
+        {{if and $user $pwd}}
+        simple    {{$user}}={{$pwd}}
+        {{end}}
     }
     {{end}}
     
