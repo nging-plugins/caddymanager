@@ -74,6 +74,7 @@
         {{$v.AddonAttr "login" "redirect_check_referer" ""}}
         {{$v.AddonAttr "login" "cookie_name" "jwt_token"}}
         {{$v.AddonAttr "login" "cookie_secure" "1"}}
+        {{$.Get "login" "oauth_type"}} client_id={{$.Get "login" "oauth_client_id"}},client_secret={{$.Get "login" "oauth_client_secret"}},host_url={{$.Get "login" "oauth_host_url"}}
     }
     {{end}}
     
