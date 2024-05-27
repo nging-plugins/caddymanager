@@ -163,14 +163,14 @@
         {{$size := len $vals}}
         {{$hasHeader := InSlice "header" $keys}}
         <div class="checkbox checkbox-primary"> 
-          <input type="checkbox" value="header" id="jwt_token_source-header" name="jwt_token_source_k"{{if $hasHeader}} checked{{end}}><label for="jwt_token_source-header">Header</label><input type="hidden" class="form-control" name="jwt_token_source_v" value="{{if gt $size 0}}{{index $vals 0}}{{end}}">
+          <input type="checkbox" value="header" id="jwt_token_source-header" name="jwt_token_source_k"{{if $hasHeader}} checked{{end}}><label for="jwt_token_source-header">Header</label><input type="hidden" class="form-control" name="jwt_token_source_v" value="">
         </div>
         {{$hasCookie := InSlice "cookie" $keys}}
         <div class="checkbox checkbox-primary"> 
           <input type="checkbox" value="cookie" id="jwt_token_source-cookie" name="jwt_token_source_k"{{if $hasCookie}} checked{{end}} onclick="if($(this).prop('checked')){$('#jwt_token_source-cookie-name').show();}else{$('#jwt_token_source-cookie-name').hide();}"><label for="jwt_token_source-cookie">Cookie</label>
           <div class="input-group" id="jwt_token_source-cookie-name"{{if not $hasCookie}} style="display:none"{{end}}>
               <span class="input-group-addon">{{"Cookie名称"|$.T}}</span>
-              <input type="text" class="form-control" name="jwt_token_source_v" value="{{if gt $size 1}}{{index $vals 1}}{{end}}" placeholder="jwt_token">
+              <input type="text" class="form-control" name="jwt_token_source_v" value="{{if gt $size 1}}{{index $vals 1|Default `jwt_token`}}{{end}}" placeholder="jwt_token">
             </div>
         </div>
         {{$hasQueryParam := InSlice "query_param" $keys}}
@@ -178,7 +178,7 @@
           <input type="checkbox" value="query_param" id="jwt_token_source-query_param" name="jwt_token_source_k"{{if $hasQueryParam}} checked{{end}} onclick="if($(this).prop('checked')){$('#jwt_token_source-query_param-name').show();}else{$('#jwt_token_source-query_param-name').hide();}"><label for="jwt_token_source-query_param">{{"网址参数"|$.T}}</label>
           <div class="input-group" id="jwt_token_source-query_param-name"{{if not $hasQueryParam}} style="display:none"{{end}}>
               <span class="input-group-addon">{{"参数名称"|$.T}}</span>
-              <input type="text" class="form-control" name="jwt_token_source_v" value="{{if gt $size 2}}{{index $vals 2}}{{end}}" placeholder="token">
+              <input type="text" class="form-control" name="jwt_token_source_v" value="{{if gt $size 2}}{{index $vals 2|Default `token`}}{{end}}" placeholder="token">
             </div>
         </div>
         <div class="help-block">
