@@ -19,3 +19,4 @@ tower-app-*
 *.log
 *.ngingbak
 nginx.conf
+vendor
