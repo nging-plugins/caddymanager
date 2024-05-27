@@ -21,6 +21,7 @@ package caddy
 import (
 	_ "github.com/caddy-plugins/caddy-expires"
 	_ "github.com/caddy-plugins/caddy-filter"
+	_ "github.com/caddy-plugins/caddy-jwt/v3"
 	_ "github.com/caddy-plugins/caddy-locale"
 	_ "github.com/caddy-plugins/caddy-prometheus"
 	_ "github.com/caddy-plugins/caddy-rate-limit"

@@ -17,6 +17,7 @@ require (
 	github.com/admpub/useragent v0.0.2
 	github.com/caddy-plugins/caddy-expires v1.1.3
 	github.com/caddy-plugins/caddy-filter v0.15.4
+	github.com/caddy-plugins/caddy-jwt/v3 v3.8.1
 	github.com/caddy-plugins/caddy-locale v0.0.2
 	github.com/caddy-plugins/caddy-prometheus v0.1.0
 	github.com/caddy-plugins/caddy-rate-limit v1.7.0
@@ -31,7 +32,7 @@ require (
 	github.com/webx-top/client v0.8.13
 	github.com/webx-top/com v1.2.13
 	github.com/webx-top/db v1.27.6
-	github.com/webx-top/echo v1.6.7
+	github.com/webx-top/echo v1.6.9
 	github.com/webx-top/restyclient v0.0.4
 	golang.org/x/crypto v0.23.0
 	golang.org/x/net v0.25.0
@@ -103,7 +104,7 @@ require (
 	github.com/admpub/webdav/v4 v4.1.3 // indirect
 	github.com/admpub/websocket v1.0.4 // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
-	github.com/aws/aws-sdk-go v1.53.4 // indirect
+	github.com/aws/aws-sdk-go v1.53.10 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/boombuler/barcode v1.0.1 // indirect
@@ -121,7 +122,7 @@ require (
 	github.com/francoispqt/gojay v1.2.13 // indirect
 	github.com/friendsofgo/errors v0.9.2 // indirect
 	github.com/fynelabs/selfupdate v0.2.0 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.4 // indirect
 	github.com/garyburd/redigo v1.6.4 // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/go-acme/lego/v4 v4.16.1 // indirect
@@ -133,10 +134,11 @@ require (
 	github.com/go-playground/validator/v10 v10.20.0 // indirect
 	github.com/go-sql-driver/mysql v1.8.1 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
-	github.com/goccy/go-json v0.10.2 // indirect
+	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/gofrs/uuid v4.4.0+incompatible // indirect
+	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
-	github.com/google/pprof v0.0.0-20240509144519-723abb6459b7 // indirect
+	github.com/google/pprof v0.0.0-20240525223248-4bfdf5a9a2af // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
@@ -145,7 +147,7 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-syslog v1.0.0 // indirect
-	github.com/hashicorp/go-version v1.6.0 // indirect
+	github.com/hashicorp/go-version v1.7.0 // indirect
 	github.com/iamacarpet/go-winpty v1.0.4 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jimstudt/http-authentication v0.0.0-20140401203705-3eca13d6893a // indirect
@@ -176,7 +178,7 @@ require (
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/nging-plugins/sshmanager v1.5.6 // indirect
-	github.com/onsi/ginkgo/v2 v2.17.3 // indirect
+	github.com/onsi/ginkgo/v2 v2.19.0 // indirect
 	github.com/oschwald/maxminddb-golang v1.12.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pkg/sftp v1.13.6 // indirect
@@ -187,7 +189,7 @@ require (
 	github.com/prometheus/common v0.53.0 // indirect
 	github.com/prometheus/procfs v0.15.0 // indirect
 	github.com/quic-go/qpack v0.4.0 // indirect
-	github.com/quic-go/quic-go v0.43.1 // indirect
+	github.com/quic-go/quic-go v0.44.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rs/xid v1.5.0 // indirect
@@ -215,7 +217,7 @@ require (
 	github.com/webx-top/validator v0.3.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.uber.org/mock v0.4.0 // indirect
-	golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842 // indirect
+	golang.org/x/exp v0.0.0-20240525044651-4c93da0ed11d // indirect
 	golang.org/x/image v0.16.0 // indirect
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/oauth2 v0.20.0 // indirect
@@ -229,9 +231,9 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	modernc.org/libc v1.50.6 // indirect
+	modernc.org/libc v1.50.9 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.8.0 // indirect
-	modernc.org/sqlite v1.29.9 // indirect
+	modernc.org/sqlite v1.29.10 // indirect
 	rsc.io/qr v0.2.0 // indirect
 )
