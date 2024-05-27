@@ -40,16 +40,24 @@
         {{$v.IteratorKV "jwt" "allow" "        allow "}}
         {{$v.IteratorKV "jwt" "deny" "        deny "}}
         {{$v.AddonAttr "jwt" "except"}}
-        {{$v.IteratorKV "jwt" "token_source" "        token_source "}}
-        {{$strip_header := $.Get "jwt" "strip_header"}}
+        {{if eq ($v.Get "jwt_token_source_header") "header"}}
+        token_source    header
+        {{end}}
+        {{if eq ($v.Get "jwt_token_source_cookie") "cookie"}}
+        token_source    cookie  {{$v.Get "jwt_token_source_cookie_name"}}
+        {{end}}
+        {{if eq ($v.Get "jwt_token_source_query_param") "query_param"}}
+        token_source    query_param  {{$v.Get "jwt_token_source_query_param_name"}}
+        {{end}}
+        {{$strip_header := $v.Get "jwt_strip_header"}}
         {{if $strip_header}}
         strip_header
         {{end}}
-        {{$passthrough := $.Get "jwt" "passthrough"}}
+        {{$passthrough := $v.Get "jwt_passthrough"}}
         {{if $passthrough}}
         passthrough
         {{end}}
-        {{$allowroot := $.Get "jwt" "allowroot"}}
+        {{$allowroot := $v.Get "jwt_allowroot"}}
         {{if $allowroot}}
         allowroot
         {{end}}
@@ -76,7 +84,7 @@
         {{$v.AddonAttr "login" "cookie_name" "jwt_token"}}
         {{$v.AddonAttr "login" "cookie_secure" "1"}}
         {{$v.AddonAttr "login" "cookie_expiry" "0s"}}
-        {{$.Get "login_oauth_type"}} client_id={{$.Get "login_oauth_client_id"}},client_secret={{$.Get "login_oauth_client_secret"}},host_url={{$.Get "login_oauth_host_url"}}
+        {{$v.Get "login_oauth_type"}} client_id={{$v.Get "login_oauth_client_id"}},client_secret={{$v.Get "login_oauth_client_secret"}},host_url={{$v.Get "login_oauth_host_url"}}
     }
     {{end}}
     
