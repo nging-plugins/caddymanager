@@ -68,12 +68,14 @@
         {{$v.AddonAttr "login" "jwt_secret_file" ""}}
         {{$v.AddonAttr "login" "jwt_algo" "HS512"}}
         {{$v.AddonAttr "login" "jwt_refreshes" "0"}}
+        {{$v.AddonAttr "login" "jwt_expiry" "24h"}}
         {{$v.AddonAttr "login" "redirect" "1"}}
         {{$v.AddonAttr "login" "redirect_query_parameter" ""}}
         {{$v.AddonAttr "login" "redirect_host_file" ""}}
         {{$v.AddonAttr "login" "redirect_check_referer" ""}}
         {{$v.AddonAttr "login" "cookie_name" "jwt_token"}}
         {{$v.AddonAttr "login" "cookie_secure" "1"}}
+        {{$v.AddonAttr "login" "cookie_expiry" "0s"}}
         {{$.Get "login" "oauth_type"}} client_id={{$.Get "login" "oauth_client_id"}},client_secret={{$.Get "login" "oauth_client_secret"}},host_url={{$.Get "login" "oauth_host_url"}}
     }
     {{end}}

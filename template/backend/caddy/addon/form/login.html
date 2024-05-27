@@ -54,6 +54,13 @@
                <div class="help-block">{{"允许JWT的最大刷新次数"|$.T}}</div>
             </div>
           </div><!-- form-group -->
+          <div class="form-group">
+             <label class="col-sm-2 control-label">{{"有效时长"|$.T}}</label>
+             <div class="col-sm-4">
+                <input type="text" class="form-control" value="{{$.Form `login_jwt_expiry`}}" name="login_jwt_expiry" placeholder="24h" pattern="^[0-9]+(y|m|d|h|i|s)([0-9]+(y|m|d|h|i|s))*$">
+                <div class="help-block">{{`格式为数字和单位字母的组合，有效的单位有："s", "i", "h", "d", "m", "y" 分别表示 "秒", "分钟", "小时", "天", "月(30天)", "年"。例如“5i30s”表示5分钟30秒`|$.T}}</div>
+             </div>
+            </div><!-- form-group -->
       </div><!-- fieldset -->
    </div><!-- col-sm-10 -->
 </div>
@@ -97,6 +104,11 @@
    <div class="col-sm-4">
       <input type="text" class="form-control" value="{{$.Form `login_cookie_name`}}" name="login_cookie_name" placeholder="jwt_token">
       <div class="help-block">{{"保存JWT数据的Cookie名称"|$.T}}</div>
+   </div>
+   <label class="col-sm-2 control-label">{{"有效时长"|$.T}}</label>
+   <div class="col-sm-4">
+      <input type="text" class="form-control" value="{{$.Form `login_cookie_exipry`}}" name="login_cookie_exipry" placeholder="0" pattern="^[0-9]+(y|m|d|h|i|s)([0-9]+(y|m|d|h|i|s))*$">
+      <div class="help-block">{{`格式为数字和单位字母的组合，有效的单位有："s", "i", "h", "d", "m", "y" 分别表示 "秒", "分钟", "小时", "天", "月(30天)", "年"。例如“5i30s”表示5分钟30秒`|$.T}}, {{"0表示即时有效"|$.T}}</div>
    </div>
    <div class="col-sm-6">
       <div class="checkbox checkbox-primary checkbox-inline">
