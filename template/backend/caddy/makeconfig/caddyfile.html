@@ -76,7 +76,7 @@
         {{$v.AddonAttr "login" "cookie_name" "jwt_token"}}
         {{$v.AddonAttr "login" "cookie_secure" "1"}}
         {{$v.AddonAttr "login" "cookie_expiry" "0s"}}
-        {{$.Get "login" "oauth_type"}} client_id={{$.Get "login" "oauth_client_id"}},client_secret={{$.Get "login" "oauth_client_secret"}},host_url={{$.Get "login" "oauth_host_url"}}
+        {{$.Get "login_oauth_type"}} client_id={{$.Get "login_oauth_client_id"}},client_secret={{$.Get "login_oauth_client_secret"}},host_url={{$.Get "login_oauth_host_url"}}
     }
     {{end}}
     
