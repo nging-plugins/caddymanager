@@ -719,8 +719,8 @@ github.com/caddy-plugins/caddy-expires v1.1.3 h1:jdkGqAKf5XQ1U5fUCTTo2s1oCtqd7BS
 github.com/caddy-plugins/caddy-expires v1.1.3/go.mod h1:ykVSc50CjCAqMPlTvxUlKA8L49UiClLUQm9VO7T9OlA=
 github.com/caddy-plugins/caddy-filter v0.15.4 h1:cnmuNqFTQgoKdxI890kMEuGSirw91gfO2DCgMVVqgLM=
 github.com/caddy-plugins/caddy-filter v0.15.4/go.mod h1:cwjx9pnugTxUm96rwP0Ragoh+zMlxf/uW3DzlixIZmo=
-github.com/caddy-plugins/caddy-jwt/v3 v3.8.1 h1:gC6MVNIC4piNk0+EyvydSEFVVn0NVg5yxsxMnOybIWo=
-github.com/caddy-plugins/caddy-jwt/v3 v3.8.1/go.mod h1:DDIMzfEe6nDPIohXlFvnJoCtiN0skLA8XqkEuZeOz/s=
+github.com/caddy-plugins/caddy-jwt/v3 v3.8.2 h1:UrO5Mi97hSQMb3cFnAh/AVj/s6sDQLKwiPC64IyVNOY=
+github.com/caddy-plugins/caddy-jwt/v3 v3.8.2/go.mod h1:DDIMzfEe6nDPIohXlFvnJoCtiN0skLA8XqkEuZeOz/s=
 github.com/caddy-plugins/caddy-locale v0.0.2 h1:9nEffdymHRL3WPmW7vHoZPtBbzMCzOcLbwwNjV6cUJo=
 github.com/caddy-plugins/caddy-locale v0.0.2/go.mod h1:C+0hRqWnSYZCnICWhlWx4S1H+ZdF0RobmRmr6EkvjP8=
 github.com/caddy-plugins/caddy-prometheus v0.1.0 h1:9vyYGisV/y5W/tyAjXx4nznX+/FD18oFJIHhF6cVJsc=

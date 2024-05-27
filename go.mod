@@ -18,7 +18,7 @@ require (
 	github.com/admpub/useragent v0.0.2
 	github.com/caddy-plugins/caddy-expires v1.1.3
 	github.com/caddy-plugins/caddy-filter v0.15.4
-	github.com/caddy-plugins/caddy-jwt/v3 v3.8.1
+	github.com/caddy-plugins/caddy-jwt/v3 v3.8.2
 	github.com/caddy-plugins/caddy-locale v0.0.2
 	github.com/caddy-plugins/caddy-prometheus v0.1.0
 	github.com/caddy-plugins/caddy-rate-limit v1.7.0
