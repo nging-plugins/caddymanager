@@ -19,6 +19,8 @@
 package caddy
 
 import (
+	"strings"
+
 	_ "github.com/caddy-plugins/caddy-expires"
 	_ "github.com/caddy-plugins/caddy-filter"
 	_ "github.com/caddy-plugins/caddy-jwt/v3"
@@ -31,5 +33,20 @@ import (
 	_ "github.com/caddy-plugins/loginsrv/caddy"
 	_ "github.com/caddy-plugins/nobots"
 	_ "github.com/caddy-plugins/webdav"
+
 	//_ "github.com/caddy-plugins/caddy-iplimit/iplimit"
+
+	"github.com/admpub/goth"
+	"github.com/admpub/nging/v5/application/library/backend/oauth2nging"
+	"github.com/caddy-plugins/loginsrv/oauth2"
 )
+
+func init() {
+	oauth2.Register(`nging`, func(cfg *oauth2.Config) goth.Provider {
+		hostURL := cfg.Extra[`host_url`]
+		if len(hostURL) > 0 {
+			hostURL = strings.TrimSuffix(hostURL, `/`)
+		}
+		return oauth2nging.New(cfg.ClientID, cfg.ClientSecret, cfg.RedirectURI, hostURL, `profile`)
+	})
+}

@@ -8,6 +8,7 @@ require (
 	gitee.com/admpub/certmagic v0.8.8
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
 	github.com/admpub/caddy v1.2.7
+	github.com/admpub/goth v0.0.2
 	github.com/admpub/log v1.3.6
 	github.com/admpub/nging/v5 v5.3.1
 	github.com/admpub/null v8.0.4+incompatible
@@ -24,7 +25,7 @@ require (
 	github.com/caddy-plugins/caddy-s3browser v0.1.3
 	github.com/caddy-plugins/cors v0.0.3
 	github.com/caddy-plugins/ipfilter v1.1.8
-	github.com/caddy-plugins/loginsrv v0.0.1
+	github.com/caddy-plugins/loginsrv v0.0.3
 	github.com/caddy-plugins/nobots v0.2.1
 	github.com/caddy-plugins/webdav v1.2.10
 	github.com/nging-plugins/servermanager v1.5.8
@@ -76,7 +77,6 @@ require (
 	github.com/admpub/goforever v0.3.1 // indirect
 	github.com/admpub/gohttp v0.0.0-20190322032039-b55c707b8f1e // indirect
 	github.com/admpub/gopty v0.1.2 // indirect
-	github.com/admpub/goth v0.0.1 // indirect
 	github.com/admpub/httpscerts v0.0.0-20180907121630-a2990e2af45c // indirect
 	github.com/admpub/humanize v0.0.0-20190501023926-5f826e92c8ca // indirect
 	github.com/admpub/i18n v0.3.0 // indirect
