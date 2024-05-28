@@ -9,14 +9,14 @@
    <label class="col-sm-2 control-label">{{"登录路径"|$.T}}</label>
    <div class="col-sm-10">
       <input type="text" class="form-control" value="{{$.Form `login_login_path`}}" name="login_login_path" placeholder="/login">
-      <div class="help-block">{{"认证成功后跳转的路径或网址"|$.T}}</div>
+      <div class="help-block">{{"登录页面的路径或网址。一般设置为路径“/login”且与上面“JWT”中的“跳转网址”保持一致"|$.T}}</div>
    </div>
 </div>
 <div class="form-group">
    <label class="col-sm-2 control-label">{{"登出网址"|$.T}}</label>
    <div class="col-sm-10">
-      <input type="text" class="form-control" value="{{$.Form `login_logout_url`}}" name="login_success_url" placeholder="">
-      <div class="help-block">{{"进行登出操作的路径或网址"|$.T}}</div>
+      <input type="text" class="form-control" value="{{$.Form `login_logout_url`}}" name="login_logout_url" placeholder="">
+      <div class="help-block">{{"进行登出操作的路径或网址。除此之外，当前网址参数 logout=true 时也能进行登出"|$.T}}</div>
    </div>
 </div>
 <div class="form-group">
@@ -111,7 +111,7 @@
    <label class="col-sm-2 control-label">{{"Cookie名称"|$.T}}</label>
    <div class="col-sm-4">
       <input type="text" class="form-control" value="{{$.Form `login_cookie_name`}}" name="login_cookie_name" placeholder="jwt_token">
-      <div class="help-block">{{"保存JWT数据的Cookie名称"|$.T}}</div>
+      <div class="help-block">{{"保存JWT数据的Cookie名称。与上面“JWT”功能中的“Cookie名称”保持一致"|$.T}}</div>
    </div>
    <label class="col-sm-2 control-label">{{"有效时长"|$.T}}</label>
    <div class="col-sm-4">
@@ -130,7 +130,7 @@
    <label class="col-sm-2 control-label">{{"oAuth2认证"|$.T}}</label>
    <div class="col-sm-10">
       {{- $v := $.Form `login_oauth_type` -}}
-      <select name="login_oauth_type" class="form-control" style="margin-bottom:2px" onchange="if(this.value=='nging'){$('.login-oauth-nging').removeClass('hide');}else{$('.login-oauth-nging').addClass('hide');}">
+      <select name="login_oauth_type" class="form-control" style="margin-bottom:2px" onchange="if(!this.value){$('#login-oauth-setting').addClass('hide');}else{$('#login-oauth-setting').removeClass('hide');if(this.value=='nging'){$('.login-oauth-nging').removeClass('hide');}else{$('.login-oauth-nging').addClass('hide');}}">
          <option value="">- {{`未选择`|$.T}} -</option>
          <option value="nging"{{if eq $v `nging`}} selected{{end}}>Nging</option>
          <option value="github"{{if eq $v `github`}} selected{{end}}>Github</option>
@@ -139,7 +139,7 @@
          <option value="gitea"{{if eq $v `gitea`}} selected{{end}}>Gitea</option>
          <option value="wechat"{{if eq $v `wechat`}} selected{{end}}>Wechat</option>
       </select>
-      <div class="fieldset bg-fc" id="login-oauth-setting">
+      <div class="fieldset bg-fc{{if not $v}} hide{{end}}" id="login-oauth-setting">
          <div class="form-group">
             <label class="col-sm-2 control-label">{{"Client ID"|$.T}}</label>
             <div class="col-sm-10">
@@ -172,6 +172,7 @@
 <div class="form-group">
    <label class="col-sm-2 control-label">{{"htpasswd认证"|$.T}}</label>
    <div class="col-sm-10">
+      <div class="fieldset bg-fc">
       <div class="form-group">
          <label class="col-sm-2 control-label">{{"文件路径"|$.T}}</label>
          <div class="col-sm-10">
@@ -179,11 +180,13 @@
             <div class="help-block">{{`htpasswd文件路径`|$.T}}</div>
          </div>
       </div>
+      </div>
     </div>
 </div>
 <div class="form-group">
    <label class="col-sm-2 control-label">{{"极简认证"|$.T}}</label>
    <div class="col-sm-10">
+      <div class="fieldset bg-fc">
       <div class="form-group">
          <label class="col-sm-2 control-label">{{"用户名"|$.T}}</label>
          <div class="col-sm-4">
@@ -201,6 +204,7 @@
             </span>
             </span>
          </div>
+      </div>
       </div>
     </div>
 </div>

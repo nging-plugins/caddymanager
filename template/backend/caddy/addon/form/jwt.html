@@ -1,15 +1,25 @@
 <div class="form-group">
     <label class="col-sm-2 control-label">{{"路径"|$.T}}</label>
     <div class="col-sm-10">
-       <input type="text" class="form-control" value="{{$.Form "jwt_path" "/"}}" name="jwt_path" required="required" placeholder="">
+       <input type="text" class="form-control" value="{{$.Form `jwt_path` `/`}}" name="jwt_path" required="required" placeholder="">
        <div class="help-block">{{"访问路径，默认为“/”"|$.T}}</div>
     </div>
   </div>
 <div class="form-group">
     <label class="col-sm-2 control-label">{{"跳转网址"|$.T}}</label>
     <div class="col-sm-10">
-       <input type="text" class="form-control" value="{{$.Form "jwt_redirect"}}" name="jwt_redirect" placeholder="">
-       <div class="help-block">{{"验证失败后的跳转网址，如果不设置，则返回带访问受限状态码的页面"|$.T}}</div>
+       <input type="text" class="form-control" value="{{$.Form `jwt_redirect`}}" name="jwt_redirect" placeholder="">
+       <div class="help-block">{{"验证失败后的跳转网址或路径，如果不设置，则返回带访问受限状态码的页面"|$.T}}</div>
+    </div>
+  </div>
+<div class="form-group">
+    <label class="col-sm-2 control-label">{{"公开路径"|$.T}}</label>
+    <div class="col-sm-10">
+       <input type="text" class="form-control" value="{{$.Form `jwt_except`}}" name="jwt_except" placeholder="">
+       <div class="help-block">
+        {{"无需JWT验证的路径。比如："|$.T}}<code>/login</code>
+        {{"一般与上面的“跳转网址”中设置的路径保持一致"}}
+      </div>
     </div>
   </div>
 <div class="form-group">
@@ -94,23 +104,16 @@
     </div>
   </div>
 <div class="form-group">
-    <label class="col-sm-2 control-label">{{"公开路径"|$.T}}</label>
-    <div class="col-sm-10">
-       <input type="text" class="form-control" value="{{$.Form "jwt_except"}}" name="jwt_except" placeholder="">
-       <div class="help-block">{{"无需JWT验证的路径。比如："|$.T}}<code>/login</code></div>
-    </div>
-  </div>
-<div class="form-group">
     <label class="col-sm-2 control-label">{{"其它设置"|$.T}}</label>
     <div class="col-sm-10">
         <div class="checkbox checkbox-primary checkbox-inline"> 
-          <input type="checkbox" value="1" id="jwt_allowroot" name="jwt_allowroot"{{if eq ($.Form "jwt_allowroot") "1"}} checked{{end}}><label for="jwt_allowroot">{{"允许公开根路径"|$.T}}</label> 
+          <input type="checkbox" value="1" id="jwt_allowroot" name="jwt_allowroot"{{if eq ($.Form `jwt_allowroot`) `1`}} checked{{end}}><label for="jwt_allowroot">{{"允许公开根路径"|$.T}}</label> 
         </div>
         <div class="checkbox checkbox-danger checkbox-inline"> 
-          <input type="checkbox" value="1" id="jwt_passthrough" name="jwt_passthrough"{{if eq ($.Form "jwt_passthrough") "1"}} checked{{end}}><label for="jwt_passthrough">{{"忽略验证"|$.T}}</label> 
+          <input type="checkbox" value="1" id="jwt_passthrough" name="jwt_passthrough"{{if eq ($.Form `jwt_passthrough`) `1`}} checked{{end}}><label for="jwt_passthrough">{{"忽略验证"|$.T}}</label> 
         </div>
         <div class="checkbox checkbox-primary checkbox-inline"> 
-          <input type="checkbox" value="1" id="jwt_strip_header" name="jwt_strip_header"{{if eq ($.Form "jwt_strip_header") "1"}} checked{{end}}><label for="jwt_strip_header">{{"Claim键名取最后一个“/”后面的值"|$.T}} (strip_header)</label> 
+          <input type="checkbox" value="1" id="jwt_strip_header" name="jwt_strip_header"{{if eq ($.Form `jwt_strip_header`) `1`}} checked{{end}}><label for="jwt_strip_header">{{"Claim键名取最后一个“/”后面的值"|$.T}} (strip_header)</label> 
         </div>
         <div class="help-block">
         </div>
@@ -149,7 +152,7 @@
 <div class="form-group">
     <label class="col-sm-2 control-label">{{"安全文件"|$.T}}</label>
     <div class="col-sm-10">
-       <input type="text" class="form-control" value="{{$.Form "jwt_secret"}}" name="jwt_secret" placeholder="/path/to/secret.txt">
+       <input type="text" class="form-control" value="{{$.Form `jwt_secret`}}" name="jwt_secret" placeholder="/path/to/secret.txt">
        <div class="help-block">{{"用于HMAC格式的令牌(Token)"|$.T}}</div>
     </div>
   </div>
