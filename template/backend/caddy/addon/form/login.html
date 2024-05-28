@@ -83,10 +83,10 @@
       </div><!-- radio -->
       <div class="fieldset bg-fc">
        <div class="form-group">
-          <label class="col-sm-2 control-label">{{"跳转网址参数"|$.T}}</label>
+          <label class="col-sm-2 control-label">{{"跳转网址参数名"|$.T}}</label>
           <div class="col-sm-10">
              <input type="text" class="form-control" value="{{$.Form `login_redirect_query_parameter`}}" name="login_redirect_query_parameter" placeholder="backTo">
-             <div class="help-block">{{"跳转网址参数，默认为“backTo”"|$.T}}</div>
+             <div class="help-block">{{"设置含自定义跳转网址的参数名。默认为“backTo”，即当前网址中如果带参数 <code>?backTo=https://coscms.com/</code> ，登录成功后则会跳转到 https://coscms.com/"|$.T|ToHTML}}</div>
           </div>
         </div><!-- form-group -->
         <div class="form-group">
