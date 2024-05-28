@@ -33,7 +33,15 @@
        <div class="form-group">
           <label class="col-sm-2 control-label">{{"密码"|$.T}}</label>
           <div class="col-sm-4">
-             <input type="text" class="form-control" value="{{$.Form `login_jwt_secret`}}" name="login_jwt_secret" placeholder="">
+            <span class="input-group">
+             <input type="password" class="form-control" value="{{$.Form `login_jwt_secret`}}" name="login_jwt_secret" placeholder="">
+             <span class="input-group-btn">
+             <a href="javascript:;" data-target="[name=login_jwt_secret]" class="btn btn-default show-password">
+               <i class="fa fa-eye"></i>
+               {{`查看`|$.T}}
+             </a>
+             </span>
+             </span>
              <div class="help-block">{{"JWT密码。如果不设置，则默认随机生成一个密码"|$.T}}</div>
           </div>
           <label class="col-sm-2 control-label">{{"密码文件"|$.T}}</label>
@@ -57,8 +65,8 @@
           <div class="form-group">
              <label class="col-sm-2 control-label">{{"有效时长"|$.T}}</label>
              <div class="col-sm-4">
-                <input type="text" class="form-control" value="{{$.Form `login_jwt_expiry`}}" name="login_jwt_expiry" placeholder="24h" pattern="^[0-9]+(y|m|d|h|i|s)([0-9]+(y|m|d|h|i|s))*$">
-                <div class="help-block">{{`格式为数字和单位字母的组合，有效的单位有："s", "i", "h", "d", "m", "y" 分别表示 "秒", "分钟", "小时", "天", "月(30天)", "年"。例如“5i30s”表示5分钟30秒`|$.T}}</div>
+                <input type="text" class="form-control" value="{{$.Form `login_jwt_expiry`}}" name="login_jwt_expiry" placeholder="24h" pattern="^[0-9]+(h|m|s)([0-9]+(h|m|s))*$">
+                <div class="help-block">{{`格式为数字和单位字母的组合，有效的单位有："s", "m", "h" 分别表示 "秒", "分钟", "小时"`|$.T}}</div>
              </div>
             </div><!-- form-group -->
       </div><!-- fieldset -->
@@ -85,14 +93,14 @@
            <label class="col-sm-2 control-label">{{"白名单文件"|$.T}}</label>
            <div class="col-sm-10">
               <input type="text" class="form-control" value="{{$.Form `login_redirect_host_file`}}" name="login_redirect_host_file" placeholder="">
-              <div class="help-block">{{"输入包含白名单根网址的文件路径，在文件内每行一个根网址"|$.T}}</div>
+              <div class="help-block">{{"输入包含白名单域名的文件路径，在文件内每行一个域名"|$.T}}</div>
            </div>
          </div><!-- form-group -->
          <div class="form-group">
             <div class="col-sm-2 control-label">&nbsp;</div>
             <div class="col-sm-10">
             <div class="checkbox checkbox-primary checkbox-inline">
-              <input type="checkbox" id="login_redirect_check_referer" name="login_redirect_check_referer" value="1"{{if eq ($.Form `login_redirect_check_referer`) `1`}} checked{{end}}> <label for="login_redirect_check_referer">{{`检查来源网址`|$.T}}</label>
+              <input type="checkbox" id="login_redirect_check_referer" name="login_redirect_check_referer" value="1"{{if eq ($.Form `login_redirect_check_referer`) `1`}} checked{{end}}> <label for="login_redirect_check_referer">{{`要求来源网址域名相同`|$.T}}</label>
             </div>
             </div>
           </div><!-- form-group -->
@@ -108,14 +116,14 @@
    <label class="col-sm-2 control-label">{{"有效时长"|$.T}}</label>
    <div class="col-sm-4">
       <span class="input-group">
-         <input type="text" class="form-control" value="{{$.Form `login_cookie_exipry`}}" name="login_cookie_exipry" placeholder="0" pattern="^[0-9]+(y|m|d|h|i|s)([0-9]+(y|m|d|h|i|s))*$">
+         <input type="text" class="form-control" value="{{$.Form `login_cookie_exipry`}}" name="login_cookie_exipry" placeholder="0s" pattern="^[0-9]+(h|m|s)([0-9]+(h|m|s))*$">
          <span class="input-group-addon no-padding-y">
             <div class="checkbox checkbox-primary checkbox-inline">
               <input type="checkbox" id="login_cookie_secure" name="login_cookie_secure" value="1"{{if eq ($.Form `login_cookie_secure`) `1`}} checked{{end}}> <label for="login_cookie_secure">Secure</label>
             </div>
          </span>
       </span>
-      <div class="help-block">{{`格式为数字和单位字母的组合，有效的单位有："s", "i", "h", "d", "m", "y" 分别表示 "秒", "分钟", "小时", "天", "月(30天)", "年"。例如“5i30s”表示5分钟30秒`|$.T}}, {{"0表示即时有效"|$.T}}</div>
+      <div class="help-block">{{`格式为数字和单位字母的组合，有效的单位有："s", "m", "h" 分别表示 "秒", "分钟", "小时"`|$.T}}, {{"0s表示即时有效"|$.T}}</div>
    </div>
 </div>
 <div class="form-group">
@@ -141,7 +149,15 @@
          <div class="form-group">
             <label class="col-sm-2 control-label">{{"Client Secret"|$.T}}</label>
             <div class="col-sm-10">
+               <span class="input-group">
                <input type="text" name="login_oauth_client_secret" class="form-control" value="{{$.Form `login_oauth_client_secret`}}">
+               <span class="input-group-btn">
+               <a href="javascript:;" data-target="[name=login_oauth_client_secret]" class="btn btn-default show-password">
+                 <i class="fa fa-eye"></i>
+                 {{`查看`|$.T}}
+               </a>
+               </span>
+               </span>
             </div>
          </div>
          <div class="form-group login-oauth-nging{{if ne $v `nging`}} hide{{end}}">
@@ -175,7 +191,15 @@
          </div>
          <label class="col-sm-2 control-label">{{"密码"|$.T}}</label>
          <div class="col-sm-4">
+            <span class="input-group">
             <input type="password" name="login_simple_password" class="form-control" value="{{$.Form `login_simple_password`}}">
+            <span class="input-group-btn">
+            <a href="javascript:;" data-target="[name=login_simple_password]" class="btn btn-default show-password">
+              <i class="fa fa-eye"></i>
+              {{`查看`|$.T}}
+            </a>
+            </span>
+            </span>
          </div>
       </div>
     </div>
@@ -199,7 +223,15 @@
          <div class="form-group">
             <label class="col-sm-2 control-label">{{"Client Secret"|$.T}}</label>
             <div class="col-sm-10">
-               <input type="text" name="login_osiam_client_secret" class="form-control" value="{{$.Form `login_osiam_client_secret`}}">
+               <span class="input-group">
+               <input type="password" name="login_osiam_client_secret" class="form-control" value="{{$.Form `login_osiam_client_secret`}}">
+               <span class="input-group-btn">
+               <a href="javascript:;" data-target="[name=login_osiam_client_secret]" class="btn btn-default show-password">
+                 <i class="fa fa-eye"></i>
+                 {{`查看`|$.T}}
+               </a>
+               </span>
+               </span>
             </div>
          </div>
          <div class="form-group">
@@ -230,8 +262,8 @@
          <div class="form-group">
             <label class="col-sm-2 control-label">{{"超时限制"|$.T}}</label>
             <div class="col-sm-10">
-               <input type="text" name="login_httpupstream_timeout" class="form-control" value="{{$.Form `login_httpupstream_timeout`}}" pattern="^[0-9]+(y|m|d|h|i|s)([0-9]+(y|m|d|h|i|s))*$">
-               <div class="help-block">{{`格式为数字和单位字母的组合，有效的单位有："s", "i", "h", "d", "m", "y" 分别表示 "秒", "分钟", "小时", "天", "月(30天)", "年"。例如“5i30s”表示5分钟30秒`|$.T}}</div>
+               <input type="text" name="login_httpupstream_timeout" class="form-control" value="{{$.Form `login_httpupstream_timeout`}}" pattern="^[0-9]+(h|m|s)([0-9]+(h|m|s))*$">
+               <div class="help-block">{{`格式为数字和单位字母的组合，有效的单位有："s", "m", "h" 分别表示 "秒", "分钟", "小时"`|$.T}}</div>
             </div>
          </div>
          <div class="form-group">
