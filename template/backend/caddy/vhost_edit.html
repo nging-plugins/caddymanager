@@ -686,10 +686,12 @@ $('#vhostForm [data-slide-settings]').on('click',function(){
     if(!history){
       if($(innerid).data('history')){
         $(innerid).html($(innerid).data('history'));
+        App.passwordInputShowPassword(innerid);
         showEngineElements($(innerid));
       }else{
         $.get(BACKEND_URL+'/caddy/addon_form',{addon:name},function(r){
           $(innerid).html(r);
+          App.passwordInputShowPassword(innerid);
           showEngineElements($(innerid));
         },'html');
       }
