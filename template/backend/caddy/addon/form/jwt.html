@@ -55,7 +55,7 @@
                   </tr>
               </tbody>
         </table>
-       <div class="help-block">{{"允许的Claim键和值，只要任何一个匹配则被允许。例如有claim数据："|$.T}}
+       <div class="help-block">{{"指定所允许的Claims数据中的键和值，只要任何一个匹配则被允许。例如有Claims数据："|$.T}}
            <pre>{
     "user": "test",
     "role": "admin",
@@ -100,7 +100,7 @@
                   </tr>
               </tbody>
         </table>
-       <div class="help-block">{{"禁止的Claim键和值。"|$.T}}</div>
+       <div class="help-block">{{"指定禁止的Claims数据中的键和值。"|$.T}}</div>
     </div>
   </div>
 <div class="form-group">
@@ -113,7 +113,7 @@
           <input type="checkbox" value="1" id="jwt_passthrough" name="jwt_passthrough"{{if eq ($.Form `jwt_passthrough`) `1`}} checked{{end}}><label for="jwt_passthrough">{{"忽略验证"|$.T}}</label> 
         </div>
         <div class="checkbox checkbox-primary checkbox-inline"> 
-          <input type="checkbox" value="1" id="jwt_strip_header" name="jwt_strip_header"{{if eq ($.Form `jwt_strip_header`) `1`}} checked{{end}}><label for="jwt_strip_header">{{"Claim键名取最后一个“/”后面的值"|$.T}} (strip_header)</label> 
+          <input type="checkbox" value="1" id="jwt_strip_header" name="jwt_strip_header"{{if eq ($.Form `jwt_strip_header`) `1`}} checked{{end}}><label for="jwt_strip_header">{{"Claims数据中的键名取最后一个“/”后面的值"|$.T}} (strip_header)</label> 
         </div>
         <div class="help-block">
         </div>

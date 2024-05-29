@@ -16,8 +16,60 @@
    <label class="col-sm-2 control-label">{{"登出网址"|$.T}}</label>
    <div class="col-sm-10">
       <input type="text" class="form-control" value="{{$.Form `login_logout_url`}}" name="login_logout_url" placeholder="">
-      <div class="help-block">{{"进行登出操作的路径或网址。除此之外，当前网址参数 logout=true 时也能进行登出"|$.T}}</div>
+      <div class="help-block">{{"进行登出操作的路径或网址。除此之外，登录路径带参数 ?logout=true 时也能进行登出"|$.T}}</div>
    </div>
+</div>
+<div class="form-group">
+   <label class="col-sm-2 control-label">{{"用户信息接口"|$.T}}</label>
+   <div class="col-sm-10">{{$enabled := eq ($.Form `login_userclaimsapi`) `1`}}
+      <div class="radio radio-success radio-inline">
+        <input type="radio" id="login_userclaimsapi_1" name="login_userclaimsapi" value="1"{{if $enabled}} checked{{end}} onclick="$('#login-userclaimsapi-setting').removeClass('hide')"> <label for="login_userclaimsapi_1">{{`启用`|$.T}}</label>
+      </div><!-- radio -->
+      <div class="radio radio-danger radio-inline">
+        <input type="radio" id="login_userclaimsapi_0" name="login_userclaimsapi" value="0"{{if not $enabled}} checked{{end}} onclick="$('#login-userclaimsapi-setting:not(.hide)').addClass('hide')"> <label for="login_userclaimsapi_0">{{`禁用`|$.T}}</label>
+      </div><!-- radio -->
+      <div class="help-block">{{`用于获取用户的Claims数据`|$.T}}</div>
+      <div class="fieldset bg-fc{{if not $enabled}} hide{{end}}" id="login-userclaimsapi-setting">
+      <div class="form-group">
+         <label class="col-sm-2 control-label">{{"接口网址"|$.T}}</label>
+         <div class="col-sm-10">
+            <input type="url" name="login_userclaimsapi_endpoint" class="form-control" value="{{$.Form `login_userclaimsapi_endpoint`}}" placeholder="">
+            <div class="help-block">
+               {{`会向此接口以GET方式提交参数:`|$.T}} <code>sub</code>({{`必传。代表用户名`|$.T}}) / <code>origin</code>({{`认证方式`|$.T}}) / <code>domain</code> / <code>email</code> / <code>group</code><br />
+               {{`如果执行成功，应该返回状态码200，并输出以下JSON格式的内容:`|$.T}}
+<pre>{
+	"sub": "<用户名>",
+	"picture": "<头像网址>",
+	"name": "<昵称>",
+	"email": "<E-mail地址>",
+	"origin": "<来源>",
+	"exp": <过期时间戳数字>,
+	"refs": <刷新次数限制>,
+	"domain": "<域>",
+	"groups": ["<用户组>"],
+}</pre>
+            {{`JSON数据中的所有键值对都不是必需的，可根据自身需要灵活选取`|$.T}}
+            </div>
+         </div>
+      </div>
+      <div class="form-group">
+         <label class="col-sm-2 control-label">{{"Token"|$.T}}</label>
+         <div class="col-sm-10">
+            <input type="text" name="login_userclaimsapi_token" class="form-control" value="{{$.Form `login_userclaimsapi_token`}}">
+            <div class="help-block">
+               {{`令牌。此处填写的令牌将作为Header中的Authorization值传递给接口，并且这个值会自动添加前缀“Bearer ”`|$.T}}
+            </div>
+         </div>
+      </div>
+      <div class="form-group">
+         <label class="col-sm-2 control-label">{{"超时限制"|$.T}}</label>
+         <div class="col-sm-10">
+            <input type="text" name="login_userclaimsapi_timeout" class="form-control" value="{{$.Form `login_userclaimsapi_timeout`}}" placeholder="5s" pattern="^[0-9]+(h|m|s)([0-9]+(h|m|s))*$">
+            <div class="help-block">{{`接口的最大执行时长。格式为数字和单位字母的组合，有效的单位有："s", "m", "h" 分别表示 "秒", "分钟", "小时"`|$.T}}</div>
+         </div>
+      </div>
+      </div>
+    </div>
 </div>
 <div class="form-group">
    <label class="col-sm-2 control-label">{{"登录页面模板"|$.T}}</label>
@@ -47,7 +99,7 @@
           <label class="col-sm-2 control-label">{{"密码文件"|$.T}}</label>
           <div class="col-sm-4">
              <input type="text" class="form-control" value="{{$.Form `login_jwt_secret_file`}}" name="login_jwt_secret_file" placeholder="">
-             <div class="help-block">{{"保存JWT密码的文件"|$.T}}</div>
+             <div class="help-block">{{"保存JWT密码的文件。填写后将此文件的内容作为密码"|$.T}}</div>
           </div>
         </div><!-- form-group -->
         <div class="form-group">
@@ -177,7 +229,7 @@
          <label class="col-sm-2 control-label">{{"文件路径"|$.T}}</label>
          <div class="col-sm-10">
             <input type="text" name="login_htpasswd_file" class="form-control" value="{{$.Form `login_htpasswd_file`}}">
-            <div class="help-block">{{`htpasswd文件路径`|$.T}}</div>
+            <div class="help-block">{{`htpasswd文件路径。填写后启用`|$.T}}</div>
          </div>
       </div>
       </div>
@@ -206,18 +258,19 @@
          </div>
       </div>
       </div>
+      <div class="help-block">{{`填写用户名和密码后启用`|$.T}}</div>
     </div>
 </div>
 <div class="form-group">
    <label class="col-sm-2 control-label">{{"osiam认证"|$.T}}</label>
-   <div class="col-sm-10">
+   <div class="col-sm-10">{{$enabled := eq ($.Form `login_osiam`) `1`}}
       <div class="radio radio-success radio-inline">
-        <input type="radio" id="login_osiam_1" name="login_osiam" value="1"{{if eq ($.Form `login_osiam`) `1`}} checked{{end}}> <label for="login_osiam_1">{{`启用`|$.T}}</label>
+        <input type="radio" id="login_osiam_1" name="login_osiam" value="1"{{if $enabled}} checked{{end}} onclick="$('#login-osiam-setting').removeClass('hide')"> <label for="login_osiam_1">{{`启用`|$.T}}</label>
       </div><!-- radio -->
       <div class="radio radio-danger radio-inline">
-        <input type="radio" id="login_osiam_0" name="login_osiam" value="0"{{if ne ($.Form `login_osiam`) `1`}} checked{{end}}> <label for="login_osiam_0">{{`禁用`|$.T}}</label>
+        <input type="radio" id="login_osiam_0" name="login_osiam" value="0"{{if not $enabled}} checked{{end}} onclick="$('#login-osiam-setting:not(.hide)').addClass('hide')"> <label for="login_osiam_0">{{`禁用`|$.T}}</label>
       </div><!-- radio -->
-      <div class="fieldset bg-fc" id="login-osiam-setting">
+      <div class="fieldset bg-fc{{if not $enabled}} hide{{end}}" id="login-osiam-setting">
          <div class="form-group">
             <label class="col-sm-2 control-label">{{"Client ID"|$.T}}</label>
             <div class="col-sm-10">
@@ -248,19 +301,22 @@
     </div>
 </div>
 <div class="form-group">
-   <label class="col-sm-2 control-label">{{"httpupstream认证"|$.T}}</label>
-   <div class="col-sm-10">
+   <label class="col-sm-2 control-label">{{"上游服务认证"|$.T}}</label>
+   <div class="col-sm-10">{{$enabled := eq ($.Form `login_httpupstream`) `1`}}
       <div class="radio radio-success radio-inline">
-        <input type="radio" id="login_httpupstream_1" name="login_httpupstream" value="1"{{if eq ($.Form `login_httpupstream`) `1`}} checked{{end}}> <label for="login_httpupstream_1">{{`启用`|$.T}}</label>
+        <input type="radio" id="login_httpupstream_1" name="login_httpupstream" value="1"{{if $enabled}} checked{{end}} onclick="$('#login-httpupstream-setting').removeClass('hide')"> <label for="login_httpupstream_1">{{`启用`|$.T}}</label>
       </div><!-- radio -->
       <div class="radio radio-danger radio-inline">
-        <input type="radio" id="login_httpupstream_0" name="login_httpupstream" value="0"{{if ne ($.Form `login_httpupstream`) `1`}} checked{{end}}> <label for="login_httpupstream_0">{{`禁用`|$.T}}</label>
+        <input type="radio" id="login_httpupstream_0" name="login_httpupstream" value="0"{{if not $enabled}} checked{{end}} onclick="$('#login-httpupstream-setting:not(.hide)').addClass('hide')"> <label for="login_httpupstream_0">{{`禁用`|$.T}}</label>
       </div><!-- radio -->
-      <div class="fieldset bg-fc" id="login-httpupstream-setting">
+      <div class="fieldset bg-fc{{if not $enabled}} hide{{end}}" id="login-httpupstream-setting">
          <div class="form-group">
-            <label class="col-sm-2 control-label">{{"upstream"|$.T}}</label>
+            <label class="col-sm-2 control-label">{{"上游服务网址"|$.T}}</label>
             <div class="col-sm-10">
                <input type="url" name="login_httpupstream_upstream" class="form-control" value="{{$.Form `login_httpupstream_upstream`}}">
+               <div class="help-block">
+                  {{`设置支持BasicAuth认证方式的上游服务网址。认证成功返回HTTP状态码200，其它状态码代表认证失败`|$.T}}
+               </div>
             </div>
          </div>
          <div class="form-group">

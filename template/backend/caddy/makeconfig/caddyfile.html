@@ -101,6 +101,15 @@
         {{if and $user $pwd}}
         simple    {{$user}}={{$pwd}}
         {{end}}
+        {{$userEndpointToken := $v.Get "login_userclaimsapi_endpoint"}}
+        {{if and ($v.IsEnabled "login_userclaimsapi") $userEndpointToken}}
+        user_endpoint    {{$userEndpointToken}}
+        {{$token := $v.Get "login_userclaimsapi_token"}}
+        {{if $token}}
+        user_endpoint_token    {{$token}}
+        {{end}}
+        user_endpoint_timeout    {{$v.Get "login_userclaimsapi_timeout"|Default "5s"}}
+        {{end}}
     }
     {{end}}
     

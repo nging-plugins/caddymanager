@@ -25,10 +25,10 @@ require (
 	github.com/caddy-plugins/caddy-s3browser v0.1.3
 	github.com/caddy-plugins/cors v0.0.3
 	github.com/caddy-plugins/ipfilter v1.1.8
-	github.com/caddy-plugins/loginsrv v0.1.4
+	github.com/caddy-plugins/loginsrv v0.1.6
 	github.com/caddy-plugins/nobots v0.2.1
 	github.com/caddy-plugins/webdav v1.2.10
-	github.com/nging-plugins/servermanager v1.5.8
+	github.com/nging-plugins/servermanager v1.5.9
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.9.0
 	github.com/webx-top/client v0.8.13
@@ -74,8 +74,7 @@ require (
 	github.com/admpub/go-sshclient v0.0.3 // indirect
 	github.com/admpub/go-utility v0.0.1 // indirect
 	github.com/admpub/godotenv v1.4.3 // indirect
-	github.com/admpub/goforever v0.3.1 // indirect
-	github.com/admpub/gohttp v0.0.0-20190322032039-b55c707b8f1e // indirect
+	github.com/admpub/goforever v0.3.2 // indirect
 	github.com/admpub/gopty v0.1.2 // indirect
 	github.com/admpub/httpscerts v0.0.0-20180907121630-a2990e2af45c // indirect
 	github.com/admpub/humanize v0.0.0-20190501023926-5f826e92c8ca // indirect
