@@ -35,10 +35,11 @@
          <div class="col-sm-10">
             <input type="url" name="login_userclaimsapi_endpoint" class="form-control" value="{{$.Form `login_userclaimsapi_endpoint`}}" placeholder="">
             <div class="help-block">
-               {{`会向此接口以GET方式提交参数:`|$.T}} <code>sub</code>({{`必传。代表用户名`|$.T}}) / <code>origin</code>({{`认证方式`|$.T}}) / <code>domain</code> / <code>email</code> / <code>group</code><br />
+               {{`会向此接口以GET方式提交参数:`|$.T}} <code>sub</code>({{`必传。代表用户名`|$.T}}) / <code>id</code>({{`用户ID`|$.T}}) / <code>origin</code>({{`认证方式`|$.T}}) / <code>domain</code> / <code>email</code> / <code>group</code><br />
                {{`如果执行成功，应该返回状态码200，并输出以下JSON格式的内容:`|$.T}}
 <pre>{
 	"sub": "<用户名>",
+	"id": "<用户ID>",
 	"picture": "<头像网址>",
 	"name": "<昵称>",
 	"email": "<E-mail地址>",
