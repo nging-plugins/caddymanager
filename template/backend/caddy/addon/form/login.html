@@ -127,14 +127,14 @@
 </div>
 <div class="form-group">
     <label class="col-sm-2 control-label">{{"网址跳转"|$.T}}</label>
-    <div class="col-sm-10">
+    <div class="col-sm-10">{{$enabled := eq ($.Form `login_redirect`) `1`}}
       <div class="radio radio-success radio-inline">
-        <input type="radio" id="login_redirect_1" name="login_redirect" value="1"{{if eq ($.Form `login_redirect`) `1`}} checked{{end}}> <label for="login_redirect_1">{{`启用`|$.T}}</label>
+        <input type="radio" id="login_redirect_1" name="login_redirect" value="1"{{if $enabled}} checked{{end}} onclick="$('#login-redirect-setting').removeClass('hide')"> <label for="login_redirect_1">{{`启用`|$.T}}</label>
       </div><!-- radio -->
       <div class="radio radio-danger radio-inline">
-        <input type="radio" id="login_redirect_0" name="login_redirect" value="0"{{if ne ($.Form `login_redirect`) `1`}} checked{{end}}> <label for="login_redirect_0">{{`禁用`|$.T}}</label>
+        <input type="radio" id="login_redirect_0" name="login_redirect" value="0"{{if not $enabled}} checked{{end}} onclick="$('#login-redirect-setting:not(.hide)').addClass('hide')"> <label for="login_redirect_0">{{`禁用`|$.T}}</label>
       </div><!-- radio -->
-      <div class="fieldset bg-fc">
+      <div class="fieldset bg-fc{{if not $enabled}} hide{{end}}" id="login-redirect-setting">
        <div class="form-group">
           <label class="col-sm-2 control-label">{{"跳转网址参数名"|$.T}}</label>
           <div class="col-sm-10">
