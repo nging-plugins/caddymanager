@@ -8,14 +8,33 @@
 <div class="row">
 	<div class="col-md-12">
 		<div class="block-flat no-padding">
+			{{- $groupId := $.Stored.groupId -}}
+			{{- $engine := $.Form `engine` -}}
 			<div class="header">
-				<div class="pull-right" style="margin-left:10px">
+				<!-- <a href="javascript:;" data-toggle="collapse" data-target="#th-toolbar" class="btn btn-default"><i class="fa fa-ellipsis-v"></i></a> -->
+				<div class="table-toolbar collapse row" id="th-toolbar">
+				<div class="col-sm-6">
+					<div class="btn-group">
+						<a href="{{BackendURL}}/caddy/vhost_build?engine={{$engine}}&groupId={{$groupId}}" class="btn btn-warning">
+							<i class="fa fa-refresh"></i>
+							{{"应用配置"|$.T}}
+						</a>
+						<a href="{{BackendURL}}/caddy/vhost_add" class="btn btn-success">
+							<i class="fa fa-plus"></i>
+							{{"添加网站"|$.T}}
+						</a>
+						<a href="javascript:;" data-url="{{BackendURL}}/caddy/log_show" id="caddy-log-show" class="btn btn-info">
+							<i class="fa fa-search"></i>
+							{{"Caddy日志"|$.T}}
+						</a>
+					</div>
+				</div>
+				<div class="col-sm-6">
 					<form class="form-horizontal" action="" id="search-form" method="GET">
 						<div class="input-group">
 							<span class="input-group-addon">{{"分组"|$.T}}</span>
 							<select name="groupId" class="form-control" id="groupId" onchange="$('#search-form').submit()">
 								<option value="0"> - {{"不限"|$.T}} - </option>
-								{{- $groupId := $.Stored.groupId -}} 
 								{{- range $k, $v := $.Stored.groupList -}}
 								<option value="{{$v.Id}}" {{- if eq $groupId $v.Id}} selected{{end}}>{{$v.Name}}</option>
 								{{- end -}}
@@ -23,7 +42,6 @@
 							<span class="input-group-addon">{{"引擎"|$.T}}</span>
 							<select name="engine" class="form-control" id="engine" onchange="$('#search-form').submit()">
 								<option value=""> - {{"不限"|$.T}} - </option>
-								{{- $engine := $.Form `engine` -}} 
 								{{- range $k, $v := $.Stored.engineList -}}
 								<option value="{{$v.K}}" {{- if eq $engine $v.K}} selected{{end}}>{{$v.V}}</option>
 								{{- end -}}
@@ -31,18 +49,7 @@
 						</div>
 					</form>
 				</div>
-				<a href="javascript:;" data-url="{{BackendURL}}/caddy/log_show" id="caddy-log-show" class="btn btn-info pull-right">
-					<i class="fa fa-search"></i>
-					{{"Caddy日志"|$.T}}
-				</a>
-				<a href="{{BackendURL}}/caddy/vhost_add" class="btn btn-success pull-right">
-					<i class="fa fa-plus"></i>
-					{{"添加网站"|$.T}}
-				</a>
-				<a href="{{BackendURL}}/caddy/vhost_build?engine={{$engine}}&groupId={{$groupId}}" class="pull-right btn btn-warning">
-                    <i class="fa fa-refresh"></i>
-                    {{"应用配置"|$.T}}
-                </a>
+				</div><!-- .table-toolbar -->
 				<h3>{{"网站列表"|$.T}}</h3>
 			</div>
 			<div class="content">
