@@ -19,7 +19,8 @@
 package handler
 
 import (
-	"github.com/admpub/nging/v5/application/handler"
+	"github.com/coscms/webcore/library/backend"
+	"github.com/coscms/webcore/library/common"
 	"github.com/nging-plugins/caddymanager/application/model"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
@@ -27,12 +28,12 @@ import (
 
 func Group(ctx echo.Context) error {
 	m := model.NewVhostGroup(ctx)
-	user := handler.User(ctx)
+	user := backend.User(ctx)
 	cond := db.NewCompounds()
 	cond.Add(db.Cond{`uid`: user.Id})
 	err := m.ListPage(cond)
 	ctx.Set(`listData`, m.Objects())
-	return ctx.Render(`caddy/group`, handler.Err(ctx, err))
+	return ctx.Render(`caddy/group`, common.Err(ctx, err))
 }
 
 func GroupAdd(ctx echo.Context) error {
@@ -44,32 +45,32 @@ func GroupAdd(ctx echo.Context) error {
 			if len(m.Name) == 0 {
 				err = ctx.E(`分组名称不能为空`)
 			} else {
-				user := handler.User(ctx)
+				user := backend.User(ctx)
 				m.Uid = user.Id
 				_, err = m.Insert()
 			}
 		}
 		if err == nil {
-			handler.SendOk(ctx, ctx.T(`操作成功`))
-			return ctx.Redirect(handler.URLFor(`/caddy/group`))
+			common.SendOk(ctx, ctx.T(`操作成功`))
+			return ctx.Redirect(backend.URLFor(`/caddy/group`))
 		}
 	}
 	ctx.Set(`activeURL`, `/caddy/group`)
-	return ctx.Render(`caddy/group_edit`, handler.Err(ctx, err))
+	return ctx.Render(`caddy/group_edit`, common.Err(ctx, err))
 }
 
 func GroupEdit(ctx echo.Context) error {
 	id := ctx.Formx(`id`).Uint()
 	m := model.NewVhostGroup(ctx)
-	user := handler.User(ctx)
+	user := backend.User(ctx)
 	err := m.Get(nil, `id`, id)
 	if err != nil {
-		handler.SendFail(ctx, err.Error())
-		return ctx.Redirect(handler.URLFor(`/caddy/group`))
+		common.SendFail(ctx, err.Error())
+		return ctx.Redirect(backend.URLFor(`/caddy/group`))
 	}
 	if m.Id < 1 || user.Id != m.Uid {
-		handler.SendFail(ctx, ctx.T(`分组不存在`))
-		return ctx.Redirect(handler.URLFor(`/caddy/group`))
+		common.SendFail(ctx, ctx.T(`分组不存在`))
+		return ctx.Redirect(backend.URLFor(`/caddy/group`))
 	}
 	if ctx.IsPost() {
 		err = ctx.MustBind(m.NgingVhostGroup)
@@ -83,28 +84,28 @@ func GroupEdit(ctx echo.Context) error {
 			}
 		}
 		if err == nil {
-			handler.SendOk(ctx, ctx.T(`修改成功`))
-			return ctx.Redirect(handler.URLFor(`/caddy/group`))
+			common.SendOk(ctx, ctx.T(`修改成功`))
+			return ctx.Redirect(backend.URLFor(`/caddy/group`))
 		}
 	} else {
 		echo.StructToForm(ctx, m.NgingVhostGroup, ``, echo.LowerCaseFirstLetter)
 	}
 	ctx.Set(`activeURL`, `/caddy/group`)
-	return ctx.Render(`caddy/group_edit`, handler.Err(ctx, err))
+	return ctx.Render(`caddy/group_edit`, common.Err(ctx, err))
 }
 
 func GroupDelete(ctx echo.Context) error {
 	id := ctx.Formx(`id`).Uint()
 	m := model.NewVhostGroup(ctx)
-	user := handler.User(ctx)
+	user := backend.User(ctx)
 	err := m.Delete(nil, db.And(
 		db.Cond{`id`: id},
 		db.Cond{`uid`: user.Id},
 	))
 	if err == nil {
-		handler.SendOk(ctx, ctx.T(`操作成功`))
+		common.SendOk(ctx, ctx.T(`操作成功`))
 	} else {
-		handler.SendFail(ctx, err.Error())
+		common.SendFail(ctx, err.Error())
 	}
-	return ctx.Redirect(handler.URLFor(`/caddy/group`))
+	return ctx.Redirect(backend.URLFor(`/caddy/group`))
 }

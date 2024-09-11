@@ -23,10 +23,10 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/admpub/nging/v5/application/library/common"
-	"github.com/admpub/nging/v5/application/library/ip2region"
 	"github.com/admpub/tail"
 	ua "github.com/admpub/useragent"
+	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/ip2region"
 	"github.com/nging-plugins/caddymanager/application/library/cmder"
 	"github.com/nging-plugins/caddymanager/application/model"
 	"github.com/webx-top/db"

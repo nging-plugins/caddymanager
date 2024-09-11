@@ -26,10 +26,10 @@ import (
 	"time"
 
 	"github.com/admpub/log"
-	"github.com/admpub/nging/v5/application/handler"
-	"github.com/admpub/nging/v5/application/library/common"
-	"github.com/admpub/nging/v5/application/library/cron"
-	"github.com/admpub/nging/v5/application/library/route"
+	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/cron"
+	"github.com/coscms/webcore/library/route"
+	routeRegistry "github.com/coscms/webcore/registry/route"
 	"github.com/nging-plugins/caddymanager/application/library/engine"
 	"github.com/nging-plugins/caddymanager/application/model"
 	"github.com/webx-top/echo"
@@ -42,7 +42,7 @@ func RegisterRoute(r *route.Collection) {
 }
 
 func registerRoute(g echo.RouteRegister) {
-	metaHandler := handler.IRegister().MetaHandler
+	metaHandler := routeRegistry.IRegister().MetaHandler
 	g.Route(`GET,POST`, `/restart`, metaHandler(echo.H{`name`: `重启Caddy服务`}, Restart))
 	g.Route(`GET,POST`, `/stop`, metaHandler(echo.H{`name`: `停止Caddy服务`}, Stop))
 	g.Route(`GET,POST`, `/log`, metaHandler(echo.H{`name`: `显示Caddy日志`}, Log))

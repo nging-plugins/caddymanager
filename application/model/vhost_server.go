@@ -3,7 +3,7 @@ package model
 import (
 	"strings"
 
-	"github.com/admpub/nging/v5/application/library/common"
+	"github.com/coscms/webcore/library/common"
 	"github.com/nging-plugins/caddymanager/application/dbschema"
 	"github.com/nging-plugins/caddymanager/application/library/engine"
 	"github.com/webx-top/com"

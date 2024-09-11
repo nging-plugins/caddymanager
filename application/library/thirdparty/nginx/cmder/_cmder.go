@@ -6,8 +6,8 @@ import (
 
 	"github.com/admpub/once"
 
-	"github.com/admpub/nging/v5/application/library/config"
-	"github.com/admpub/nging/v5/application/library/config/cmder"
+	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/config/cmder"
 
 	"github.com/nging-plugins/caddymanager/application/library/thirdparty"
 	nginxConfig "github.com/nging-plugins/caddymanager/application/library/thirdparty/nginx/config"

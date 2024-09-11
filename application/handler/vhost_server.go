@@ -31,8 +31,8 @@ import (
 	"github.com/webx-top/echo/code"
 	"golang.org/x/net/publicsuffix"
 
-	"github.com/admpub/nging/v5/application/handler"
-	"github.com/admpub/nging/v5/application/library/common"
+	"github.com/coscms/webcore/library/backend"
+	"github.com/coscms/webcore/library/common"
 	"github.com/nging-plugins/caddymanager/application/dbschema"
 	"github.com/nging-plugins/caddymanager/application/library/engine"
 	"github.com/nging-plugins/caddymanager/application/library/form"
@@ -46,7 +46,7 @@ func ServerIndex(ctx echo.Context) error {
 	ctx.Set(`listData`, m.Objects())
 	ctx.SetFunc(`engineName`, engine.Engines.Get)
 	ctx.SetFunc(`environName`, engine.Environs.Get)
-	return ctx.Render(`caddy/server`, handler.Err(ctx, err))
+	return ctx.Render(`caddy/server`, common.Err(ctx, err))
 }
 
 func ServerAdd(ctx echo.Context) error {
@@ -79,8 +79,8 @@ func ServerAdd(ctx echo.Context) error {
 				}
 			}
 		}
-		handler.SendOk(ctx, ctx.T(`操作成功`))
-		return ctx.Redirect(handler.URLFor(`/caddy/server`))
+		common.SendOk(ctx, ctx.T(`操作成功`))
+		return ctx.Redirect(backend.URLFor(`/caddy/server`))
 	} else {
 		id := ctx.Formx(`copyId`).Uint()
 		if id > 0 {
@@ -96,7 +96,7 @@ END:
 	ctx.Set(`activeURL`, `/caddy/server`)
 	ctx.Set(`isAdd`, true)
 	setServerForm(ctx)
-	return ctx.Render(`caddy/server_edit`, handler.Err(ctx, err))
+	return ctx.Render(`caddy/server_edit`, common.Err(ctx, err))
 }
 
 func setServerForm(ctx echo.Context) {
@@ -115,8 +115,8 @@ func ServerEdit(ctx echo.Context) error {
 	m := model.NewVhostServer(ctx)
 	err := m.Get(nil, `id`, id)
 	if err != nil {
-		handler.SendFail(ctx, err.Error())
-		return ctx.Redirect(handler.URLFor(`/caddy/server`))
+		common.SendFail(ctx, err.Error())
+		return ctx.Redirect(backend.URLFor(`/caddy/server`))
 	}
 	if ctx.IsPost() {
 		old := *m.NgingVhostServer
@@ -192,8 +192,8 @@ func ServerEdit(ctx echo.Context) error {
 				goto END
 			}
 		}
-		handler.SendOk(ctx, ctx.T(`修改成功`))
-		return ctx.Redirect(handler.URLFor(`/caddy/server`))
+		common.SendOk(ctx, ctx.T(`修改成功`))
+		return ctx.Redirect(backend.URLFor(`/caddy/server`))
 	} else if ctx.IsAjax() {
 		data := ctx.Data()
 		disabled := ctx.Query(`disabled`)
@@ -226,7 +226,7 @@ END:
 	ctx.Set(`activeURL`, `/caddy/server`)
 	ctx.Set(`isAdd`, false)
 	setServerForm(ctx)
-	return ctx.Render(`caddy/server_edit`, handler.Err(ctx, err))
+	return ctx.Render(`caddy/server_edit`, common.Err(ctx, err))
 }
 
 func ServerDelete(ctx echo.Context) error {
@@ -258,11 +258,11 @@ func ServerDelete(ctx echo.Context) error {
 
 END:
 	if err == nil {
-		handler.SendOk(ctx, ctx.T(`操作成功`))
+		common.SendOk(ctx, ctx.T(`操作成功`))
 	} else {
-		handler.SendFail(ctx, err.Error())
+		common.SendFail(ctx, err.Error())
 	}
-	return ctx.Redirect(handler.URLFor(`/caddy/server`))
+	return ctx.Redirect(backend.URLFor(`/caddy/server`))
 }
 
 func ServerRenewCert(ctx echo.Context) error {

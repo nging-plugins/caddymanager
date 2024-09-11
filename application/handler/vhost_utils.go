@@ -30,9 +30,9 @@ import (
 	"strings"
 
 	"github.com/admpub/log"
-	"github.com/admpub/nging/v5/application/handler"
-	"github.com/admpub/nging/v5/application/library/common"
-	"github.com/admpub/nging/v5/application/library/config"
+	"github.com/coscms/webcore/library/backend"
+	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/config"
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/db/lib/factory"
@@ -472,8 +472,8 @@ func vhostbuild(ctx echo.Context, groupID uint, serverIdent string, engineType s
 			rowAndGroup = rowAndGroup[0:0]
 			_, err = makeQuerier().SetOffset(i).SetSize(n).List()
 			if err != nil {
-				handler.SendFail(ctx, err.Error())
-				return ctx.Redirect(handler.URLFor(`/caddy/vhost`))
+				common.SendFail(ctx, err.Error())
+				return ctx.Redirect(backend.URLFor(`/caddy/vhost`))
 			}
 		}
 		for _, m := range rowAndGroup {

@@ -24,9 +24,9 @@ package main
 import (
 	"path/filepath"
 
-	"github.com/admpub/nging/v5/application/library/bindata"
-	"github.com/admpub/nging/v5/application/library/buildinfo"
-	"github.com/admpub/nging/v5/application/library/buildinfo/nginginfo"
+	"github.com/coscms/webcore/library/bindata"
+	"github.com/coscms/webcore/library/buildinfo"
+	"github.com/coscms/webcore/library/buildinfo/nginginfo"
 )
 
 func init() {

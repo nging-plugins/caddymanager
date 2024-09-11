@@ -29,23 +29,19 @@ import (
 	"path/filepath"
 
 	"github.com/admpub/log"
-	"github.com/admpub/nging/v5/application/cmd"
+	_ "github.com/admpub/nging/v5/application/handler"
 	_ "github.com/admpub/nging/v5/application/ico"
-	_ "github.com/admpub/nging/v5/upgrade"
 
 	"github.com/webx-top/com"
 
 	//register
 
-	_ "github.com/admpub/nging/v5/application"
-	_ "github.com/admpub/nging/v5/application/initialize/manager"
-	"github.com/admpub/nging/v5/application/library/buildinfo"
-	"github.com/admpub/nging/v5/application/library/buildinfo/nginginfo"
-	"github.com/admpub/nging/v5/application/library/config"
-	"github.com/admpub/nging/v5/application/library/module"
-	_ "github.com/admpub/nging/v5/application/library/sqlite"
+	"github.com/coscms/webcore"
+	"github.com/coscms/webcore/library/buildinfo"
+	"github.com/coscms/webcore/library/buildinfo/nginginfo"
+	"github.com/coscms/webcore/library/config"
 
-	"github.com/admpub/nging/v5/application/version"
+	"github.com/coscms/webcore/version"
 
 	// module
 	"github.com/nging-plugins/caddymanager"
@@ -80,18 +76,6 @@ func main() {
 		buildinfo.Package(PACKAGE),
 		buildinfo.SchemaVer(schemaVer),
 	).Apply()
-	initModule()
-	exec()
-}
-
-func exec() {
-	cmd.Execute()
-}
-
-func initModule() {
 	nginginfo.SetNgingPluginsDir(buildinfo.NgingPluginsDir())
-	module.Register(
-		&caddymanager.Module,
-		&servermanager.Module,
-	)
+	webcore.Start(&caddymanager.Module, &servermanager.Module)
 }

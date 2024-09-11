@@ -24,9 +24,9 @@ import (
 	"time"
 
 	"github.com/admpub/log"
-	"github.com/admpub/nging/v5/application/cmd"
-	"github.com/admpub/nging/v5/application/library/common"
-	"github.com/admpub/nging/v5/application/library/config"
+	"github.com/coscms/webcore/cmd"
+	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/config"
 	"github.com/nging-plugins/caddymanager/application/model"
 	"github.com/spf13/cobra"
 	"github.com/webx-top/db"

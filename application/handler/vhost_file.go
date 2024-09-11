@@ -30,12 +30,13 @@ import (
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 
-	"github.com/admpub/nging/v5/application/handler"
-	"github.com/admpub/nging/v5/application/library/config"
-	"github.com/admpub/nging/v5/application/library/filemanager"
-	"github.com/admpub/nging/v5/application/library/notice"
-	"github.com/admpub/nging/v5/application/library/respond"
-	uploadChunk "github.com/admpub/nging/v5/application/registry/upload/chunk"
+	"github.com/coscms/webcore/library/backend"
+	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/filemanager"
+	"github.com/coscms/webcore/library/notice"
+	"github.com/coscms/webcore/library/respond"
+	uploadChunk "github.com/coscms/webcore/registry/upload/chunk"
 
 	"github.com/nging-plugins/caddymanager/application/model"
 )
@@ -49,7 +50,7 @@ func VhostFile(ctx echo.Context) error {
 	err = m.Get(nil, db.Cond{`id`: id})
 	mgr := filemanager.New(m.Root, config.FromFile().Sys.EditableFileMaxBytes(), ctx)
 	absPath := m.Root
-	user := handler.User(ctx)
+	user := backend.User(ctx)
 	if err == nil && len(m.Root) > 0 {
 
 		if len(filePath) > 0 {
@@ -96,7 +97,7 @@ func VhostFile(ctx echo.Context) error {
 		case `delete`:
 			err = mgr.Remove(absPath)
 			if err != nil {
-				handler.SendFail(ctx, err.Error())
+				common.SendFail(ctx, err.Error())
 			}
 			next := ctx.Referer()
 			if len(next) == 0 {
@@ -112,7 +113,7 @@ func VhostFile(ctx echo.Context) error {
 			}
 			err = mgr.Upload(absPath, cu, opts...)
 			if err != nil {
-				user := handler.User(ctx)
+				user := backend.User(ctx)
 				if user != nil {
 					notice.OpenMessage(user.Username, `upload`)
 					notice.Send(user.Username, notice.NewMessageWithValue(`upload`, ctx.T(`文件上传出错`), err.Error()))

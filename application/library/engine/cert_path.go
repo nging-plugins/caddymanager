@@ -3,7 +3,7 @@ package engine
 import (
 	"strings"
 
-	"github.com/admpub/nging/v5/application/library/checkinstall"
+	"github.com/coscms/webcore/library/checkinstall"
 	"github.com/nging-plugins/caddymanager/application/dbschema"
 	"github.com/webx-top/echo"
 )

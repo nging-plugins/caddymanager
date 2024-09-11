@@ -37,8 +37,8 @@ import (
 	//_ "github.com/caddy-plugins/caddy-iplimit/iplimit"
 
 	"github.com/admpub/goth"
-	"github.com/admpub/nging/v5/application/library/backend/oauth2nging"
 	"github.com/caddy-plugins/loginsrv/oauth2"
+	"github.com/coscms/webcore/library/backend/oauth2nging"
 )
 
 func init() {

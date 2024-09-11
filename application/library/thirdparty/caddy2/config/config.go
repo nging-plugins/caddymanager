@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/admpub/nging/v5/application/library/config"
+	"github.com/coscms/webcore/library/config"
 	"github.com/nging-plugins/caddymanager/application/library/engine"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"

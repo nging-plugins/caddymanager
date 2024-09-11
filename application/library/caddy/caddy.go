@@ -41,9 +41,9 @@ import (
 	"github.com/webx-top/echo"
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 
-	"github.com/admpub/nging/v5/application/library/config"
-	"github.com/admpub/nging/v5/application/library/msgbox"
-	"github.com/admpub/nging/v5/application/library/common"
+	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/msgbox"
 )
 
 const UnsupportedPathInfo = `unsupported-nging-default-webserver-config`
@@ -81,7 +81,7 @@ func SetDefaults(c *Config) {
 	if len(c.CPU) == 0 {
 		c.CPU = DefaultConfig.CPU
 	}
-	pidFile := filepath.Join(echo.Wd(), `data` + echo.FilePathSeparator + `pid`)
+	pidFile := filepath.Join(echo.Wd(), `data`+echo.FilePathSeparator+`pid`)
 	err := com.MkdirAll(pidFile, os.ModePerm)
 	if err != nil {
 		log.Println(err)
@@ -89,7 +89,7 @@ func SetDefaults(c *Config) {
 	pidFile = filepath.Join(pidFile, `caddy.pid`)
 	c.PidFile = pidFile
 	if len(c.LogFile) == 0 {
-		logFile := filepath.Join(echo.Wd(), `data` + echo.FilePathSeparator + `logs`)
+		logFile := filepath.Join(echo.Wd(), `data`+echo.FilePathSeparator+`logs`)
 		err := com.MkdirAll(logFile, os.ModePerm)
 		if err != nil {
 			log.Println(err)

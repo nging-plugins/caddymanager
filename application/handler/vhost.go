@@ -27,8 +27,8 @@ import (
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
 
-	"github.com/admpub/nging/v5/application/handler"
-	"github.com/admpub/nging/v5/application/library/common"
+	"github.com/coscms/webcore/library/backend"
+	"github.com/coscms/webcore/library/common"
 	"github.com/nging-plugins/caddymanager/application/dbschema"
 	"github.com/nging-plugins/caddymanager/application/library/engine"
 	"github.com/nging-plugins/caddymanager/application/model"
@@ -63,7 +63,7 @@ func VhostIndex(ctx echo.Context) error {
 	}).SetRecv(&rowAndGroup)
 	p.AddJoin(`LEFT`, dbschema.NewNgingVhostServer(ctx).Short_(), `b`, `b.ident=a.server_ident`)
 	p.AddArgs(cond.And())
-	_, err := handler.PagingWithList(ctx, p)
+	_, err := common.PagingWithList(ctx, p)
 	mg := dbschema.NewNgingVhostGroup(ctx)
 	var groupList []*dbschema.NgingVhostGroup
 	mg.ListByOffset(&groupList, nil, 0, -1)
@@ -76,7 +76,7 @@ func VhostIndex(ctx echo.Context) error {
 		return generateHostURL(currentHost, hosts)
 	})
 	ctx.SetFunc(`engineName`, engine.Engines.Get)
-	return ctx.Render(`caddy/vhost`, handler.Err(ctx, err))
+	return ctx.Render(`caddy/vhost`, common.Err(ctx, err))
 }
 
 func Vhostbuild(ctx echo.Context) error {
@@ -85,11 +85,11 @@ func Vhostbuild(ctx echo.Context) error {
 	engineType := ctx.Formx(`engine`).String()
 	err := vhostbuild(ctx, groupID, serverIdent, engineType)
 	if err != nil {
-		handler.SendFail(ctx, err.Error())
-		return ctx.Redirect(handler.URLFor(`/caddy/vhost`))
+		common.SendFail(ctx, err.Error())
+		return ctx.Redirect(backend.URLFor(`/caddy/vhost`))
 	}
-	handler.SendOk(ctx, ctx.T(`操作成功`))
-	return ctx.Redirect(handler.URLFor(`/caddy/vhost`))
+	common.SendOk(ctx, ctx.T(`操作成功`))
+	return ctx.Redirect(backend.URLFor(`/caddy/vhost`))
 }
 
 func VhostAdd(ctx echo.Context) error {
@@ -117,8 +117,8 @@ func VhostAdd(ctx echo.Context) error {
 			ctx.End(err == nil)
 		}
 		if err == nil {
-			handler.SendOk(ctx, ctx.T(`操作成功`))
-			return ctx.Redirect(handler.URLFor(`/caddy/vhost`))
+			common.SendOk(ctx, ctx.T(`操作成功`))
+			return ctx.Redirect(backend.URLFor(`/caddy/vhost`))
 		}
 	} else {
 		id := ctx.Formx(`copyId`).Uint()
@@ -162,42 +162,42 @@ func setVhostForm(ctx echo.Context) {
 func VhostDelete(ctx echo.Context) error {
 	id := ctx.Formx(`id`).Uint()
 	if id < 1 {
-		handler.SendFail(ctx, ctx.T(`id无效`))
-		return ctx.Redirect(handler.URLFor(`/caddy/vhost`))
+		common.SendFail(ctx, ctx.T(`id无效`))
+		return ctx.Redirect(backend.URLFor(`/caddy/vhost`))
 	}
 	m := model.NewVhost(ctx)
 	err := m.Get(func(r db.Result) db.Result {
 		return r.Select(`server_ident`)
 	}, `id`, id)
 	if err != nil {
-		handler.SendFail(ctx, err.Error())
-		return ctx.Redirect(handler.URLFor(`/caddy/vhost`))
+		common.SendFail(ctx, err.Error())
+		return ctx.Redirect(backend.URLFor(`/caddy/vhost`))
 	}
 	err = m.Delete(nil, db.Cond{`id`: id})
 	if err != nil {
-		handler.SendFail(ctx, err.Error())
+		common.SendFail(ctx, err.Error())
 	} else {
 		err = DeleteCaddyfileByID(ctx, m.ServerIdent, id)
 		if err == nil {
-			handler.SendOk(ctx, ctx.T(`操作成功`))
+			common.SendOk(ctx, ctx.T(`操作成功`))
 		}
 	}
-	return ctx.Redirect(handler.URLFor(`/caddy/vhost`))
+	return ctx.Redirect(backend.URLFor(`/caddy/vhost`))
 }
 
 func VhostEdit(ctx echo.Context) error {
 	id := ctx.Formx(`id`).Uint()
 	if id < 1 {
-		handler.SendFail(ctx, ctx.T(`id无效`))
-		return ctx.Redirect(handler.URLFor(`/caddy/vhost`))
+		common.SendFail(ctx, ctx.T(`id无效`))
+		return ctx.Redirect(backend.URLFor(`/caddy/vhost`))
 	}
 
 	var err error
 	m := model.NewVhost(ctx)
 	err = m.Get(nil, db.Cond{`id`: id})
 	if err != nil {
-		handler.SendFail(ctx, err.Error())
-		return ctx.Redirect(handler.URLFor(`/caddy/vhost`))
+		common.SendFail(ctx, err.Error())
+		return ctx.Redirect(backend.URLFor(`/caddy/vhost`))
 	}
 	if ctx.IsPost() {
 		old := *m.NgingVhost
@@ -229,8 +229,8 @@ func VhostEdit(ctx echo.Context) error {
 			ctx.End(err == nil)
 		}
 		if err == nil {
-			handler.SendOk(ctx, ctx.T(`操作成功`))
-			return ctx.Redirect(handler.URLFor(`/caddy/vhost`))
+			common.SendOk(ctx, ctx.T(`操作成功`))
+			return ctx.Redirect(backend.URLFor(`/caddy/vhost`))
 		}
 	} else if ctx.IsAjax() {
 		data := ctx.Data()
