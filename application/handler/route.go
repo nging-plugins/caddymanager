@@ -28,7 +28,8 @@ import (
 	"github.com/admpub/log"
 	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/cron"
-	"github.com/coscms/webcore/library/route"
+	"github.com/coscms/webcore/library/module"
+	"github.com/coscms/webcore/library/nerrors"
 	routeRegistry "github.com/coscms/webcore/registry/route"
 	"github.com/nging-plugins/caddymanager/application/library/engine"
 	"github.com/nging-plugins/caddymanager/application/model"
@@ -37,8 +38,8 @@ import (
 	"github.com/webx-top/echo/param"
 )
 
-func RegisterRoute(r *route.Collection) {
-	r.Backend.RegisterToGroup(`/caddy`, registerRoute)
+func RegisterRoute(r module.Router) {
+	r.Backend().RegisterToGroup(`/caddy`, registerRoute)
 }
 
 func registerRoute(g echo.RouteRegister) {
@@ -112,7 +113,7 @@ func renewVhostCertJob(idString string) cron.Runner {
 		jsonBytes := []byte(m.Setting)
 		err = json.Unmarshal(jsonBytes, &formData)
 		if err != nil {
-			err = common.JSONBytesParseError(err, jsonBytes)
+			err = nerrors.JSONBytesParseError(err, jsonBytes)
 			onErr = cron.ErrFailure
 			runingErr = err.Error()
 			return

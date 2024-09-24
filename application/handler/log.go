@@ -25,8 +25,8 @@ import (
 
 	"github.com/admpub/tail"
 	ua "github.com/admpub/useragent"
-	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/ip2region"
+	"github.com/coscms/webcore/library/nlog"
 	"github.com/nging-plugins/caddymanager/application/library/cmder"
 	"github.com/nging-plugins/caddymanager/application/model"
 	"github.com/webx-top/db"
@@ -34,7 +34,7 @@ import (
 )
 
 func LogShow(ctx echo.Context) error {
-	return common.LogShow(ctx, cmder.GetCaddyConfig().LogFile)
+	return nlog.LogShow(ctx, cmder.GetCaddyConfig().LogFile)
 }
 
 func VhostLog(ctx echo.Context) error {
@@ -57,7 +57,7 @@ func VhostLog(ctx echo.Context) error {
 		return ctx.JSON(ctx.Data().SetError(err))
 	}
 	logFile := formData.Get(`log_file`)
-	return common.LogShow(ctx, logFile, echo.H{`title`: m.Name})
+	return nlog.LogShow(ctx, logFile, echo.H{`title`: m.Name})
 }
 
 func ParseTailLine(line *tail.Line) (interface{}, error) {

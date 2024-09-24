@@ -33,6 +33,7 @@ import (
 
 	"github.com/coscms/webcore/library/backend"
 	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/nging-plugins/caddymanager/application/dbschema"
 	"github.com/nging-plugins/caddymanager/application/library/engine"
 	"github.com/nging-plugins/caddymanager/application/library/form"
@@ -384,7 +385,7 @@ func parseVhostEnabledHTTPSDomains(ctx echo.Context, row *dbschema.NgingVhost, _
 		jsonBytes := []byte(row.Setting)
 		err = json.Unmarshal(jsonBytes, &formData)
 		if err != nil {
-			return nil, common.JSONBytesParseError(err, jsonBytes)
+			return nil, nerrors.JSONBytesParseError(err, jsonBytes)
 		}
 	}
 	if !supportedAutoSSL(formData) {

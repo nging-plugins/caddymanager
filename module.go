@@ -1,10 +1,10 @@
 package caddymanager
 
 import (
-	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config/cmder"
 	"github.com/coscms/webcore/library/config/extend"
 	"github.com/coscms/webcore/library/module"
+	"github.com/coscms/webcore/library/nlog"
 
 	"github.com/nging-plugins/caddymanager/application/handler"
 	pluginCmder "github.com/nging-plugins/caddymanager/application/library/cmder"
@@ -32,7 +32,7 @@ var Module = module.Module{
 	Dashboard:     RegisterDashboard,
 	Navigate:      RegisterNavigate,
 	Route:         handler.RegisterRoute,
-	LogParser: map[string]common.LogParser{
+	LogParser: map[string]nlog.LogParser{
 		`access`: handler.ParseTailLine,
 	},
 	DBSchemaVer: 0.3000,

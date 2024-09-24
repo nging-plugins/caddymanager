@@ -21,12 +21,13 @@ package caddymanager
 import (
 	"github.com/webx-top/echo"
 
-	"github.com/coscms/webcore/registry/dashboard"
+	"github.com/coscms/webcore/library/dashboard"
+	"github.com/coscms/webcore/library/module"
 	"github.com/nging-plugins/caddymanager/application/model"
 )
 
-func RegisterDashboard(dd *dashboard.Dashboards) {
-	dd.Backend.Cards.Add(-1,
+func RegisterDashboard(dd module.Dashboard) {
+	dd.Backend().Cards.Add(-1,
 		(&dashboard.Card{
 			IconName:  `fa-sitemap`,
 			IconColor: `primary`,
