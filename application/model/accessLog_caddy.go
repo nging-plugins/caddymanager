@@ -138,7 +138,9 @@ func (l *AccessLog) parseCaddyHardCode(line string) error {
 		urlInfo := strings.SplitN(strings.TrimSpace(line[0:pos]), " ", 2)
 		i, _ := strconv.ParseUint(urlInfo[0], 10, 64)
 		l.StatusCode = uint(i)
-		l.BodyBytes, _ = strconv.ParseUint(urlInfo[1], 10, 64)
+  if len(urlInfo) > 1 {
+		  l.BodyBytes, _ = strconv.ParseUint(urlInfo[1], 10, 64)
+  }
 		line = line[pos+1:]
 	}
 	pos = strings.Index(line, `"`)
