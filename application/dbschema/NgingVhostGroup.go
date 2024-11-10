@@ -212,10 +212,14 @@ func (a *NgingVhostGroup) Struct_() string {
 }
 
 func (a *NgingVhostGroup) Name_() string {
-	if a.base.Namer() != nil {
-		return WithPrefix(a.base.Namer()(a))
+	b := a
+	if b == nil {
+		b = &NgingVhostGroup{}
 	}
-	return WithPrefix(factory.TableNamerGet(a.Short_())(a))
+	if b.base.Namer() != nil {
+		return WithPrefix(b.base.Namer()(b))
+	}
+	return WithPrefix(factory.TableNamerGet(b.Short_())(b))
 }
 
 func (a *NgingVhostGroup) CPAFrom(source factory.Model) factory.Model {
@@ -433,7 +437,7 @@ func (a *NgingVhostGroup) UpdateFields(mw func(db.Result) db.Result, kvset map[s
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -453,7 +457,7 @@ func (a *NgingVhostGroup) UpdatexFields(mw func(db.Result) db.Result, kvset map[
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -588,6 +592,9 @@ func (a *NgingVhostGroup) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingVhostGroup) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -600,6 +607,50 @@ func (a *NgingVhostGroup) FromRow(row map[string]interface{}) {
 		case "created":
 			a.Created = param.AsUint(value)
 		}
+	}
+}
+
+func (a *NgingVhostGroup) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Uid":
+		return a.Uid
+	case "Name":
+		return a.Name
+	case "Description":
+		return a.Description
+	case "Created":
+		return a.Created
+	default:
+		return nil
+	}
+}
+
+func (a *NgingVhostGroup) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Uid",
+		"Name",
+		"Description",
+		"Created",
+	}
+}
+
+func (a *NgingVhostGroup) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Uid":
+		return true
+	case "Name":
+		return true
+	case "Description":
+		return true
+	case "Created":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -665,17 +716,19 @@ func (a *NgingVhostGroup) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingVhostGroup) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingVhostGroup) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingVhostGroup) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingVhostGroup) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingVhostGroup) BatchValidate(kvset map[string]interface{}) error {

@@ -220,10 +220,14 @@ func (a *NgingVhost) Struct_() string {
 }
 
 func (a *NgingVhost) Name_() string {
-	if a.base.Namer() != nil {
-		return WithPrefix(a.base.Namer()(a))
+	b := a
+	if b == nil {
+		b = &NgingVhost{}
 	}
-	return WithPrefix(factory.TableNamerGet(a.Short_())(a))
+	if b.base.Namer() != nil {
+		return WithPrefix(b.base.Namer()(b))
+	}
+	return WithPrefix(factory.TableNamerGet(b.Short_())(b))
 }
 
 func (a *NgingVhost) CPAFrom(source factory.Model) factory.Model {
@@ -481,7 +485,7 @@ func (a *NgingVhost) UpdateFields(mw func(db.Result) db.Result, kvset map[string
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -511,7 +515,7 @@ func (a *NgingVhost) UpdatexFields(mw func(db.Result) db.Result, kvset map[strin
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -691,6 +695,9 @@ func (a *NgingVhost) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingVhost) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -719,6 +726,90 @@ func (a *NgingVhost) FromRow(row map[string]interface{}) {
 		case "server_ident":
 			a.ServerIdent = param.AsString(value)
 		}
+	}
+}
+
+func (a *NgingVhost) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Name":
+		return a.Name
+	case "GroupId":
+		return a.GroupId
+	case "Domain":
+		return a.Domain
+	case "Root":
+		return a.Root
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	case "Setting":
+		return a.Setting
+	case "Disabled":
+		return a.Disabled
+	case "SslEnabled":
+		return a.SslEnabled
+	case "SslObtained":
+		return a.SslObtained
+	case "SslRenewed":
+		return a.SslRenewed
+	case "ServerIdent":
+		return a.ServerIdent
+	default:
+		return nil
+	}
+}
+
+func (a *NgingVhost) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Name",
+		"GroupId",
+		"Domain",
+		"Root",
+		"Created",
+		"Updated",
+		"Setting",
+		"Disabled",
+		"SslEnabled",
+		"SslObtained",
+		"SslRenewed",
+		"ServerIdent",
+	}
+}
+
+func (a *NgingVhost) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Name":
+		return true
+	case "GroupId":
+		return true
+	case "Domain":
+		return true
+	case "Root":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	case "Setting":
+		return true
+	case "Disabled":
+		return true
+	case "SslEnabled":
+		return true
+	case "SslObtained":
+		return true
+	case "SslRenewed":
+		return true
+	case "ServerIdent":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -824,17 +915,19 @@ func (a *NgingVhost) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingVhost) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingVhost) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingVhost) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingVhost) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingVhost) BatchValidate(kvset map[string]interface{}) error {

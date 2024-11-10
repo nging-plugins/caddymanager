@@ -234,10 +234,14 @@ func (a *NgingVhostServer) Struct_() string {
 }
 
 func (a *NgingVhostServer) Name_() string {
-	if a.base.Namer() != nil {
-		return WithPrefix(a.base.Namer()(a))
+	b := a
+	if b == nil {
+		b = &NgingVhostServer{}
 	}
-	return WithPrefix(factory.TableNamerGet(a.Short_())(a))
+	if b.base.Namer() != nil {
+		return WithPrefix(b.base.Namer()(b))
+	}
+	return WithPrefix(factory.TableNamerGet(b.Short_())(b))
 }
 
 func (a *NgingVhostServer) CPAFrom(source factory.Model) factory.Model {
@@ -575,7 +579,7 @@ func (a *NgingVhostServer) UpdateFields(mw func(db.Result) db.Result, kvset map[
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -625,7 +629,7 @@ func (a *NgingVhostServer) UpdatexFields(mw func(db.Result) db.Result, kvset map
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -885,6 +889,9 @@ func (a *NgingVhostServer) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingVhostServer) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -941,6 +948,160 @@ func (a *NgingVhostServer) FromRow(row map[string]interface{}) {
 		case "updated":
 			a.Updated = param.AsUint(value)
 		}
+	}
+}
+
+func (a *NgingVhostServer) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Engine":
+		return a.Engine
+	case "Environ":
+		return a.Environ
+	case "Ident":
+		return a.Ident
+	case "Name":
+		return a.Name
+	case "ExecutableFile":
+		return a.ExecutableFile
+	case "Endpoint":
+		return a.Endpoint
+	case "ConfigLocalFile":
+		return a.ConfigLocalFile
+	case "ConfigContainerFile":
+		return a.ConfigContainerFile
+	case "VhostConfigLocalDir":
+		return a.VhostConfigLocalDir
+	case "VhostConfigContainerDir":
+		return a.VhostConfigContainerDir
+	case "CertLocalDir":
+		return a.CertLocalDir
+	case "CertContainerDir":
+		return a.CertContainerDir
+	case "CertAutoRenew":
+		return a.CertAutoRenew
+	case "WorkDir":
+		return a.WorkDir
+	case "Env":
+		return a.Env
+	case "CmdWithConfig":
+		return a.CmdWithConfig
+	case "ConfigFileUpdated":
+		return a.ConfigFileUpdated
+	case "AutoModifyConfig":
+		return a.AutoModifyConfig
+	case "EndpointTlsCert":
+		return a.EndpointTlsCert
+	case "EndpointTlsKey":
+		return a.EndpointTlsKey
+	case "CertPathFormatKey":
+		return a.CertPathFormatKey
+	case "CertPathFormatCert":
+		return a.CertPathFormatCert
+	case "CertPathFormatTrust":
+		return a.CertPathFormatTrust
+	case "Disabled":
+		return a.Disabled
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	default:
+		return nil
+	}
+}
+
+func (a *NgingVhostServer) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Engine",
+		"Environ",
+		"Ident",
+		"Name",
+		"ExecutableFile",
+		"Endpoint",
+		"ConfigLocalFile",
+		"ConfigContainerFile",
+		"VhostConfigLocalDir",
+		"VhostConfigContainerDir",
+		"CertLocalDir",
+		"CertContainerDir",
+		"CertAutoRenew",
+		"WorkDir",
+		"Env",
+		"CmdWithConfig",
+		"ConfigFileUpdated",
+		"AutoModifyConfig",
+		"EndpointTlsCert",
+		"EndpointTlsKey",
+		"CertPathFormatKey",
+		"CertPathFormatCert",
+		"CertPathFormatTrust",
+		"Disabled",
+		"Created",
+		"Updated",
+	}
+}
+
+func (a *NgingVhostServer) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Engine":
+		return true
+	case "Environ":
+		return true
+	case "Ident":
+		return true
+	case "Name":
+		return true
+	case "ExecutableFile":
+		return true
+	case "Endpoint":
+		return true
+	case "ConfigLocalFile":
+		return true
+	case "ConfigContainerFile":
+		return true
+	case "VhostConfigLocalDir":
+		return true
+	case "VhostConfigContainerDir":
+		return true
+	case "CertLocalDir":
+		return true
+	case "CertContainerDir":
+		return true
+	case "CertAutoRenew":
+		return true
+	case "WorkDir":
+		return true
+	case "Env":
+		return true
+	case "CmdWithConfig":
+		return true
+	case "ConfigFileUpdated":
+		return true
+	case "AutoModifyConfig":
+		return true
+	case "EndpointTlsCert":
+		return true
+	case "EndpointTlsKey":
+		return true
+	case "CertPathFormatKey":
+		return true
+	case "CertPathFormatCert":
+		return true
+	case "CertPathFormatTrust":
+		return true
+	case "Disabled":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -1116,17 +1277,19 @@ func (a *NgingVhostServer) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingVhostServer) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingVhostServer) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingVhostServer) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingVhostServer) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingVhostServer) BatchValidate(kvset map[string]interface{}) error {

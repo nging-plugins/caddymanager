@@ -230,10 +230,14 @@ func (a *NgingAccessLog) Struct_() string {
 }
 
 func (a *NgingAccessLog) Name_() string {
-	if a.base.Namer() != nil {
-		return WithPrefix(a.base.Namer()(a))
+	b := a
+	if b == nil {
+		b = &NgingAccessLog{}
 	}
-	return WithPrefix(factory.TableNamerGet(a.Short_())(a))
+	if b.base.Namer() != nil {
+		return WithPrefix(b.base.Namer()(b))
+	}
+	return WithPrefix(factory.TableNamerGet(b.Short_())(b))
 }
 
 func (a *NgingAccessLog) CPAFrom(source factory.Model) factory.Model {
@@ -471,7 +475,7 @@ func (a *NgingAccessLog) UpdateFields(mw func(db.Result) db.Result, kvset map[st
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -496,7 +500,7 @@ func (a *NgingAccessLog) UpdatexFields(mw func(db.Result) db.Result, kvset map[s
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -709,6 +713,9 @@ func (a *NgingAccessLog) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingAccessLog) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -757,6 +764,140 @@ func (a *NgingAccessLog) FromRow(row map[string]interface{}) {
 		case "created":
 			a.Created = param.AsUint(value)
 		}
+	}
+}
+
+func (a *NgingAccessLog) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "VhostId":
+		return a.VhostId
+	case "RemoteAddr":
+		return a.RemoteAddr
+	case "XRealIp":
+		return a.XRealIp
+	case "XForwardFor":
+		return a.XForwardFor
+	case "LocalAddr":
+		return a.LocalAddr
+	case "Elapsed":
+		return a.Elapsed
+	case "Host":
+		return a.Host
+	case "User":
+		return a.User
+	case "TimeLocal":
+		return a.TimeLocal
+	case "Minute":
+		return a.Minute
+	case "Method":
+		return a.Method
+	case "Uri":
+		return a.Uri
+	case "Version":
+		return a.Version
+	case "StatusCode":
+		return a.StatusCode
+	case "BodyBytes":
+		return a.BodyBytes
+	case "Referer":
+		return a.Referer
+	case "UserAgent":
+		return a.UserAgent
+	case "HitStatus":
+		return a.HitStatus
+	case "Scheme":
+		return a.Scheme
+	case "BrowerName":
+		return a.BrowerName
+	case "BrowerType":
+		return a.BrowerType
+	case "Created":
+		return a.Created
+	default:
+		return nil
+	}
+}
+
+func (a *NgingAccessLog) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"VhostId",
+		"RemoteAddr",
+		"XRealIp",
+		"XForwardFor",
+		"LocalAddr",
+		"Elapsed",
+		"Host",
+		"User",
+		"TimeLocal",
+		"Minute",
+		"Method",
+		"Uri",
+		"Version",
+		"StatusCode",
+		"BodyBytes",
+		"Referer",
+		"UserAgent",
+		"HitStatus",
+		"Scheme",
+		"BrowerName",
+		"BrowerType",
+		"Created",
+	}
+}
+
+func (a *NgingAccessLog) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "VhostId":
+		return true
+	case "RemoteAddr":
+		return true
+	case "XRealIp":
+		return true
+	case "XForwardFor":
+		return true
+	case "LocalAddr":
+		return true
+	case "Elapsed":
+		return true
+	case "Host":
+		return true
+	case "User":
+		return true
+	case "TimeLocal":
+		return true
+	case "Minute":
+		return true
+	case "Method":
+		return true
+	case "Uri":
+		return true
+	case "Version":
+		return true
+	case "StatusCode":
+		return true
+	case "BodyBytes":
+		return true
+	case "Referer":
+		return true
+	case "UserAgent":
+		return true
+	case "HitStatus":
+		return true
+	case "Scheme":
+		return true
+	case "BrowerName":
+		return true
+	case "BrowerType":
+		return true
+	case "Created":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -912,17 +1053,19 @@ func (a *NgingAccessLog) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingAccessLog) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingAccessLog) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingAccessLog) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingAccessLog) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingAccessLog) BatchValidate(kvset map[string]interface{}) error {
