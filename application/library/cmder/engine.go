@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	engine.Engines.Add(`default`, `默认(内置Caddy1)`, echo.KVOptX(newEngine()))
+	engine.Engines.Add(`default`, `默认(内置Caddy1)`, echo.KVOptX(newEngine())) // i18n.T(`默认(内置Caddy1)`)
 }
 
 func newEngine() engine.Enginer {

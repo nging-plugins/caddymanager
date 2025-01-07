@@ -32,7 +32,7 @@ func RegisterDashboard(dd module.Dashboard) {
 			IconName:  `fa-sitemap`,
 			IconColor: `primary`,
 			Short:     `SITES`,
-			Name:      `网站数量`,
+			Name:      `网站数量`, // i18n.T(`网站数量`)
 			Summary:   ``,
 		}).SetContentGenerator(func(ctx echo.Context) interface{} {
 			//网站统计
