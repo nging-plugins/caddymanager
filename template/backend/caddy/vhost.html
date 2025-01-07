@@ -43,7 +43,7 @@
 							<select name="engine" class="form-control" id="engine" onchange="$('#search-form').submit()">
 								<option value=""> - {{"不限"|$.T}} - </option>
 								{{- range $k, $v := $.Stored.engineList -}}
-								<option value="{{$v.K}}" {{- if eq $engine $v.K}} selected{{end}}>{{$v.V}}</option>
+								<option value="{{$v.K}}" {{- if eq $engine $v.K}} selected{{end}}>{{$v.V|$.T}}</option>
 								{{- end -}}
 							</select>
 						</div>
@@ -102,7 +102,7 @@
 							<td>
 								<div class="wrap">
 								{{- if eq $v.ServerIdent `default` -}}
-								<span class="label label-default label-xs">{{call $.Func.engineName `default`}}</span>
+								<span class="label label-default label-xs">{{call $.Func.engineName `default`|$.T}}</span>
 								{{- else -}}
 								<span class="label label-primary label-xs">{{call $.Func.engineName $v.ServerEngine.String}}</span>
 								{{$v.ServerName.String}}
