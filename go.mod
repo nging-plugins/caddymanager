@@ -33,12 +33,12 @@ require (
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
 	github.com/webx-top/client v0.9.5
-	github.com/webx-top/com v1.3.7
-	github.com/webx-top/db v1.27.10
-	github.com/webx-top/echo v1.10.8
+	github.com/webx-top/com v1.3.19
+	github.com/webx-top/db v1.28.2
+	github.com/webx-top/echo v1.13.5
 	github.com/webx-top/restyclient v0.0.4
-	golang.org/x/crypto v0.27.0
-	golang.org/x/net v0.29.0
+	golang.org/x/crypto v0.31.0
+	golang.org/x/net v0.33.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
@@ -92,11 +92,11 @@ require (
 	github.com/admpub/safesvg v0.0.8 // indirect
 	github.com/admpub/securecookie v1.3.0 // indirect
 	github.com/admpub/service v0.0.5 // indirect
-	github.com/admpub/sessions v0.2.1 // indirect
+	github.com/admpub/sessions v0.2.2 // indirect
 	github.com/admpub/sonyflake v0.0.1 // indirect
-	github.com/admpub/timeago v1.2.1 // indirect
+	github.com/admpub/timeago v1.2.2 // indirect
 	github.com/admpub/webdav/v4 v4.1.3 // indirect
-	github.com/andybalholm/brotli v1.1.0 // indirect
+	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/boombuler/barcode v1.0.2 // indirect
@@ -112,7 +112,7 @@ require (
 	github.com/francoispqt/gojay v1.2.13 // indirect
 	github.com/friendsofgo/errors v0.9.2 // indirect
 	github.com/fynelabs/selfupdate v0.2.0 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.5 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.7 // indirect
 	github.com/go-acme/lego/v4 v4.18.0 // indirect
 	github.com/go-errors/errors v1.5.1 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
@@ -120,12 +120,12 @@ require (
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.22.1 // indirect
+	github.com/go-playground/validator/v10 v10.23.0 // indirect
 	github.com/go-sql-driver/mysql v1.8.1 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
-	github.com/goccy/go-json v0.10.3 // indirect
+	github.com/goccy/go-json v0.10.4 // indirect
 	github.com/gofrs/uuid v4.4.0+incompatible // indirect
-	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
+	github.com/golang-jwt/jwt/v4 v4.5.1 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/google/pprof v0.0.0-20240925223930-fa3061bff0bc // indirect
 	github.com/google/uuid v1.6.0 // indirect
@@ -143,7 +143,7 @@ require (
 	github.com/jimstudt/http-authentication v0.0.0-20140401203705-3eca13d6893a // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0 // indirect
-	github.com/klauspost/compress v1.17.10 // indirect
+	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/klauspost/cpuid v1.3.1 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
@@ -202,15 +202,15 @@ require (
 	github.com/webx-top/validator v0.3.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.uber.org/mock v0.4.0 // indirect
-	golang.org/x/exp v0.0.0-20240909161429-701f63a606c0 // indirect
+	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67 // indirect
 	golang.org/x/image v0.20.0 // indirect
-	golang.org/x/mod v0.21.0 // indirect
-	golang.org/x/oauth2 v0.23.0 // indirect
-	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/sys v0.25.0 // indirect
-	golang.org/x/text v0.18.0 // indirect
-	golang.org/x/time v0.6.0 // indirect
-	golang.org/x/tools v0.25.0 // indirect
+	golang.org/x/mod v0.22.0 // indirect
+	golang.org/x/oauth2 v0.24.0 // indirect
+	golang.org/x/sync v0.10.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
+	golang.org/x/time v0.8.0 // indirect
+	golang.org/x/tools v0.28.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
