@@ -134,6 +134,34 @@
       </div>
     </div>
   </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">
+      {{"网址重写"|$.T}}
+      <a class="engine-show-default" href="https://caddyserver.com/docs/rewrite" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
+      <a class="engine-show-caddy2" href="https://caddyserver.com/docs/caddyfile/directives/rewrite" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
+      <a class="engine-show-nginx" href="https://nginx.org/en/docs/http/ngx_http_rewrite_module.html#rewrite" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
+    </label>
+    <div class="col-sm-8">
+      <textarea type="text" id="rewrite_rule" class="form-control" style="min-height:200px" name="rewrite_rule">{{$.Form `rewrite_rule`}}</textarea>
+      <div class="help-block">
+        <div class="engine-show-default">{{Include "caddy/addon/help_rewrite"}}</div><!-- /.engine-show-default -->
+        <div class="engine-show-caddy2">
+          {{`语法：`|$.T}} <strong>rewrite</strong> <em>[&lt;matcher&gt;]</em> <em>&lt;to&gt;</em><br />
+          {{`例如：`|$.T}}  
+          <pre>rewrite * /foo.html
+  rewrite /api/* ?a=b
+  rewrite /api/* ?{query}&a=b
+  rewrite * /index.php?{query}&p={path}</pre>
+        </div><!-- /.engine-show-caddy2 -->
+        <div class="engine-show-nginx">
+          {{`语法：`|$.T}} <strong>rewrite</strong> <em>regex</em> <em>replacement</em> <em>[flag]</em>;<br />
+          {{`例如：`|$.T}} 
+          <pre>rewrite ^(/download/.*)/media/(.*)\..*$ $1/mp3/$2.mp3 last;
+  rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;</pre>
+        </div><!-- /.engine-show-nginx -->
+      </div><!-- /.help-block -->
+    </div> 
+  </div>
 
 <div class="form-group">
     <label class="col-sm-2 control-label">{{"备注"|$.T}}</label>

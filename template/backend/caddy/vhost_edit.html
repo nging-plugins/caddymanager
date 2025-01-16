@@ -36,7 +36,7 @@
             <div class="form-group">
                 <div class="col-sm-12">
                   {{- if $v.H.turnable -}}
-                  {{- $val := $.Form $v.K "1" -}}
+                  {{- $val := $.Form $v.K `1` `0` -}}
                   <div class="radio radio-primary radio-inline"> 
                     <input type="radio" value="1" id="{{$v.K}}-enable" name="{{$v.K}}" data-slide-settings="show"{{if eq $val `1`}} checked{{end}}><label for="{{$v.K}}-enable">{{"启用"|$.T}}</label> 
                   </div>

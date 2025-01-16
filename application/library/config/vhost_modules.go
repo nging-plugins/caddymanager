@@ -3,9 +3,9 @@ package config
 import "github.com/webx-top/echo"
 
 var VhostModules = echo.NewKVData().
-	Add(`basic`, echo.T(`基本设置`)).
+	Add(`basic`, echo.T(`通用设置`)).
 	//Add(`log`, echo.T(`访问日志`), echo.KVOptHKV(`turnable`, true)).
-	Add(`header`, echo.T(`响应Header`), echo.KVOptHKV(`docURL`, `https://caddyserver.com/docs/header`)).
+	Add(`header`, echo.T(`响应Header`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`docURL`, `https://caddyserver.com/docs/header`)).
 	// Add(`tls`, echo.T(`HTTPS`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`docURLs`, map[string]string{
 	// 	`default`: `https://caddyserver.com/docs/tls`,
 	// 	`caddy2`:  `https://caddyserver.com/docs/caddyfile/directives/tls`,
