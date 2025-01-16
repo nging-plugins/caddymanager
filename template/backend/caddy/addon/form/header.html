@@ -1,0 +1,50 @@
+{{Strip}}
+    <div class="form-group">
+          <label class="col-sm-2 control-label">{{"指定路径"|$.T}}</label>
+          <div class="col-sm-9">
+             <input type="text" class="form-control" name="header_path" value="{{$.Form `header_path`}}">
+             <div class="help-block">{{"可以针对某个起始路径设置header"|$.T}}</div>
+          </div>
+    </div>
+
+    <div class="form-group">
+          <label class="col-sm-2 control-label">{{"设置Header"|$.T}}</label>
+          <div class="col-sm-9">
+    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:50%;">{{"字段名"|$.T}}</th>
+                                <th>{{"值"|$.T}}</th>
+                                <th width="70">{{"删除"|$.T}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                {{- $vals := $.FormValues "header_v" -}}
+                {{- $vlen := len $vals -}}
+                {{- range $k,$v:=$.FormValues "header_k" -}}
+                    {{- if lt $k $vlen -}}
+<tr>
+<td><input type="text" class="form-control" name="header_k" value="{{$v}}"></td>
+<td><input type="text" class="form-control" name="header_v" value="{{index $vals $k}}"></td>
+<td class="text-center">
+<button type="button" class="btn btn-danger" onclick="$(this).parent().parent().remove()">
+<i class="fa fa-times"></i>
+</button>
+</td>
+</tr>
+                        
+                    {{- end -}}
+                {{- end -}}
+                            <tr>
+                                <td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" id="headerAddVarBtn" onclick="addKVs(this,'header_k','header_v');"><i class="fa fa-plus"></i></td>
+                            </tr>
+                        </tbody>
+                  </table>
+    <div class="help-block">
+      {{"如果要将已存在的header删掉，请在名称前使用减号(-)并将其值留空"|$.T}}
+      ({{`Nginx不支持删除响应header`|$.T}})
+    </div>
+  </div>
+  
+          </div>
+{{/Strip}}

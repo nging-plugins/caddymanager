@@ -77,65 +77,6 @@
 </div>
 <div class="form-group">
   <label class="col-sm-2 control-label">
-    {{"响应Header"|$.T}}
-    <a class="engine-show-default" href="https://caddyserver.com/docs/header" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
-  </label>
-  <div class="col-sm-8">
-    <div class="fieldset bg-fc">
-      <div class="form-group">
-            <label class="col-sm-2 control-label">{{"指定路径"|$.T}}</label>
-            <div class="col-sm-9">
-               <input type="text" class="form-control" name="header_path" value="{{$.Form `header_path`}}">
-               <div class="help-block">{{"可以针对某个起始路径设置header"|$.T}}</div>
-            </div>
-      </div>
-
-      <div class="form-group">
-            <label class="col-sm-2 control-label">{{"设置Header"|$.T}}</label>
-            <div class="col-sm-9">
-      <table>
-                          <thead>
-                              <tr>
-                                  <th style="width:50%;">{{"字段名"|$.T}}</th>
-                                  <th>{{"值"|$.T}}</th>
-                                  <th width="70">{{"删除"|$.T}}</th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                  {{- $vals := $.FormValues "header_v" -}}
-                  {{- $vlen := len $vals -}}
-                  {{- range $k,$v:=$.FormValues "header_k" -}}
-                      {{- if lt $k $vlen -}}
-<tr>
-<td><input type="text" class="form-control" name="header_k" value="{{$v}}"></td>
-<td><input type="text" class="form-control" name="header_v" value="{{index $vals $k}}"></td>
-<td class="text-center">
-<button type="button" class="btn btn-danger" onclick="$(this).parent().parent().remove()">
-<i class="fa fa-times"></i>
-</button>
-</td>
-</tr>
-                          
-                      {{- end -}}
-                  {{- end -}}
-                              <tr>
-                                  <td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" id="headerAddVarBtn" onclick="addKVs(this,'header_k','header_v');"><i class="fa fa-plus"></i></td>
-                              </tr>
-                          </tbody>
-                    </table>
-      <div class="help-block">
-        {{"如果要将已存在的header删掉，请在名称前使用减号(-)并将其值留空"|$.T}}
-        ({{`Nginx不支持删除响应header`|$.T}})
-      </div>
-    </div>
-    
-            </div>
-      </div>
-
-  </div>
-</div>
-<div class="form-group">
-  <label class="col-sm-2 control-label">
     {{"HTTPS"|$.T}}
     <a class="engine-show-default" href="https://caddyserver.com/docs/tls" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
     <a class="engine-show-caddy2" href="https://caddyserver.com/docs/caddyfile/directives/tls" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
@@ -174,3 +115,33 @@
       </div>
   </div>
 </div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label">{{"备注"|$.T}}</label>
+    <div class="col-sm-8">
+      <textarea class="form-control" name="remark">{{$.Form `remark`}}</textarea>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">{{"网站状态"|$.T}}</label>
+    <div class="col-sm-8">
+      {{- $v := $.Form "disabled" -}}
+      <div class="radio radio-primary radio-inline"> 
+        <input type="radio" value="N" id="disabled-N" name="disabled"{{if eq $v `N` ``}} checked{{end}}><label for="disabled-N">{{"启用"|$.T}}</label> 
+      </div>
+      <div class="radio radio-danger radio-inline"> 
+        <input type="radio" value="Y" id="disabled-Y" name="disabled"{{if eq $v `Y`}} checked{{end}}><label for="disabled-Y">{{"禁用"|$.T}}</label> 
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">{{"附加操作"|$.T}}</label>
+    <div class="col-sm-8">
+      <div class="checkbox checkbox-success checkbox-inline"> 
+        <input type="checkbox" value="1" id="restart-enable" name="restart" checked="checked"><label for="restart-enable" class="text-left">{{"重启服务"|$.T}}</label>
+      </div>
+      <div class="checkbox checkbox-warning checkbox-inline"> 
+        <input type="checkbox" value="1" id="removeCachedCert" name="removeCachedCert"><label for="removeCachedCert" class="text-left">{{"删除HTTPS证书缓存"|$.T}}</label> 
+      </div>
+    </div>
+  </div>

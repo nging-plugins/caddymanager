@@ -23,7 +23,16 @@
     <div class="tab-content">
     {{- range $k, $v := $.Stored.moduleList -}}
       <div class="tab-pane cont fade{{if eq $k 0}} active in{{end}}" id="tabVhost-{{$v.K}}">
-            <h3 class="hthin">{{$v.V|$.T}}</h3>
+            <h3 class="hthin">
+              {{$v.V|$.T}}
+              {{- if $v.H.docURL -}}
+              <a class="engine-show-default" href="{{$v.H.docURL}}" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
+              {{- else if $v.H.docURLs -}}
+              {{- range $dk,$dv:= $v.H.docURLs -}}
+              <a class="engine-show-{{$dk}}" href="{{$dv}}" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
+              {{- end -}}
+              {{- end -}}
+            </h3>
             <div class="form-group">
                 <div class="col-sm-12">
                   {{- if $v.H.turnable -}}
@@ -34,13 +43,19 @@
                   <div class="radio radio-danger radio-inline"> 
                     <input type="radio" value="0" id="{{$v.K}}-disable" name="{{$v.K}}" data-slide-settings="hide"{{if eq $val `0` ``}} checked{{end}}><label for="{{$v.K}}-disable">{{"禁用"|$.T}}</label> 
                   </div>
-                  <div class="fieldset bg-fc hide" id="{{$v.K}}-settings">
+
+                  {{- if $v.H.noWrapper -}}
+                  <div class="hide" id="{{$v.K}}-settings">
                     {{- if eq $val "1"}}{{$.Fetch (printf "caddy/addon/form/%s" $v.K) $}}{{end -}}
                   </div>
                   {{- else -}}
-                  <div class="fieldset bg-fc" id="{{$v.K}}-settings">
-                    {{- $.Fetch (printf "caddy/addon/form/%s" $v.K) $ -}}
+                  <div class="fieldset bg-fc hide" id="{{$v.K}}-settings">
+                    {{- if eq $val "1"}}{{$.Fetch (printf "caddy/addon/form/%s" $v.K) $}}{{end -}}
                   </div>
+                  {{- end -}}
+
+                  {{- else -}}
+                    {{- $.Fetch (printf "caddy/addon/form/%s" $v.K) $ -}}
                   {{- end -}}
                 </div>
             </div><!-- /form-group -->
