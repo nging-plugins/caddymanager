@@ -196,7 +196,7 @@
                                 <div class="checkbox checkbox-primary checkbox-inline">
                                     <input type="checkbox" id="proxy_preset-websocket" name="proxy_preset" value="websocket"{{if HasString $proxyPreset `websocket`}} checked{{end}}> <label for="proxy_preset-websocket">websocket</label>
                                 </div>
-    {{`表示当前代理转发WebSocket连接。`|$.T}}<a href="javascript:;" onclick="$(this).next('pre').toggleClass('hide')">{{`等同于`|$.T}}</a>: <div class="hide"><pre>
+    {{`表示当前代理转发WebSocket连接。`|$.T}}<a href="javascript:;" onclick="$(this).next('div').toggleClass('hide')">{{`等同于`|$.T}}</a>: <div class="hide"><pre>
     header_upstream Connection {&gt;Connection}
     header_upstream Upgrade {&gt;Upgrade}</pre>
     {{`注意：HTTP/2不支持upgrade协议`|$.T}}
