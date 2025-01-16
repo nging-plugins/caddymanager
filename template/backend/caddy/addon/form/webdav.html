@@ -7,17 +7,17 @@
   <div class="form-group">
     <label class="col-sm-2 control-label">{{"默认根目录"|$.T}}</label>
     <div class="col-sm-10">
-       <input type="text" class="form-control" value="{{$.Form "webdav_root"}}" name="webdav_root" required="required">
+       <input type="text" class="form-control" value="{{$.Form `webdav_root`}}" name="webdav_root" required="required">
     </div>
   </div>
 <div class="form-group">
     <label class="col-sm-2 control-label">{{"修改文件"|$.T}}</label>
     <div class="col-sm-10">{{$v := $.Form "webdav_modify"}}
         <div class="radio radio-primary radio-inline"> 
-          <input type="radio" value="1" id="webdav-modify-1" name="webdav_modify"{{if eq $v "1"}} checked{{end}}><label for="webdav-modify-1">{{"允许"|$.T}}</label> 
+          <input type="radio" value="1" id="webdav-modify-1" name="webdav_modify"{{if eq $v `1`}} checked{{end}}><label for="webdav-modify-1">{{"允许"|$.T}}</label> 
         </div>
         <div class="radio radio-danger radio-inline"> 
-          <input type="radio" value="0" id="webdav-modify-0" name="webdav_modify"{{if or (eq $v "0") (eq $v "")}} checked{{end}}><label for="webdav-modify-0">{{"不允许"|$.T}}</label> 
+          <input type="radio" value="0" id="webdav-modify-0" name="webdav_modify"{{if eq $v `0` ``}} checked{{end}}><label for="webdav-modify-0">{{"不允许"|$.T}}</label> 
         </div>
     </div>
   </div>
@@ -33,12 +33,12 @@
 								        	</tr>
 								        </thead>
 								        <tbody>
-                            {{$writeables := $.FormValues "webdav_writeables[global]"}}
-                                  {{$readables := $.FormValues "webdav_readables[global]"}}
-                                  {{$wlen := len $writeables}}
-                                  {{$rlen := len $readables}}
-                                {{range $k,$v:=$.FormValues "webdav_resources[global]"}}
-                                {{if and (lt $k $rlen) (lt $k $wlen)}}
+                            {{- $writeables := $.FormValues "webdav_writeables[global]" -}}
+                                  {{- $readables := $.FormValues "webdav_readables[global]" -}}
+                                  {{- $wlen := len $writeables -}}
+                                  {{- $rlen := len $readables -}}
+                                {{- range $k,$v:=$.FormValues "webdav_resources[global]" -}}
+                                {{- if and (lt $k $rlen) (lt $k $wlen) -}}
 <tr>
 	<td>
     <span class="input-group">
@@ -64,8 +64,8 @@
     </button>
   </td>
 </tr>
-                                {{end}}
-                                {{end}}
+                                {{- end -}}
+                                {{- end -}}
 								        	<tr>
 								        		<td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" onclick="$(this).parent().before($('#webdavTmplAddVariableRowG').html());"><i class="fa fa-plus"></i></td>
 								        	</tr>
@@ -77,17 +77,17 @@
   <div class="form-group">
     <label class="col-sm-2 control-label">{{"用户权限"|$.T}}</label>
     <div class="col-sm-10">
-        {{$roots := $.FormValues "webdav_user_root"}}
-        {{$writeables := $.FormValues "webdav_user_writeable"}}
-        {{$users := $.FormValues "webdav_user"}}
-        {{$indexes := $.FormValues "webdav_user_index"}}
-        {{$rlen := len $roots}}
-        {{$wlen := len $writeables}}
-        {{$ulen := len $users}}
-        {{$ilen := len $indexes}}
-        {{range $uk,$uv:=$.FormValues "webdav_pass"}}
-        {{if and (lt $uk $rlen) (lt $uk $wlen) (lt $uk $ulen) (lt $uk $ilen)}}
-        {{$index := index $indexes $uk}}
+        {{- $roots := $.FormValues "webdav_user_root" -}}
+        {{- $writeables := $.FormValues "webdav_user_writeable" -}}
+        {{- $users := $.FormValues "webdav_user" -}}
+        {{- $indexes := $.FormValues "webdav_user_index" -}}
+        {{- $rlen := len $roots -}}
+        {{- $wlen := len $writeables -}}
+        {{- $ulen := len $users -}}
+        {{- $ilen := len $indexes -}}
+        {{- range $uk,$uv:=$.FormValues "webdav_pass" -}}
+        {{- if and (lt $uk $rlen) (lt $uk $wlen) (lt $uk $ulen) (lt $uk $ilen) -}}
+        {{- $index := index $indexes $uk -}}
         <div class="webdav-user-perm margin-bottom-10" id="webdav-user-perm-{{$uk}}">
         <span class="input-group">
             <span class="input-group-addon">{{`用户名`|$.T}}</span>
@@ -116,12 +116,12 @@
 								        	</tr>
 								        </thead>
 								        <tbody>
-                          {{$writeables := $.FormValues (printf "webdav_writeables[user][%v]" $index)}}
-                                {{$readables := $.FormValues (printf "webdav_readables[user][%v]" $index)}}
-                                {{$wlen := len $writeables}}
-                                {{$rlen := len $readables}}
-                                {{range $k,$v:=$.FormValues (printf "webdav_resources[user][%v]" $index)}}
-                                {{if and (lt $k $rlen) (lt $k $wlen)}}
+                          {{- $writeables := $.FormValues (printf "webdav_writeables[user][%v]" $index) -}}
+                                {{- $readables := $.FormValues (printf "webdav_readables[user][%v]" $index) -}}
+                                {{- $wlen := len $writeables -}}
+                                {{- $rlen := len $readables -}}
+                                {{- range $k,$v:=$.FormValues (printf "webdav_resources[user][%v]" $index) -}}
+                                {{- if and (lt $k $rlen) (lt $k $wlen) -}}
 <tr>
 	<td>
     <span class="input-group">
@@ -147,16 +147,16 @@
     </button>
   </td>
 </tr>
-                                {{end}}
-                                {{end}}
+                                {{- end -}}
+                                {{- end -}}
 								        	<tr>
 								        		<td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" onclick="addWebdavUserRes(this,'{{$uk}}');"><i class="fa fa-plus"></i></td>
 								        	</tr>
 								        </tbody>
 							      </table>
                 </div><!-- /.webdav-user-perm -->
-        {{end}}
-        {{end}}
+        {{- end -}}
+        {{- end -}}
         <a class="btn btn-success no-margin-left" href="javascript:;" onclick="addWebdavUser(this);">{{`添加用户`|$.T}}</a>
         <div class="help-blo">{{`“资源路径”支持使用通配符“*”，否则请指定完整前缀。如要禁用某个资源，需要明确指定`|$.T}}</div>
         </div>

@@ -13,7 +13,7 @@
                         <div class="form-group">
                           <label class="col-sm-3 control-label">{{"FastCGI程序类型"|$.T}}</label>
                           <div class="col-sm-9">
-                            {{$v := $.Form "fastcgi_preset"}}
+                            {{- $v := $.Form "fastcgi_preset" -}}
                              <select class="form-control" name="fastcgi_preset">
                                <option value=""{{if eq $v ``}} selected{{end}}>{{"默认"|$.T}}</option>
                                <option value="php"{{if eq $v `php`}} selected{{end}}>{{"PHP"|$.T}}</option>
@@ -60,10 +60,10 @@
 								              	</tr>
 								              </thead>
 								              <tbody>
-                                {{$vals := $.FormValues "fastcgi_env_v"}}
-                                {{$vlen := len $vals}}
-                                {{range $k,$v:=$.FormValues "fastcgi_env_k"}}
-                                    {{if lt $k $vlen}}
+                                {{- $vals := $.FormValues "fastcgi_env_v" -}}
+                                {{- $vlen := len $vals -}}
+                                {{- range $k,$v:=$.FormValues "fastcgi_env_k" -}}
+                                    {{- if lt $k $vlen -}}
 <tr>
 	<td><input type="text" class="form-control" name="fastcgi_env_k" value="{{$v}}"></td>
 	<td><input type="text" class="form-control" name="fastcgi_env_v" value="{{index $vals $k}}"></td>
@@ -74,8 +74,8 @@
   </td>
 </tr>
                                         
-                                    {{end}}
-                                {{end}}
+                                    {{- end -}}
+                                {{- end -}}
 								              	<tr>
 								              		<td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" id="fastcgiAddEnvVarBtn" onclick="addKVs(this,'fastcgi_env_k','fastcgi_env_v');"><i class="fa fa-plus"></i></td>
 								              	</tr>

@@ -1,7 +1,7 @@
 <div class="form-group">
       <label class="col-sm-2 control-label">{{"日志保存位置"|$.T}}</label>
       <div class="col-sm-10">
-         <input type="text" class="form-control" value="{{$.Form "log_file" "access_local.log"}}" name="log_file" required="required">
+         <input type="text" class="form-control" value="{{$.Form `log_file` `access_local.log`}}" name="log_file" required="required">
          <div class="help-block">
             {{"日志保存位置支持以下位置类型"|$.T}}: 
             <ol>
@@ -21,7 +21,7 @@
     <div class="form-group">
       <label class="col-sm-2 control-label">{{"日志格式"|$.T}}</label>
       <div class="col-sm-10">
-         <input type="text" class="form-control" name="log_format" value="{{$.Form "log_format" "{combined} {latency}"}}" id="log_format">
+         <input type="text" class="form-control" name="log_format" value="{{$.Form `log_format` `{combined} {latency}`}}" id="log_format">
          <div class="help-block">
              {{($.T "日志内容格式，支持%s占位符%s。除此之外，还支持以下预定义组合占位符" "<a href='javascript:;' onclick=\"showRequestPlaceholders('#log_format')\">" "</a>")|ToHTML}}
              <ul>

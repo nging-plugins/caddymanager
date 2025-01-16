@@ -1,7 +1,7 @@
 <div class="form-group">
     <label class="col-sm-2 control-label">{{"炸弹文件"|$.T}}</label>
     <div class="col-sm-10">
-       <input type="text" class="form-control" value="{{$.Form "nobots_bomb"}}" name="nobots_bomb" required="required" placeholder="bomb.gz">
+       <input type="text" class="form-control" value="{{$.Form `nobots_bomb`}}" name="nobots_bomb" required="required" placeholder="bomb.gz">
        <div class="help-block">
          {{"gzip压缩包文件路径。"|$.T}}<a href="https://github.com/caddy-plugins/nobots/blob/master/README.md" target="_blank">{{"如何创建炸弹文件？"|$.T}}</a><br />
          {{`内置三个炸弹文件: 1G.gzip, 10G.gzip, 1T.gzip。如要使用内置炸弹文件，只需要输入文件名即可(如<code>1G</code>)`|$.T|ToHTML}}
@@ -49,7 +49,7 @@
           <col style="width:50px" />
         </colgroup>
            <tbody>
-           {{range $k,$v:=$.FormValues "nobots_userAgentRegexp"}}
+           {{- range $k,$v:=$.FormValues "nobots_userAgentRegexp" -}}
 <tr>
    <td><input type="text" class="form-control" name="nobots_userAgentRegexp" value="{{$v}}"></td>
    <td class="text-center">
@@ -58,7 +58,7 @@
    </button>
  </td>
 </tr>
-           {{else}}
+           {{- else -}}
 <tr>
    <td><input type="text" class="form-control" name="nobots_userAgentRegexp" value="" required="required" placeholder=""></td>
    <td class="text-center">
@@ -67,7 +67,7 @@
    </button>
  </td>
 </tr>
-           {{end}}
+           {{- end -}}
                <tr>
                    <td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" id="nobotsUserAgentRegexpBtn" onclick="addKs(this,'nobots_userAgentRegexp');"><i class="fa fa-plus"></i></td>
                </tr>
@@ -86,7 +86,7 @@
          <col style="width:50px" />
        </colgroup>
            <tbody>
-           {{range $k,$v:=$.FormValues "nobots_publicPathRegexp"}}
+           {{- range $k,$v:=$.FormValues "nobots_publicPathRegexp" -}}
 <tr>
    <td><input type="text" class="form-control" name="nobots_publicPathRegexp" value="{{$v}}"></td>
    <td class="text-center">
@@ -95,7 +95,7 @@
    </button>
  </td>
 </tr>
-           {{else}}
+           {{- else -}}
 <tr>
    <td><input type="text" class="form-control" name="nobots_publicPathRegexp" value="" required="required" placeholder=""></td>
    <td class="text-center">
@@ -104,7 +104,7 @@
    </button>
  </td>
 </tr>
-           {{end}}
+           {{- end -}}
                <tr>
                    <td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" id="nobotsPublicPathRegexpBtn" onclick="addKs(this,'nobots_publicPathRegexp');"><i class="fa fa-plus"></i></td>
                </tr>

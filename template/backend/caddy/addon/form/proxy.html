@@ -95,10 +95,10 @@
 								              </thead>
 								              <tbody>
                                 
-                                {{$vals := $.FormValues "proxy_header_upstream_v"}}
-                                {{$vlen := len $vals}}
-                                {{range $k,$v:=$.FormValues "proxy_header_upstream_k"}}
-                                    {{if lt $k $vlen}}
+                                {{- $vals := $.FormValues "proxy_header_upstream_v" -}}
+                                {{- $vlen := len $vals -}}
+                                {{- range $k,$v:=$.FormValues "proxy_header_upstream_k" -}}
+                                    {{- if lt $k $vlen -}}
 <tr>
 	<td><input type="text" class="form-control" name="proxy_header_upstream_k" value="{{$v}}"></td>
 	<td><input type="text" class="form-control" name="proxy_header_upstream_v" value="{{index $vals $k}}"></td>
@@ -109,8 +109,8 @@
   </td>
 </tr>
                                         
-                                    {{end}}
-                                {{end}}
+                                    {{- end -}}
+                                {{- end -}}
 								              	<tr>
 								              		<td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" id="proxyHeaderUpstreamBtn" onclick="addKVs(this,'proxy_header_upstream_k','proxy_header_upstream_v');"><i class="fa fa-plus"></i></td>
 								              	</tr>
@@ -134,10 +134,10 @@
 								              	</tr>
 								              </thead>
 								              <tbody>
-                                {{$vals := $.FormValues "proxy_header_downstream_v"}}
-                                {{$vlen := len $vals}}
-                                {{range $k,$v:=$.FormValues "proxy_header_downstream_k"}}
-                                    {{if lt $k $vlen}}
+                                {{- $vals := $.FormValues "proxy_header_downstream_v" -}}
+                                {{- $vlen := len $vals -}}
+                                {{- range $k,$v:=$.FormValues "proxy_header_downstream_k" -}}
+                                    {{- if lt $k $vlen -}}
 <tr>
 	<td><input type="text" class="form-control" name="proxy_header_downstream_k" value="{{$v}}"></td>
 	<td><input type="text" class="form-control" name="proxy_header_downstream_v" value="{{index $vals $k}}"></td>
@@ -148,8 +148,8 @@
   </td>
 </tr>
                                         
-                                    {{end}}
-                                {{end}}
+                                    {{- end -}}
+                                {{- end -}}
 								              	<tr>
 								              		<td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" id="proxyHeaderDownstreamBtn" onclick="addKVs(this,'proxy_header_downstream_k','proxy_header_downstream_v');"><i class="fa fa-plus"></i></td>
 								              	</tr>
@@ -187,7 +187,7 @@
                             </div>
                           </div>
                         </div>
-                        {{$proxyPreset := $.FormValues "proxy_preset"}}
+                        {{- $proxyPreset := $.FormValues "proxy_preset" -}}
                         <div class="form-group">
                           <label class="col-sm-3 control-label">{{"TLS验证"|$.T}}</label>
                           <div class="col-sm-9">

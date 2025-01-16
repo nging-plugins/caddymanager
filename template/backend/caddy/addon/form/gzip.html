@@ -21,7 +21,7 @@
                         <div class="engine-hide-nginx form-group">
                           <label class="col-sm-2 control-label">{{"排除路径"|$.T}}</label>
                           <div class="col-sm-10">
-                             <input type="text" class="form-control" name="gzip_not" value="{{$.Form "gzip_not"}}">
+                             <input type="text" class="form-control" name="gzip_not" value="{{$.Form `gzip_not`}}">
                              <div class="help-block">
                               {{"指定要排除的路径，如有多个，用空格隔开"|$.T}}<br />
                               {{`Nginx 不支持此设置`|$.T}}
@@ -31,7 +31,7 @@
                         <div class="engine-hide-default form-group">
                           <label class="col-sm-2 control-label">{{"排除UA"|$.T}}</label>
                           <div class="col-sm-10">
-                             <input type="text" class="form-control" name="gzip_not_ua_regexp" value="{{$.Form "gzip_not_ua_regexp"}}">
+                             <input type="text" class="form-control" name="gzip_not_ua_regexp" value="{{$.Form `gzip_not_ua_regexp`}}">
                              <div class="help-block">
                               {{"指定要排除的 User-Agent 正则表达式"|$.T}}<br />
                               {{`仅 Nginx、Caddy2 支持此设置`|$.T}}

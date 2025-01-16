@@ -11,7 +11,7 @@
        <div class="input-group">
         <input type="number" class="form-control" value="{{$.Form `ratelimit_rate` `1`}}" name="ratelimit_rate" required="required" min="1" step="1">
         <span class="input-group-addon">{{"个请求每"|$.T}}</span>
-        {{$unit := $.Form "ratelimit_unit"}}
+        {{- $unit := $.Form "ratelimit_unit" -}}
        <select name="ratelimit_unit" class="form-control">
            <option value="second"{{if eq $unit `second`}} selected{{end}}>{{"秒"|$.T}}</option>
            <option value="minute"{{if eq $unit `minute`}} selected{{end}}>{{"分钟"|$.T}}</option>
@@ -71,7 +71,7 @@
 								        	</tr>
 								        </thead>
 								        <tbody>
-                                {{range $k,$v:=$.FormValues "ratelimit_resources"}}
+                                {{- range $k,$v:=$.FormValues "ratelimit_resources" -}}
 <tr>
 	<td><input type="text" class="form-control" name="ratelimit_resources" value="{{$v}}"></td>
 	<td class="text-center">
@@ -80,7 +80,7 @@
     </button>
   </td>
 </tr>
-																{{else}}
+																{{- else -}}
 <tr>
 	<td><input type="text" class="form-control" name="ratelimit_resources" value="" required="required"></td>
 	<td class="text-center">
@@ -89,7 +89,7 @@
     </button>
   </td>
 </tr>
-                                {{end}}
+                                {{- end -}}
 								        	<tr>
 								        		<td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" id="ratelimitResourcesBtn" onclick="addKs(this,'ratelimit_resources');"><i class="fa fa-plus"></i></td>
 								        	</tr>

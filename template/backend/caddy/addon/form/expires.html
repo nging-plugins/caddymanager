@@ -7,10 +7,10 @@
 								        	</tr>
 								        </thead>
 								        <tbody>
-                                {{$vals := $.FormValues "expires_match_v"}}
-                                {{$vlen := len $vals}}
-                                {{range $k,$v:=$.FormValues "expires_match_k"}}
-                                    {{if lt $k $vlen}}
+                                {{- $vals := $.FormValues "expires_match_v" -}}
+                                {{- $vlen := len $vals -}}
+                                {{- range $k,$v:=$.FormValues "expires_match_k" -}}
+                                    {{- if lt $k $vlen -}}
 <tr>
 	<td><input type="text" class="form-control" name="expires_match_k" value="{{$v}}"></td>
 	<td><input type="text" class="form-control" name="expires_match_v" pattern="^[0-9]+(y|m|d|h|i|s)([0-9]+(y|m|d|h|i|s))*$" value="{{index $vals $k}}"></td>
@@ -21,8 +21,8 @@
   </td>
 </tr>
                                         
-                                    {{end}}
-																{{else}}
+                                    {{- end -}}
+																{{- else -}}
 <tr>
 	<td><input type="text" class="form-control" name="expires_match_k" value="" required="required"></td>
 	<td><input type="text" class="form-control" name="expires_match_v" pattern="^[0-9]+(y|m|d|h|i|s)([0-9]+(y|m|d|h|i|s))*$" value="" required="required"></td>
@@ -32,7 +32,7 @@
     </button>
   </td>
 </tr>
-                                {{end}}
+                                {{- end -}}
 								        	<tr>
 								        		<td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" id="expiresMatchesBtn" onclick="addKVs(this,'expires_match_k','expires_match_v');"><i class="fa fa-plus"></i></td>
 								        	</tr>

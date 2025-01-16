@@ -34,10 +34,10 @@
                 </tr>
             </thead>
             <tbody>
-           {{$vals := $.FormValues "jwt_allow_v"}}
-           {{$vlen := len $vals}}
-           {{range $k,$v:=$.FormValues "jwt_allow_k"}}
-               {{if lt $k $vlen}}
+           {{- $vals := $.FormValues "jwt_allow_v" -}}
+           {{- $vlen := len $vals -}}
+           {{- range $k,$v:=$.FormValues "jwt_allow_k" -}}
+               {{- if lt $k $vlen -}}
 <tr>
 <td><input type="text" class="form-control" name="jwt_allow_k" value="{{$v}}"></td>
 <td><input type="text" class="form-control" name="jwt_allow_v" value="{{index $vals $k}}"></td>
@@ -48,8 +48,8 @@
 </td>
 </tr>
                    
-               {{end}}
-           {{end}}
+               {{end -}}
+           {{end -}}
                   <tr>
                       <td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" id="jwtAllowBtn" onclick="addKVs(this,'jwt_allow_k','jwt_allow_v');"><i class="fa fa-plus"></i></td>
                   </tr>
@@ -79,10 +79,10 @@
                 </tr>
             </thead>
             <tbody>
-           {{$vals := $.FormValues "jwt_deny_v"}}
-           {{$vlen := len $vals}}
-           {{range $k,$v:=$.FormValues "jwt_deny_k"}}
-               {{if lt $k $vlen}}
+           {{- $vals := $.FormValues "jwt_deny_v" -}}
+           {{- $vlen := len $vals -}}
+           {{- range $k,$v:=$.FormValues "jwt_deny_k" -}}
+               {{- if lt $k $vlen -}}
 <tr>
 <td><input type="text" class="form-control" name="jwt_deny_k" value="{{$v}}"></td>
 <td><input type="text" class="form-control" name="jwt_deny_v" value="{{index $vals $k}}"></td>
@@ -93,8 +93,8 @@
 </td>
 </tr>
                    
-               {{end}}
-           {{end}}
+               {{- end -}}
+           {{- end -}}
                   <tr>
                       <td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" id="jwtDenyBtn" onclick="addKVs(this,'jwt_deny_k','jwt_deny_v');"><i class="fa fa-plus"></i></td>
                   </tr>

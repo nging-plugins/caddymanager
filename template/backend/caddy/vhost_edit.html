@@ -106,7 +106,7 @@
                     <div class="form-group">
                           <label class="col-sm-2 control-label">{{"指定路径"|$.T}}</label>
                           <div class="col-sm-9">
-                             <input type="text" class="form-control" name="header_path" value="{{$.Form "header_path"}}">
+                             <input type="text" class="form-control" name="header_path" value="{{$.Form `header_path`}}">
                              <div class="help-block">{{"可以针对某个起始路径设置header"|$.T}}</div>
                           </div>
                     </div>
@@ -345,7 +345,7 @@
     <a class="engine-show-nginx" href="https://nginx.org/en/docs/http/ngx_http_rewrite_module.html#rewrite" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
   </label>
   <div class="col-sm-8">
-    <textarea type="text" id="rewrite_rule" class="form-control" style="min-height:200px" name="rewrite_rule">{{$.Form "rewrite_rule"}}</textarea>
+    <textarea type="text" id="rewrite_rule" class="form-control" style="min-height:200px" name="rewrite_rule">{{$.Form `rewrite_rule`}}</textarea>
     <div class="help-block">
       <div class="engine-show-default">{{Include "caddy/addon/help_rewrite"}}</div><!-- /.engine-show-default -->
       <div class="engine-show-caddy2">
@@ -523,7 +523,7 @@ rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;</pre>
               <div class="form-group">
                 <label class="col-sm-2 control-label">{{"备注"|$.T}}</label>
                 <div class="col-sm-8">
-                  <textarea class="form-control" name="remark">{{$.Form "remark"}}</textarea>
+                  <textarea class="form-control" name="remark">{{$.Form `remark`}}</textarea>
                 </div>
               </div>
               <div class="form-group">
