@@ -4,18 +4,18 @@ import "github.com/webx-top/echo"
 
 var VhostModules = echo.NewKVData().
 	Add(`basic`, echo.T(`基本设置`)).
-	Add(`log`, echo.T(`访问日志`), echo.KVOptHKV(`turnable`, true)).
+	//Add(`log`, echo.T(`访问日志`), echo.KVOptHKV(`turnable`, true)).
 	Add(`header`, echo.T(`响应Header`), echo.KVOptHKV(`docURL`, `https://caddyserver.com/docs/header`)).
-	Add(`tls`, echo.T(`HTTPS`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`docURLs`, map[string]string{
-		`default`: `https://caddyserver.com/docs/tls`,
-		`caddy2`:  `https://caddyserver.com/docs/caddyfile/directives/tls`,
-		`nginx`:   `https://nginx.org/en/docs/http/ngx_http_ssl_module.html#ssl`,
-	})).
-	Add(`gzip`, echo.T(`GZIP`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`docURLs`, map[string]string{
-		`default`: `https://caddyserver.com/docs/gzip`,
-		`caddy2`:  `https://caddyserver.com/docs/caddyfile/directives/encode`,
-		`nginx`:   `https://nginx.org/en/docs/http/ngx_http_gzip_module.html#gzip`,
-	})).
+	// Add(`tls`, echo.T(`HTTPS`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`docURLs`, map[string]string{
+	// 	`default`: `https://caddyserver.com/docs/tls`,
+	// 	`caddy2`:  `https://caddyserver.com/docs/caddyfile/directives/tls`,
+	// 	`nginx`:   `https://nginx.org/en/docs/http/ngx_http_ssl_module.html#ssl`,
+	// })).
+	// Add(`gzip`, echo.T(`GZIP`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`docURLs`, map[string]string{
+	// 	`default`: `https://caddyserver.com/docs/gzip`,
+	// 	`caddy2`:  `https://caddyserver.com/docs/caddyfile/directives/encode`,
+	// 	`nginx`:   `https://nginx.org/en/docs/http/ngx_http_gzip_module.html#gzip`,
+	// })).
 	Add(`fastcgi`, echo.T(`FastCGI`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`docURLs`, map[string]string{
 		`default`: `https://caddyserver.com/docs/fastcgi`,
 		`caddy2`:  `https://caddyserver.com/docs/caddyfile/directives/php_fastcgi#syntax`,
@@ -31,7 +31,7 @@ var VhostModules = echo.NewKVData().
 		`caddy2`:  `https://caddyserver.com/docs/caddyfile/directives/file_server#syntax`,
 		`nginx`:   `https://nginx.org/en/docs/http/ngx_http_autoindex_module.html`,
 	})).
-	Add(`expires`, echo.T(`静态文件缓存`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`docURL`, `https://caddyserver.com/docs/http.expires`)).
+	//Add(`expires`, echo.T(`静态文件缓存`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`docURL`, `https://caddyserver.com/docs/http.expires`)).
 	Add(`ipfilter`, echo.T(`IP过滤`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`docURL`, `https://caddyserver.com/docs/http.ipfilter`)).
 	Add(`filter`, echo.T(`响应内容过滤`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`noWrapper`, true), echo.KVOptHKV(`docURL`, `https://caddyserver.com/docs/http.filter`)).
 	Add(`rewrite`, echo.T(`网址重写`), echo.KVOptHKV(`docURLs`, map[string]string{

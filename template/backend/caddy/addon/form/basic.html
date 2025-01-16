@@ -117,6 +117,25 @@
 </div>
 
 <div class="form-group">
+    <label class="col-sm-2 control-label">
+      {{"静态文件缓存"|$.T}}
+      <a class="engine-show-default" href="https://caddyserver.com/docs/http.expires" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
+    </label>
+    <div class="col-sm-8">
+      {{- $v := $.Form "expires" -}}
+      <div class="radio radio-primary radio-inline"> 
+        <input type="radio" value="1" id="expires-enable" name="expires" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="expires-enable">{{"启用"|$.T}}</label> 
+      </div>
+      <div class="radio radio-danger radio-inline"> 
+        <input type="radio" value="0" id="expires-disable" name="expires" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="expires-disable">{{"禁用"|$.T}}</label> 
+      </div>
+      <div class="fieldset bg-fc hide" id="expires-settings">
+        {{- if eq $v "1"}}{{Include "caddy/addon/form/expires"}}{{end -}}
+      </div>
+    </div>
+  </div>
+
+<div class="form-group">
     <label class="col-sm-2 control-label">{{"备注"|$.T}}</label>
     <div class="col-sm-8">
       <textarea class="form-control" name="remark">{{$.Form `remark`}}</textarea>
