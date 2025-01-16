@@ -22,21 +22,21 @@
               <div class="form-group">
                   <label class="col-sm-2 control-label">{{"分组"|$.T}}</label>
                   <div class="col-sm-3">
-                      {{$v := $.Form "groupId"}}
+                      {{- $v := $.Form "groupId" -}}
                       <select class="form-control" name="groupId">
                           <option value="">{{"<无>"|$.T}}</option>
-                          {{range $k,$g:=$.Stored.Get "groupList"}}
+                          {{- range $k,$g:=$.Stored.Get "groupList" -}}
                           <option value="{{$g.Id}}"{{if eq $v (Str $g.Id)}} selected{{end}}>{{$g.Name}}</option>
-                          {{end}}
+                          {{- end -}}
                       </select>
                   </div>
                   <label class="col-sm-2 control-label">{{"引擎配置"|$.T}}</label>
                   <div class="col-sm-3">{{$v := $.Form "serverIdent"}}
                       <select class="form-control" id="serverIdent" name="serverIdent">
                           <option value="default" data-engine="default" data-environ="local">{{"<默认>"|$.T}}</option>
-                          {{range $k,$g:=$.Stored.Get "serverList"}}
+                          {{- range $k,$g:=$.Stored.Get "serverList" -}}
                           <option value="{{$g.Ident}}" data-engine="{{$g.Engine}}" data-environ="{{$g.Environ}}"{{if eq $v $g.Ident}} selected{{end}}>{{$g.Name}}</option>
-                          {{end}}
+                          {{- end -}}
                       </select>
                   </div>
               </div>
@@ -84,7 +84,7 @@
               <div class="form-group">
                 <label class="col-sm-2 control-label">{{"访问日志"|$.T}}</label>
                 <div class="col-sm-8">
-                  {{$v := $.Form "log" "1"}}
+                  {{- $v := $.Form "log" "1" -}}
                   <div class="radio radio-primary radio-inline"> 
                     <input type="radio" value="1" id="log-enable" name="log" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="log-enable">{{"启用"|$.T}}</label> 
                   </div>
@@ -92,7 +92,7 @@
                     <input type="radio" value="0" id="log-disable" name="log" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="log-disable">{{"禁用"|$.T}}</label> 
                   </div>
                   <div class="fieldset bg-fc hide" id="log-settings">
-                    {{if eq $v "1"}}{{Include "caddy/addon/form/log"}}{{end}}
+                    {{- if eq $v "1"}}{{Include "caddy/addon/form/log"}}{{end -}}
                   </div>
                 </div>
               </div>
@@ -123,10 +123,10 @@
 								        	</tr>
 								        </thead>
 								        <tbody>
-                                {{$vals := $.FormValues "header_v"}}
-                                {{$vlen := len $vals}}
-                                {{range $k,$v:=$.FormValues "header_k"}}
-                                    {{if lt $k $vlen}}
+                                {{- $vals := $.FormValues "header_v" -}}
+                                {{- $vlen := len $vals -}}
+                                {{- range $k,$v:=$.FormValues "header_k" -}}
+                                    {{- if lt $k $vlen -}}
 <tr>
 	<td><input type="text" class="form-control" name="header_k" value="{{$v}}"></td>
 	<td><input type="text" class="form-control" name="header_v" value="{{index $vals $k}}"></td>
@@ -137,8 +137,8 @@
   </td>
 </tr>
                                         
-                                    {{end}}
-                                {{end}}
+                                    {{- end -}}
+                                {{- end -}}
 								        	<tr>
 								        		<td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" id="headerAddVarBtn" onclick="addKVs(this,'header_k','header_v');"><i class="fa fa-plus"></i></td>
 								        	</tr>
@@ -163,7 +163,7 @@
                   <a class="engine-show-nginx" href="https://nginx.org/en/docs/http/ngx_http_ssl_module.html#ssl" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
                 </label>
                 <div class="col-sm-8">
-                    {{$v := $.Form "tls"}}
+                    {{- $v := $.Form "tls" -}}
                     <div class="radio radio-primary radio-inline"> 
                       <input type="radio" value="1" id="tls-enable" name="tls" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="tls-enable">{{"启用"|$.T}}</label> 
                     </div>
@@ -171,7 +171,7 @@
                       <input type="radio" value="0" id="tls-disable" name="tls" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="tls-disable">{{"禁用"|$.T}}</label> 
                     </div>
                     <div class="fieldset bg-fc hide" id="tls-settings">
-                        {{if eq $v "1"}}{{Include "caddy/addon/form/tls"}}{{end}}
+                        {{- if eq $v "1"}}{{Include "caddy/addon/form/tls"}}{{end -}}
                     </div>
                 </div>
               </div>
@@ -183,7 +183,7 @@
                   <a class="engine-show-nginx" href="https://nginx.org/en/docs/http/ngx_http_gzip_module.html#gzip" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
                 </label>
                 <div class="col-sm-8">
-                  {{$v := $.Form "gzip"}}
+                  {{- $v := $.Form "gzip" -}}
                   <div class="radio radio-primary radio-inline"> 
                     <input type="radio" value="1" id="gzip-enable" name="gzip" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="gzip-enable">{{"启用"|$.T}}</label> 
                   </div>
@@ -191,7 +191,7 @@
                     <input type="radio" value="0" id="gzip-disable" name="gzip" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="gzip-disable">{{"禁用"|$.T}}</label> 
                   </div>
                     <div class="fieldset bg-fc hide" id="gzip-settings">
-                        {{if eq $v "1"}}{{Include "caddy/addon/form/gzip"}}{{end}}
+                        {{- if eq $v "1"}}{{Include "caddy/addon/form/gzip"}}{{end -}}
                     </div>
                 </div>
               </div>
@@ -204,7 +204,7 @@
                   <a class="engine-show-nginx" href="https://nginx.org/en/docs/http/ngx_http_fastcgi_module.html#fastcgi_pass" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
                 </label>
                 <div class="col-sm-8">
-                  {{$v := $.Form "fastcgi"}}
+                  {{- $v := $.Form "fastcgi" -}}
                   <div class="radio radio-primary radio-inline"> 
                     <input type="radio" value="1" id="fastcgi-enable" name="fastcgi" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="fastcgi-enable">{{"启用"|$.T}}</label> 
                   </div>
@@ -212,7 +212,7 @@
                     <input type="radio" value="0" id="fastcgi-disable" name="fastcgi" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="fastcgi-disable">{{"禁用"|$.T}}</label> 
                   </div>
                   <div class="fieldset bg-fc hide" id="fastcgi-settings">
-                    {{if eq $v "1"}}{{Include "caddy/addon/form/fastcgi"}}{{end}}
+                    {{- if eq $v "1"}}{{Include "caddy/addon/form/fastcgi"}}{{end -}}
                   </div>
                 </div>
               </div>
@@ -225,7 +225,7 @@
                   <a class="engine-show-nginx" href="https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
                 </label>
                 <div class="col-sm-8">
-                  {{$v := $.Form "proxy"}}
+                  {{- $v := $.Form "proxy" -}}
                   <div class="radio radio-primary radio-inline"> 
                     <input type="radio" value="1" id="proxy-enable" name="proxy" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="proxy-enable">{{"启用"|$.T}}</label> 
                   </div>
@@ -233,7 +233,7 @@
                     <input type="radio" value="0" id="proxy-disable" name="proxy" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="proxy-disable">{{"禁用"|$.T}}</label> 
                   </div>
                   <div class="fieldset bg-fc hide" id="proxy-settings">
-                    {{if eq $v "1"}}{{Include "caddy/addon/form/proxy"}}{{end}}
+                    {{- if eq $v "1"}}{{Include "caddy/addon/form/proxy"}}{{end -}}
                   </div>
                 </div>
               </div>
@@ -247,7 +247,7 @@
                   <a class="engine-show-nginx" href="https://nginx.org/en/docs/http/ngx_http_autoindex_module.html" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
                 </label>
                 <div class="col-sm-8">
-                  {{$v := $.Form "browse"}}
+                  {{- $v := $.Form "browse" -}}
                   <div class="radio radio-primary radio-inline"> 
                     <input type="radio" value="1" id="browse-enable" name="browse" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="browse-enable">{{"启用"|$.T}}</label> 
                   </div>
@@ -255,7 +255,7 @@
                     <input type="radio" value="0" id="browse-disable" name="browse" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="browse-disable">{{"禁用"|$.T}}</label> 
                   </div>
                   <div class="fieldset bg-fc hide" id="browse-settings">
-                    {{if eq $v "1"}}{{Include "caddy/addon/form/browse"}}{{end}}
+                    {{- if eq $v "1"}}{{Include "caddy/addon/form/browse"}}{{end -}}
                   </div>
                 </div>
               </div>
@@ -266,7 +266,7 @@
                   <a class="engine-show-default" href="https://caddyserver.com/docs/http.expires" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
                 </label>
                 <div class="col-sm-8">
-                  {{$v := $.Form "expires"}}
+                  {{- $v := $.Form "expires" -}}
                   <div class="radio radio-primary radio-inline"> 
                     <input type="radio" value="1" id="expires-enable" name="expires" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="expires-enable">{{"启用"|$.T}}</label> 
                   </div>
@@ -274,7 +274,7 @@
                     <input type="radio" value="0" id="expires-disable" name="expires" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="expires-disable">{{"禁用"|$.T}}</label> 
                   </div>
                   <div class="fieldset bg-fc hide" id="expires-settings">
-                    {{if eq $v "1"}}{{Include "caddy/addon/form/expires"}}{{end}}
+                    {{- if eq $v "1"}}{{Include "caddy/addon/form/expires"}}{{end -}}
                   </div>
                 </div>
               </div>
@@ -285,7 +285,7 @@
                   <a href="https://caddyserver.com/docs/http.ipfilter" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
                 </label>
                 <div class="col-sm-8">
-                  {{$v := $.Form "ipfilter"}}
+                  {{- $v := $.Form "ipfilter" -}}
                   <div class="radio radio-primary radio-inline"> 
                     <input type="radio" value="1" id="ipfilter-enable" name="ipfilter" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="ipfilter-enable">{{"启用"|$.T}}</label> 
                   </div>
@@ -293,7 +293,7 @@
                     <input type="radio" value="0" id="ipfilter-disable" name="ipfilter" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="ipfilter-disable">{{"禁用"|$.T}}</label> 
                   </div>
                   <div class="fieldset bg-fc hide" id="ipfilter-settings">
-                    {{if eq $v "1"}}{{Include "caddy/addon/form/ipfilter"}}{{end}}
+                    {{- if eq $v "1"}}{{Include "caddy/addon/form/ipfilter"}}{{end -}}
                   </div>
                 </div>
               </div>
@@ -304,7 +304,7 @@
                   <a href="https://caddyserver.com/docs/http.filter" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
                 </label>
                 <div class="col-sm-8">
-                  {{$v := $.Form "filter"}}
+                  {{- $v := $.Form "filter" -}}
                   <div class="radio radio-primary radio-inline"> 
                     <input type="radio" value="1" id="filter-enable" name="filter" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="filter-enable">{{"启用"|$.T}}</label> 
                   </div>
@@ -369,7 +369,7 @@ rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;</pre>
               <div class="form-group">
                 <label class="col-sm-2 control-label">{{"BasicAuth"|$.T}}</label>
                 <div class="col-sm-8">
-                  {{$v := $.Form "basicauth"}}
+                  {{- $v := $.Form "basicauth" -}}
                   <div class="radio radio-primary radio-inline"> 
                     <input type="radio" value="1" id="basicauth-enable" name="basicauth" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="basicauth-enable">{{"启用"|$.T}}</label> 
                   </div>
@@ -377,14 +377,14 @@ rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;</pre>
                     <input type="radio" value="0" id="basicauth-disable" name="basicauth" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="basicauth-disable">{{"禁用"|$.T}}</label> 
                   </div>
                   <div class="fieldset bg-fc hide" id="basicauth-settings">
-                    {{if eq $v "1"}}{{Include "caddy/addon/form/basicauth"}}{{end}}
+                    {{- if eq $v "1"}}{{Include "caddy/addon/form/basicauth"}}{{end -}}
                   </div>
                 </div>
               </div>
               <div class="engine-hide-caddy2 form-group">
                 <label class="col-sm-2 control-label">{{"限流"|$.T}}</label>
                 <div class="col-sm-8">
-                  {{$v := $.Form "ratelimit"}}
+                  {{- $v := $.Form "ratelimit" -}}
                   <div class="radio radio-primary radio-inline"> 
                     <input type="radio" value="1" id="ratelimit-enable" name="ratelimit" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="ratelimit-enable">{{"启用"|$.T}}</label> 
                   </div>
@@ -392,14 +392,14 @@ rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;</pre>
                     <input type="radio" value="0" id="ratelimit-disable" name="ratelimit" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="ratelimit-disable">{{"禁用"|$.T}}</label> 
                   </div>
                   <div class="fieldset bg-fc hide" id="ratelimit-settings">
-                    {{if eq $v "1"}}{{Include "caddy/addon/form/ratelimit"}}{{end}}
+                    {{- if eq $v "1"}}{{Include "caddy/addon/form/ratelimit"}}{{end -}}
                   </div>
                 </div>
               </div>
               <div class="form-group">
                 <label class="col-sm-2 control-label">{{"跨域支持(CORS)"|$.T}}</label>
                 <div class="col-sm-8">
-                  {{$v := $.Form "cors"}}
+                  {{- $v := $.Form "cors" -}}
                   <div class="radio radio-primary radio-inline"> 
                     <input type="radio" value="1" id="cors-enable" name="cors" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="cors-enable">{{"启用"|$.T}}</label> 
                   </div>
@@ -407,14 +407,14 @@ rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;</pre>
                     <input type="radio" value="0" id="cors-disable" name="cors" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="cors-disable">{{"禁用"|$.T}}</label> 
                   </div>
                   <div class="fieldset bg-fc hide" id="cors-settings">
-                    {{if eq $v "1"}}{{Include "caddy/addon/form/cors"}}{{end}}
+                    {{- if eq $v "1"}}{{Include "caddy/addon/form/cors"}}{{end -}}
                   </div>
                 </div>
               </div>
               <div class="engine-show-default form-group">
                 <label class="col-sm-2 control-label">{{"JWT"|$.T}}</label>
                 <div class="col-sm-8">
-                  {{$v := $.Form "jwt"}}
+                  {{- $v := $.Form "jwt" -}}
                   <div class="radio radio-primary radio-inline"> 
                     <input type="radio" value="1" id="jwt-enable" name="jwt" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="jwt-enable">{{"启用"|$.T}}</label> 
                   </div>
@@ -422,7 +422,7 @@ rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;</pre>
                     <input type="radio" value="0" id="jwt-disable" name="jwt" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="jwt-disable">{{"禁用"|$.T}}</label> 
                   </div>
                   <div class="fieldset bg-fc hide" id="jwt-settings">
-                    {{if eq $v "1"}}{{Include "caddy/addon/form/jwt"}}{{end}}
+                    {{- if eq $v "1"}}{{Include "caddy/addon/form/jwt"}}{{end -}}
                   </div>
                   <div class="help-block">JSON Web Token</div>
                 </div>
@@ -430,7 +430,7 @@ rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;</pre>
               <div class="engine-show-default form-group">
                 <label class="col-sm-2 control-label">{{"Login"|$.T}}</label>
                 <div class="col-sm-8">
-                  {{$v := $.Form "login"}}
+                  {{- $v := $.Form "login" -}}
                   <div class="radio radio-primary radio-inline"> 
                     <input type="radio" value="1" id="login-enable" name="login" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="login-enable">{{"启用"|$.T}}</label> 
                   </div>
@@ -438,7 +438,7 @@ rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;</pre>
                     <input type="radio" value="0" id="login-disable" name="login" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="login-disable">{{"禁用"|$.T}}</label> 
                   </div>
                   <div class="fieldset bg-fc hide" id="login-settings">
-                    {{if eq $v "1"}}{{Include "caddy/addon/form/login"}}{{end}}
+                    {{- if eq $v "1"}}{{Include "caddy/addon/form/login"}}{{end -}}
                   </div>
                   <div class="help-block">{{`登录认证。此功能必须与上面的JWT一同使用`|$.T}}</div>
                 </div>
@@ -446,7 +446,7 @@ rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;</pre>
               <div class="engine-show-default form-group">
                 <label class="col-sm-2 control-label">{{"多语言"|$.T}}</label>
                 <div class="col-sm-8">
-                  {{$v := $.Form "locale"}}
+                  {{- $v := $.Form "locale" -}}
                   <div class="radio radio-primary radio-inline"> 
                     <input type="radio" value="1" id="locale-enable" name="locale" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="locale-enable">{{"启用"|$.T}}</label> 
                   </div>
@@ -454,7 +454,7 @@ rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;</pre>
                     <input type="radio" value="0" id="locale-disable" name="locale" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="locale-disable">{{"禁用"|$.T}}</label> 
                   </div>
                   <div class="fieldset bg-fc hide" id="locale-settings">
-                    {{if eq $v "1"}}{{Include "caddy/addon/form/locale"}}{{end}}
+                    {{- if eq $v "1"}}{{Include "caddy/addon/form/locale"}}{{end -}}
                   </div>
                   <div class="help-block">{{"获取当前语言类型并设置到占位符{>Detected-Locale}中"|$.T}}</div>
                 </div>
@@ -462,7 +462,7 @@ rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;</pre>
               <div class="engine-show-default form-group">
                 <label class="col-sm-2 control-label">{{"反爬虫"|$.T}}</label>
                 <div class="col-sm-8">
-                  {{$v := $.Form "nobots"}}
+                  {{- $v := $.Form "nobots" -}}
                   <div class="radio radio-primary radio-inline"> 
                     <input type="radio" value="1" id="nobots-enable" name="nobots" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="nobots-enable">{{"启用"|$.T}}</label> 
                   </div>
@@ -470,14 +470,14 @@ rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;</pre>
                     <input type="radio" value="0" id="nobots-disable" name="nobots" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="nobots-disable">{{"禁用"|$.T}}</label> 
                   </div>
                   <div class="fieldset bg-fc hide" id="nobots-settings">
-                    {{if eq $v "1"}}{{Include "caddy/addon/form/nobots"}}{{end}}
+                    {{- if eq $v "1"}}{{Include "caddy/addon/form/nobots"}}{{end -}}
                   </div>
                 </div>
               </div>
               <div class="engine-show-default form-group">
                 <label class="col-sm-2 control-label">{{"Prometheus"|$.T}}</label>
                 <div class="col-sm-8">
-                  {{$v := $.Form "prometheus"}}
+                  {{- $v := $.Form "prometheus" -}}
                   <div class="radio radio-primary radio-inline"> 
                     <input type="radio" value="1" id="prometheus-enable" name="prometheus" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="prometheus-enable">{{"启用"|$.T}}</label> 
                   </div>
@@ -485,14 +485,14 @@ rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;</pre>
                     <input type="radio" value="0" id="prometheus-disable" name="prometheus" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="prometheus-disable">{{"禁用"|$.T}}</label> 
                   </div>
                   <div class="fieldset bg-fc hide" id="prometheus-settings">
-                    {{if eq $v "1"}}{{Include "caddy/addon/form/prometheus"}}{{end}}
+                    {{- if eq $v "1"}}{{Include "caddy/addon/form/prometheus"}}{{end -}}
                   </div>
                 </div>
               </div>
               <div class="engine-show-default form-group">
                 <label class="col-sm-2 control-label">{{"S3Browser"|$.T}}</label>
                 <div class="col-sm-8">
-                  {{$v := $.Form "s3browser"}}
+                  {{- $v := $.Form "s3browser" -}}
                   <div class="radio radio-primary radio-inline"> 
                     <input type="radio" value="1" id="s3browser-enable" name="s3browser" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="s3browser-enable">{{"启用"|$.T}}</label> 
                   </div>
@@ -500,7 +500,7 @@ rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;</pre>
                     <input type="radio" value="0" id="s3browser-disable" name="s3browser" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="s3browser-disable">{{"禁用"|$.T}}</label> 
                   </div>
                   <div class="fieldset bg-fc hide" id="s3browser-settings">
-                    {{if eq $v "1"}}{{Include "caddy/addon/form/s3browser"}}{{end}}
+                    {{- if eq $v "1"}}{{Include "caddy/addon/form/s3browser"}}{{end -}}
                   </div>
                   <div class="help-block">{{"浏览 Amazon S3(或其它与S3兼容的对象存储引擎) 对象目录"|$.T}}</div>
                 </div>
@@ -508,7 +508,7 @@ rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;</pre>
               <div class="engine-show-default form-group">
                 <label class="col-sm-2 control-label">{{"WebDAV"|$.T}}</label>
                 <div class="col-sm-8">
-                  {{$v := $.Form "webdav"}}
+                  {{- $v := $.Form "webdav" -}}
                   <div class="radio radio-primary radio-inline"> 
                     <input type="radio" value="1" id="webdav-enable" name="webdav" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="webdav-enable">{{"启用"|$.T}}</label> 
                   </div>
@@ -516,7 +516,7 @@ rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;</pre>
                     <input type="radio" value="0" id="webdav-disable" name="webdav" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="webdav-disable">{{"禁用"|$.T}}</label> 
                   </div>
                   <div class="fieldset bg-fc hide" id="webdav-settings">
-                    {{if eq $v "1"}}{{Include "caddy/addon/form/webdav"}}{{end}}
+                    {{- if eq $v "1"}}{{Include "caddy/addon/form/webdav"}}{{end -}}
                   </div>
                 </div>
               </div>
@@ -529,7 +529,7 @@ rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;</pre>
               <div class="form-group">
                 <label class="col-sm-2 control-label">{{"网站状态"|$.T}}</label>
                 <div class="col-sm-8">
-                  {{$v := $.Form "disabled"}}
+                  {{- $v := $.Form "disabled" -}}
                   <div class="radio radio-primary radio-inline"> 
                     <input type="radio" value="N" id="disabled-N" name="disabled"{{if eq $v `N` ``}} checked{{end}}><label for="disabled-N">{{"启用"|$.T}}</label> 
                   </div>
