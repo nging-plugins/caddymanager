@@ -27,7 +27,9 @@ var Module = module.Module{
 	TemplatePath: map[string]string{
 		ID: `caddymanager/template/backend`,
 	},
-	AssetsPath:    []string{},
+	AssetsPath: []string{
+		`caddymanager/public/assets/backend`,
+	},
 	SQLCollection: setup.RegisterSQL,
 	Dashboard:     RegisterDashboard,
 	Navigate:      RegisterNavigate,

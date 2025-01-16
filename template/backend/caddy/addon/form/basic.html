@@ -1,0 +1,176 @@
+<div class="form-group">
+    <label class="col-sm-2 control-label">{{"分组"|$.T}}</label>
+    <div class="col-sm-3">
+        {{- $v := $.Form "groupId" -}}
+        <select class="form-control" name="groupId">
+            <option value="">{{"<无>"|$.T}}</option>
+            {{- range $k,$g:=$.Stored.Get "groupList" -}}
+            <option value="{{$g.Id}}"{{if eq $v (Str $g.Id)}} selected{{end}}>{{$g.Name}}</option>
+            {{- end -}}
+        </select>
+    </div>
+    <label class="col-sm-2 control-label">{{"引擎配置"|$.T}}</label>
+    <div class="col-sm-3">{{$v := $.Form "serverIdent"}}
+        <select class="form-control" id="serverIdent" name="serverIdent">
+            <option value="default" data-engine="default" data-environ="local">{{"<默认>"|$.T}}</option>
+            {{- range $k,$g:=$.Stored.Get "serverList" -}}
+            <option value="{{$g.Ident}}" data-engine="{{$g.Engine}}" data-environ="{{$g.Environ}}"{{if eq $v $g.Ident}} selected{{end}}>{{$g.Name}}</option>
+            {{- end -}}
+        </select>
+    </div>
+</div>
+<div class="form-group">
+  <label class="col-sm-2 control-label">{{"监听地址"|$.T}}</label>
+  <div class="col-sm-8">
+      <input type="text" id="bind-address" name="domain" class="form-control" required="required" value="{{$.Form `domain`}}">
+      <div class="help-block">
+        {{"可以是网址、域名或IP。如果不提供端口则默认为2005，如果不提供协议(比如https://)则默认为http，如果不提供IP和域名则默认为0.0.0.0，如果只想允许本机访问请设置为localhost或127.0.0.1。"|$.T}}<br />
+        {{"域名支持通配符“*”(例如*.admpub.com)和环境变量(环境变量用花括号括起来，例如localhost:{$PORT})。"|$.T}}<br />
+        {{"例子"|$.T}}: 
+        <span class="badge badge-success clickable" onclick="App.insertAtCursor($('#bind-address')[0],$(this).text(),8,18);">https://admpub.com:443</span>
+        <span class="badge badge-primary clickable" onclick="App.insertAtCursor($('#bind-address')[0],$(this).text(),0,10);">admpub.com:80</span>
+        <span class="badge badge-danger clickable" onclick="App.insertAtCursor($('#bind-address')[0],$(this).text(),1,6);">:8080</span>
+        <span class="badge badge-info clickable" onclick="App.insertAtCursor($('#bind-address')[0],$(this).text(),10,14);">127.0.0.1:9999</span><br />
+        {{"监听地址如有多个，用空格隔开。"|$.T}}
+      </div>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-sm-2 control-label">{{"网站位置"|$.T}}</label>
+  <div class="col-sm-8">
+      <input type="text" id="www-root-path" name="root" class="form-control typeahead" value="{{$.Form `root`}}" data-provide="typeahead">
+      <div class="help-block">{{"网站文件夹在服务器上的绝对路径"|$.T}}</div>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-sm-2 control-label">{{"网站名称"|$.T}}</label>
+  <div class="col-sm-8">
+      <input type="text" name="name" class="form-control" value="{{$.Form `name`}}">
+      <div class="help-block">
+        {{"为了提高辨识度，您可以给网站起一个名字。"|$.T}}
+      </div>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-sm-2 control-label">{{"默认首页"|$.T}}</label>
+  <div class="col-sm-8">
+      <input type="text" name="index" class="form-control" value="{{$.Form `index`}}">
+      <div class="help-block">{{"默认首页文件，多个之间用半角空格隔开，如不填写，默认为："|$.T}}<br/> 
+        index.html index.htm index.txt default.html default.htm default.txt
+      </div>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-sm-2 control-label">{{"访问日志"|$.T}}</label>
+  <div class="col-sm-8">
+    {{- $v := $.Form "log" "1" -}}
+    <div class="radio radio-primary radio-inline"> 
+      <input type="radio" value="1" id="log-enable" name="log" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="log-enable">{{"启用"|$.T}}</label> 
+    </div>
+    <div class="radio radio-danger radio-inline"> 
+      <input type="radio" value="0" id="log-disable" name="log" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="log-disable">{{"禁用"|$.T}}</label> 
+    </div>
+    <div class="fieldset bg-fc hide" id="log-settings">
+      {{- if eq $v "1"}}{{Include "caddy/addon/form/log"}}{{end -}}
+    </div>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-sm-2 control-label">
+    {{"响应Header"|$.T}}
+    <a class="engine-show-default" href="https://caddyserver.com/docs/header" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
+  </label>
+  <div class="col-sm-8">
+    <div class="fieldset bg-fc">
+      <div class="form-group">
+            <label class="col-sm-2 control-label">{{"指定路径"|$.T}}</label>
+            <div class="col-sm-9">
+               <input type="text" class="form-control" name="header_path" value="{{$.Form `header_path`}}">
+               <div class="help-block">{{"可以针对某个起始路径设置header"|$.T}}</div>
+            </div>
+      </div>
+
+      <div class="form-group">
+            <label class="col-sm-2 control-label">{{"设置Header"|$.T}}</label>
+            <div class="col-sm-9">
+      <table>
+                          <thead>
+                              <tr>
+                                  <th style="width:50%;">{{"字段名"|$.T}}</th>
+                                  <th>{{"值"|$.T}}</th>
+                                  <th width="70">{{"删除"|$.T}}</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                  {{- $vals := $.FormValues "header_v" -}}
+                  {{- $vlen := len $vals -}}
+                  {{- range $k,$v:=$.FormValues "header_k" -}}
+                      {{- if lt $k $vlen -}}
+<tr>
+<td><input type="text" class="form-control" name="header_k" value="{{$v}}"></td>
+<td><input type="text" class="form-control" name="header_v" value="{{index $vals $k}}"></td>
+<td class="text-center">
+<button type="button" class="btn btn-danger" onclick="$(this).parent().parent().remove()">
+<i class="fa fa-times"></i>
+</button>
+</td>
+</tr>
+                          
+                      {{- end -}}
+                  {{- end -}}
+                              <tr>
+                                  <td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" id="headerAddVarBtn" onclick="addKVs(this,'header_k','header_v');"><i class="fa fa-plus"></i></td>
+                              </tr>
+                          </tbody>
+                    </table>
+      <div class="help-block">
+        {{"如果要将已存在的header删掉，请在名称前使用减号(-)并将其值留空"|$.T}}
+        ({{`Nginx不支持删除响应header`|$.T}})
+      </div>
+    </div>
+    
+            </div>
+      </div>
+
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-sm-2 control-label">
+    {{"HTTPS"|$.T}}
+    <a class="engine-show-default" href="https://caddyserver.com/docs/tls" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
+    <a class="engine-show-caddy2" href="https://caddyserver.com/docs/caddyfile/directives/tls" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
+    <a class="engine-show-nginx" href="https://nginx.org/en/docs/http/ngx_http_ssl_module.html#ssl" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
+  </label>
+  <div class="col-sm-8">
+      {{- $v := $.Form "tls" -}}
+      <div class="radio radio-primary radio-inline"> 
+        <input type="radio" value="1" id="tls-enable" name="tls" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="tls-enable">{{"启用"|$.T}}</label> 
+      </div>
+      <div class="radio radio-danger radio-inline"> 
+        <input type="radio" value="0" id="tls-disable" name="tls" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="tls-disable">{{"禁用"|$.T}}</label> 
+      </div>
+      <div class="fieldset bg-fc hide" id="tls-settings">
+          {{- if eq $v "1"}}{{Include "caddy/addon/form/tls"}}{{end -}}
+      </div>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-sm-2 control-label">
+    {{"GZIP"|$.T}}
+    <a class="engine-show-default" href="https://caddyserver.com/docs/gzip" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
+    <a class="engine-show-caddy2" href="https://caddyserver.com/docs/caddyfile/directives/encode" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
+    <a class="engine-show-nginx" href="https://nginx.org/en/docs/http/ngx_http_gzip_module.html#gzip" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
+  </label>
+  <div class="col-sm-8">
+    {{- $v := $.Form "gzip" -}}
+    <div class="radio radio-primary radio-inline"> 
+      <input type="radio" value="1" id="gzip-enable" name="gzip" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="gzip-enable">{{"启用"|$.T}}</label> 
+    </div>
+    <div class="radio radio-danger radio-inline"> 
+      <input type="radio" value="0" id="gzip-disable" name="gzip" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="gzip-disable">{{"禁用"|$.T}}</label> 
+    </div>
+      <div class="fieldset bg-fc hide" id="gzip-settings">
+          {{- if eq $v "1"}}{{Include "caddy/addon/form/gzip"}}{{end -}}
+      </div>
+  </div>
+</div>

@@ -1,4 +1,20 @@
-<div class="tab-container tab-left">
+{{Extend "layout"}}
+{{Block "title"}}{{$.Stored.title}}{{/Block}}
+{{Block "breadcrumb"}}
+{{Super}}
+<li class="active">{{$.Stored.title}}</li>
+{{/Block}}
+{{Block "headEnd"}}
+<style type="text/css">
+.extra-page-remove{position:absolute;display:none;border-radius:0 0 50px 0;z-index:2;}
+.fieldset:hover .extra-page-remove{display:block;}
+</style>
+{{/Block}}
+{{Block "main"}}
+<div class="row">
+    <div class="col-md-12">
+<form class="form-horizontal group-border-dashed" method="POST" action="" id="vhostForm">
+<div class="tab-container tab-left tab-flex">
     <ul class="nav nav-tabs flat-tabs">
     {{- range $k, $v := $.Stored.moduleList -}}
       <li{{if eq $k 0}} class="active"{{end}}><a href="#tabVhost-{{$v.K}}" data-toggle="tab">{{$v.V|$.T}}</a></li>
@@ -18,7 +34,7 @@
                     <input type="radio" value="0" id="{{$v.K}}-disable" name="{{$v.K}}" data-slide-settings="hide"{{if eq $val `0` ``}} checked{{end}}><label for="{{$v.K}}-disable">{{"禁用"|$.T}}</label> 
                   </div>
                   <div class="fieldset bg-fc hide" id="{{$v.K}}-settings">
-                    {{- if eq $val "1"}}{{Include "caddy/addon/form/log"}}{{end -}}
+                    {{- if eq $val "1"}}{{$.Fetch (printf "caddy/addon/form/%s" $v.K) $}}{{end -}}
                   </div>
                 </div>
             </div><!-- /form-group -->
@@ -26,3 +42,46 @@
     {{- end -}}
     </div><!-- /tab-content -->
 </div><!-- /tab-container -->
+<div class="block-flat no-padding">
+<div class="content">
+<div class="form-group form-submit-group">
+  <div class="col-sm-2 control-label">&nbsp;</div>
+    <div class="col-sm-9">
+      <button type="submit" class="btn btn-primary btn-lg"><i class="fa fa-save"></i> {{"保存"|$.T}}</button>
+      <button type="reset" class="btn btn-default btn-lg"><i class="fa fa-refresh"></i> {{"重置"|$.T}}</button>
+    </div>
+</div><!-- /form-group -->
+</div><!-- /content -->
+</div><!-- /block-flat -->
+</form>
+</div><!-- /col-md-12 -->
+</div><!-- /row -->
+{{/Block}}
+
+
+{{Block "footer"}}
+<script type="text/javascript" src="{{AssetsURL}}/js/textarea/editor.min.js?t={{BuildTime}}"></script>
+<script type="text/template" id="tmplAddVariableRow">
+<tr>
+	<td><input type="text" class="form-control" name="{k}" value=""></td>
+	<td><input type="text" class="form-control" name="{v}" value=""></td>
+	<td class="text-center">
+    <button type="button" class="btn btn-danger" onclick="$(this).parent().parent().remove()">
+      <i class="fa fa-times"></i>
+    </button>
+  </td>
+</tr>
+</script>
+<script type="text/template" id="tmplAddVariableRowSingleCell">
+<tr>
+	<td><input type="text" class="form-control" name="{k}" value=""></td>
+	<td class="text-center">
+    <button type="button" class="btn btn-danger" onclick="$(this).parent().parent().remove()">
+      <i class="fa fa-times"></i>
+    </button>
+  </td>
+</tr>
+</script>
+{{call $.Func.Modal "__TMPL__/caddy/request_placeholders.yaml"}}
+<script type="text/javascript" src="{{AssetsURL}}/caddy/js/vhost_edit.js?t={{BuildTime}}"></script>
+{{/Block}}
