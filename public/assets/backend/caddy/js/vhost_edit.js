@@ -114,6 +114,19 @@ $('#vhostForm [data-slide-settings]').on('click',function(){
     $(innerid).empty();
     $(eid).addClass('hide');
   }
+
+  var tabPanel=$(this).closest('.tab-pane');
+  if(tabPanel.length>0) {
+    var tabPanelId = tabPanel.attr('id');
+    if(tabPanelId) {
+      var tabItem=$('.nav-tabs>li>a[href="#'+tabPanelId+'"]').parent('li');
+      if($(this).val()=='1'){
+        tabItem.removeClass('disabled');
+      }else if(!tabItem.hasClass('disabled')){
+        tabItem.addClass('disabled');
+      }
+    }
+  }
 });
 $('#vhostForm [data-slide-settings="show"]:checked').trigger('click');
 $('#request-placeholders-modal .modal-body table tbody td b').off().on('click',function(){
