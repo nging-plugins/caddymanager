@@ -75,9 +75,9 @@ function changeTabsTitleStatus(tabPanel,show){
   if(tabLink.length<1) return;
   var tabItem=$('.nav-tabs>li>a[href="#'+tabPanelId+'"]').parent('li');
   if(show){
-    tabItem.removeClass('disabled');
-  }else if(!tabItem.hasClass('disabled')){
-    tabItem.addClass('disabled');
+    tabItem.removeClass('not-enabled');
+  }else if(!tabItem.hasClass('not-enabled')){
+    tabItem.addClass('not-enabled');
   }
 }
 var requiredWWWRootPathFields=['fastcgi','browse'];//必须设置“网站位置”的模块

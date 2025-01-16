@@ -8,7 +8,7 @@
 <style type="text/css">
 .extra-page-remove{position:absolute;display:none;border-radius:0 0 50px 0;z-index:2;}
 .fieldset:hover .extra-page-remove{display:block;}
-.nav-tabs > li.disabled{font-style:italic;}
+.nav-tabs > li.not-enabled{font-style:italic;opacity:.8;}
 </style>
 {{/Block}}
 {{Block "main"}}
@@ -18,8 +18,8 @@
 <div class="tab-container tab-left tab-flex">
     <ul class="nav nav-tabs flat-tabs">
     {{- range $k, $v := $.Stored.moduleList -}}
-    {{- $isDisabled := and $v.H.turnable (ne ($.Form $v.K) `1`) -}}
-      <li class="{{if $v.H.engineValid}}engine-show-{{$v.H.engineValid}}{{else if $v.H.engineInvalid}}engine-hide-{{$v.H.engineInvalid}}{{end}}{{if $isDisabled}} disabled{{end}}{{if eq $k 0}} active{{end}}"><a href="#tabVhost-{{$v.K}}" data-toggle="tab">{{$v.V|$.T}}</a></li>
+    {{- $notEnabled := and $v.H.turnable (ne ($.Form $v.K) `1`) -}}
+      <li class="{{if $v.H.engineValid}}engine-show-{{$v.H.engineValid}}{{else if $v.H.engineInvalid}}engine-hide-{{$v.H.engineInvalid}}{{end}}{{if $notEnabled}} not-enabled{{end}}{{if eq $k 0}} active{{end}}"><a href="#tabVhost-{{$v.K}}" data-toggle="tab">{{$v.V|$.T}}</a></li>
     {{- end -}} 
     </ul>
     <div class="tab-content">
