@@ -12,12 +12,10 @@
                              <div class="help-block">{{"符合条件的访问将会被代理到这个地址。至少一个。如有多个，要用空格隔开。如果没有指定sheme(http/https),默认使用http。支持Unix sockets。"|$.T}}</div>
                           </div>
                         </div>
-
-                        
                         <div class="form-group">
                           <label class="col-sm-3 control-label">{{"策略"|$.T}}</label>
-                          <div class="col-sm-9">
-                            {{$v := $.Form "proxy_policy"}}
+                          <div class="col-sm-3">
+                            {{- $v := $.Form "proxy_policy" -}}
                              <select class="form-control" name="proxy_policy">
                                <option value="random"{{if eq $v `random`}} selected{{end}}>{{"随机"|$.T}}</option>
                                <option value="least_conn"{{if eq $v `least_conn`}} selected{{end}}>{{"最少连接"|$.T}}</option>
@@ -25,31 +23,32 @@
                                <option value="ip_hash"{{if eq $v `ip_hash`}} selected{{end}}>{{"IP哈希值"|$.T}}</option>
                              </select>
                           </div>
-                        </div>
-                        <div class="form-group">
-                          <label class="col-sm-3 control-label">{{"最大连接时长"|$.T}}</label>
-                          <div class="col-sm-9">
-                             <input type="text" class="form-control" name="proxy_fail_timeout" value="{{call $.Func.Val `proxy_fail_timeout` `30s`}}" required="required">
-                             <div class="help-block">{{"超时之后判断为失败。设置的值需要带单位(秒:s / 分钟:m)，比如，输入30s表示30秒。输入0s表示禁用"|$.T}}</div>
+                          <label class="col-sm-3 control-label">{{"保持在线时长"|$.T}}</label>
+                          <div class="col-sm-3">
+                             <input type="number" class="form-control" name="proxy_keepalive" value="{{call $.Func.Val `proxy_keepalive` `0`}}" min="0">
+                             <div class="help-block">{{"也就是设置header中的keepalive值。时间单位为秒。值为0时表示禁用"|$.T}}</div>
                           </div>
                         </div>
                         <div class="form-group">
+                          <label class="col-sm-3 control-label">{{"最大连接时长"|$.T}}</label>
+                          <div class="col-sm-3">
+                             <input type="text" class="form-control" name="proxy_fail_timeout" value="{{call $.Func.Val `proxy_fail_timeout` `30s`}}" required="required">
+                             <div class="help-block">{{"超时之后判断为失败。设置的值需要带单位(秒:s / 分钟:m)，比如，输入30s表示30秒。输入0s表示禁用"|$.T}}</div>
+                          </div>
                           <label class="col-sm-3 control-label">{{"最大失败次数"|$.T}}</label>
-                          <div class="col-sm-9">
+                          <div class="col-sm-3">
                              <input type="number" class="form-control" name="proxy_max_fails" value="{{call $.Func.Val `proxy_max_fails` `1`}}" min="1" required="required">
                              <div class="help-block">{{"允许的最小值为1，默认为1。如果“最大连接时间”被设置为禁用，则不使用此功能。达到最大失败次数后，将不再连接"|$.T}}</div>
                           </div>
                         </div>
                         <div class="form-group">
                           <label class="col-sm-3 control-label">{{"尝试连接时长"|$.T}}</label>
-                          <div class="col-sm-9">
+                          <div class="col-sm-3">
                              <input type="text" class="form-control" name="proxy_try_duration" value="{{call $.Func.Val `proxy_try_duration` `10s`}}" required="required">
                              <div class="help-block">{{"设置的值需要带单位(秒:s / 分钟:m)，比如，输入30s表示30秒。输入0s表示禁用"|$.T}}</div>
                           </div>
-                        </div>
-                        <div class="form-group">
                           <label class="col-sm-3 control-label">{{"尝试间隔时间"|$.T}}</label>
-                          <div class="col-sm-9">
+                          <div class="col-sm-3">
                              <input type="text" class="form-control" name="proxy_try_interval" value="{{call $.Func.Val `proxy_try_interval` `250ms`}}" required="required">
                              <div class="help-block">{{"默认值250ms。设置的值需要带单位(毫秒:ms / 秒:s / 分钟:m)，比如，输入30s表示30秒。输入0s表示禁用"|$.T}}</div>
                           </div>
@@ -63,23 +62,14 @@
                         </div>
                         <div class="engine-hide-nginx form-group">
                           <label class="col-sm-3 control-label">{{"健康检查间隔时间"|$.T}}</label>
-                          <div class="col-sm-9">
+                          <div class="col-sm-3">
                              <input type="text" class="form-control" name="proxy_health_check_interval" value="{{call $.Func.Val `proxy_health_check_interval` `30s`}}">
                              <div class="help-block">{{"默认值30s。设置的值需要带单位(秒:s / 分钟:m)，比如，输入30s表示30秒"|$.T}}</div>
                           </div>
-                        </div>
-                        <div class="engine-hide-nginx form-group">
                           <label class="col-sm-3 control-label">{{"健康检查最大时长"|$.T}}</label>
-                          <div class="col-sm-9">
+                          <div class="col-sm-3">
                              <input type="text" class="form-control" name="proxy_health_check_timeout" value="{{call $.Func.Val `proxy_health_check_timeout` `60s`}}">
                              <div class="help-block">{{"默认值60s。设置的值需要带单位(秒:s / 分钟:m)，比如，输入30s表示30秒"|$.T}}</div>
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label class="col-sm-3 control-label">{{"保持在线时长"|$.T}}</label>
-                          <div class="col-sm-9">
-                             <input type="number" class="form-control" name="proxy_keepalive" value="{{call $.Func.Val `proxy_keepalive` `0`}}" min="0">
-                             <div class="help-block">{{"也就是设置header中的keepalive值。时间单位为秒。值为0时表示禁用"|$.T}}</div>
                           </div>
                         </div>
                         <div class="form-group">
@@ -201,15 +191,19 @@
                         <div class="form-group">
                           <label class="col-sm-3 control-label">{{"预置功能"|$.T}}</label>
                           <div class="col-sm-9">
-                            <div class="checkbox checkbox-primary checkbox-inline">
-                                <input type="checkbox" id="proxy_preset-websocket" name="proxy_preset" value="websocket"{{if HasString $proxyPreset `websocket`}} checked{{end}}> <label for="proxy_preset-websocket">websocket</label>
-                            </div>
-                              <p>
-表示当前代理转发WebSocket连接。 等同于: <pre>
-header_upstream Connection {&gt;Connection}
-header_upstream Upgrade {&gt;Upgrade}</pre>
-注意：HTTP/2不支持upgrade协议</p>
-                              <div class="checkbox checkbox-primary checkbox-inline">
+                            <div class="row">
+                              <div class="col-sm-6">
+                                <div class="checkbox checkbox-primary checkbox-inline">
+                                    <input type="checkbox" id="proxy_preset-websocket" name="proxy_preset" value="websocket"{{if HasString $proxyPreset `websocket`}} checked{{end}}> <label for="proxy_preset-websocket">websocket</label>
+                                </div>
+                                  <p>
+    表示当前代理转发WebSocket连接。 等同于: <pre>
+    header_upstream Connection {&gt;Connection}
+    header_upstream Upgrade {&gt;Upgrade}</pre>
+    注意：HTTP/2不支持upgrade协议</p>
+                              </div>
+                              <div class="col-sm-6">
+                                <div class="checkbox checkbox-primary checkbox-inline">
                                 <input type="checkbox" id="proxy_preset-transparent" name="proxy_preset" value="transparent"{{if HasString $proxyPreset `transparent`}} checked{{end}}> <label for="proxy_preset-transparent">transparent</label>
                               </div>
                               <p>
@@ -218,6 +212,8 @@ header_upstream Host {host}
 header_upstream X-Real-IP {remote}
 header_upstream X-Forwarded-For {remote}
 header_upstream X-Forwarded-Proto {scheme}</pre></p>
+                              </div>
+                            </div><!-- /row -->
                              <div class="help-block">
 上面用花括号"{}"括起来的部分是<a href="https://caddyserver.com/docs/placeholders" target="_blank">{{"占位符"|$.T}}</a>
                              </div>
