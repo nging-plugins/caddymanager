@@ -155,14 +155,12 @@
                         
                         <div class="form-group">
                           <label class="col-sm-2 control-label">{{"删除路径前缀"|$.T}}</label>
-                          <div class="col-sm-10">
+                          <div class="col-sm-4">
                              <input type="text" class="form-control" name="proxy_without" value="{{$.Form `proxy_without`}}">
                              <div class="help-block">{{"在提交到后端之前要删除的路径前缀。例如/api/foo删除掉前缀/api后就成了/foo"|$.T}}</div>
                           </div>
-                        </div>
-                        <div class="form-group">
                           <label class="col-sm-2 control-label">{{"忽略代理路径"|$.T}}</label>
-                          <div class="col-sm-10">
+                          <div class="col-sm-4">
                              <input type="text" class="form-control" name="proxy_except" value="{{$.Form `proxy_except`}}">
                              <div class="help-block">{{"用空格分隔的忽略代理路径。符合这些路径的网址将不会代理到后端"|$.T}}</div>
                           </div>

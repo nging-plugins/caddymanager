@@ -1,41 +1,41 @@
               
                         <div class="form-group">
-                          <label class="col-sm-3 control-label">{{"路径"|$.T}}</label>
+                          <label class="col-sm-2 control-label">{{"路径"|$.T}}</label>
                           <div class="col-sm-9">
                              <input type="text" class="form-control" name="ipfilter_paths" value="{{$.Form `ipfilter_paths`}}" required="required">
                              <div class="help-block">{{"如有多个，用空格分隔开"|$.T}}</div>
                           </div>
                         </div>
                         <div class="form-group">
-                          <label class="col-sm-3 control-label">{{"IP范围"|$.T}}</label>
+                          <label class="col-sm-2 control-label">{{"IP范围"|$.T}}</label>
                           <div class="col-sm-9">
                             <input type="text" class="form-control" name="ipfilter_ip" value="{{$.Form `ipfilter_ip`}}">
                              <div class="help-block">{{"例如：192.168.1.0/24 或 192.168.1.0-10 (表示：192.168.1.0至192.168.1.10) 或 192.168 (表示：192.168.0.0至192.168.255.255) 。"|$.T}}<br />{{`如有多个，用空格隔开。`|$.T}}</div>
                           </div>
                         </div>
                         <div class="form-group">
-                          <label class="col-sm-3 control-label">{{"国家"|$.T}}</label>
+                          <label class="col-sm-2 control-label">{{"国家"|$.T}}</label>
                           <div class="col-sm-9">
                              <input type="text" class="form-control" name="ipfilter_country" value="{{$.Form `ipfilter_country`}}">
                              <div class="help-block">{{"国家简码(比如:US JP)。"|$.T}}{{`如有多个，用空格隔开。`|$.T}}</div>
                           </div>
                         </div>
                         <div class="form-group">
-                          <label class="col-sm-3 control-label">{{"国家IP库"|$.T}}</label>
+                          <label class="col-sm-2 control-label">{{"国家IP库"|$.T}}</label>
                           <div class="col-sm-9">
                              <input type="text" class="form-control" name="ipfilter_database" value="{{$.Form `ipfilter_database`}}" placeholder="">
                              <div class="help-block">{{"geo-IP数据库路径(例如：/local/data/GeoLite2-Country.mmdb)"|$.T}}</div>
                           </div>
                         </div>
                         <div class="form-group">
-                          <label class="col-sm-3 control-label">{{"受阻时展示页"|$.T}}</label>
+                          <label class="col-sm-2 control-label">{{"受阻时展示页"|$.T}}</label>
                           <div class="col-sm-9">
                              <input type="text" class="form-control" name="ipfilter_blockpage" value="{{$.Form `ipfilter_blockpage`}}">
                              <div class="help-block">{{`阻止访问时显示的页面文件物理路径。例如：D:\www\block.html`|$.T}}</div>
                           </div>
                         </div>
                         <div class="form-group">
-                          <label class="col-sm-3 control-label">{{"过滤方式"|$.T}}</label>
+                          <label class="col-sm-2 control-label">{{"过滤方式"|$.T}}</label>
                           <div class="col-sm-9">
                             {{$v := $.Form "ipfilter_rule" "block"}}
                             <div class="radio radio-primary radio-inline"> 
@@ -47,7 +47,7 @@
                           </div>
                         </div>
                         <div class="form-group">
-                          <label class="col-sm-3 control-label"></label>
+                          <label class="col-sm-2 control-label"></label>
                           <div class="col-sm-9">
                             <div class="checkbox checkbox-primary checkbox-inline">
                              <input type="checkbox" id="ipfilter_strict" name="ipfilter_strict" value="1"{{if eq ($.Form `ipfilter_strict`) `1`}} checked{{end}}>
