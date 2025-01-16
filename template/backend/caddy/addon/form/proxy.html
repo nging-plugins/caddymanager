@@ -196,25 +196,27 @@
                                 <div class="checkbox checkbox-primary checkbox-inline">
                                     <input type="checkbox" id="proxy_preset-websocket" name="proxy_preset" value="websocket"{{if HasString $proxyPreset `websocket`}} checked{{end}}> <label for="proxy_preset-websocket">websocket</label>
                                 </div>
+                                <div class="help-block">
     {{`表示当前代理转发WebSocket连接。`|$.T}}<a href="javascript:;" onclick="$(this).next('div').toggleClass('hide')">{{`等同于`|$.T}}</a>: <div class="hide"><pre>
     header_upstream Connection {&gt;Connection}
     header_upstream Upgrade {&gt;Upgrade}</pre>
     {{`注意：HTTP/2不支持upgrade协议`|$.T}}
-    <div class="help-block">
      {{`用花括号"{}"括起来的部分是`|$.T}}<a href="https://caddyserver.com/docs/placeholders" target="_blank">{{"占位符"|$.T}}</a>
     </div>
-    </div>
-                              </div>
+    </div><!-- /help-block -->
+                              </div><!-- /col-sm-6 -->
                               <div class="col-sm-6">
                                 <div class="checkbox checkbox-primary checkbox-inline">
                                 <input type="checkbox" id="proxy_preset-transparent" name="proxy_preset" value="transparent"{{if HasString $proxyPreset `transparent`}} checked{{end}}> <label for="proxy_preset-transparent">transparent</label>
-                              </div>
+                                </div>
+                                <div class="help-block">
                               {{`把来自浏览器端提交的原始主机信息传递给后端。`|$.T}}<a href="javascript:;" onclick="$(this).next('pre').toggleClass('hide')">{{`等同于`|$.T}}</a> <pre class="hide">
 header_upstream Host {host}
 header_upstream X-Real-IP {remote}
 header_upstream X-Forwarded-For {remote}
 header_upstream X-Forwarded-Proto {scheme}</pre></p>
-                              </div>
+                                </div><!-- /help-block -->
+                              </div><!-- /col-sm-6 -->
                             </div><!-- /row -->
                           </div>
                         </div>
