@@ -63,7 +63,7 @@
 <div class="form-group">
   <label class="col-sm-2 control-label">{{"访问日志"|$.T}}</label>
   <div class="col-sm-8">
-    {{- $v := $.Form "log" "1" -}}
+    {{- $v := $.Form `log` `1` -}}
     <div class="radio radio-primary radio-inline"> 
       <input type="radio" value="1" id="log-enable" name="log" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="log-enable">{{"启用"|$.T}}</label> 
     </div>
@@ -71,7 +71,7 @@
       <input type="radio" value="0" id="log-disable" name="log" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="log-disable">{{"禁用"|$.T}}</label> 
     </div>
     <div class="fieldset bg-fc hide" id="log-settings">
-      {{- if eq $v "1"}}{{Include "caddy/addon/form/log"}}{{end -}}
+      {{- if eq $v `1`}}{{Include "caddy/addon/form/log"}}{{end -}}
     </div>
   </div>
 </div>
@@ -91,7 +91,7 @@
         <input type="radio" value="0" id="tls-disable" name="tls" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="tls-disable">{{"禁用"|$.T}}</label> 
       </div>
       <div class="fieldset bg-fc hide" id="tls-settings">
-          {{- if eq $v "1"}}{{Include "caddy/addon/form/tls"}}{{end -}}
+          {{- if eq $v `1`}}{{Include "caddy/addon/form/tls"}}{{end -}}
       </div>
   </div>
 </div>
@@ -111,7 +111,7 @@
       <input type="radio" value="0" id="gzip-disable" name="gzip" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="gzip-disable">{{"禁用"|$.T}}</label> 
     </div>
       <div class="fieldset bg-fc hide" id="gzip-settings">
-          {{- if eq $v "1"}}{{Include "caddy/addon/form/gzip"}}{{end -}}
+          {{- if eq $v `1`}}{{Include "caddy/addon/form/gzip"}}{{end -}}
       </div>
   </div>
 </div>
@@ -130,7 +130,7 @@
         <input type="radio" value="0" id="expires-disable" name="expires" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="expires-disable">{{"禁用"|$.T}}</label> 
       </div>
       <div class="fieldset bg-fc hide" id="expires-settings">
-        {{- if eq $v "1"}}{{Include "caddy/addon/form/expires"}}{{end -}}
+        {{- if eq $v `1`}}{{Include "caddy/addon/form/expires"}}{{end -}}
       </div>
     </div>
   </div>
