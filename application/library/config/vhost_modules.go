@@ -32,20 +32,20 @@ var VhostModules = echo.NewKVData().
 		`nginx`:   `https://nginx.org/en/docs/http/ngx_http_autoindex_module.html`,
 	})).
 	//Add(`expires`, echo.T(`静态文件缓存`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`docURL`, `https://caddyserver.com/docs/http.expires`)).
-	Add(`ipfilter`, echo.T(`IP过滤`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`docURL`, `https://caddyserver.com/docs/http.ipfilter`)).
-	Add(`filter`, echo.T(`响应内容过滤`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`noWrapper`, true), echo.KVOptHKV(`docURL`, `https://caddyserver.com/docs/http.filter`)).
+	Add(`ipfilter`, echo.T(`IP过滤`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`docURL`, `https://caddyserver.com/docs/http.ipfilter`), echo.KVOptHKV(`engineValid`, `default`)).
+	Add(`filter`, echo.T(`响应内容过滤`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`noWrapper`, true), echo.KVOptHKV(`docURL`, `https://caddyserver.com/docs/http.filter`), echo.KVOptHKV(`engineValid`, `default`)).
 	// Add(`rewrite`, echo.T(`网址重写`), echo.KVOptHKV(`docURLs`, map[string]string{
 	// 	`default`: `https://caddyserver.com/docs/rewrite`,
 	// 	`caddy2`:  `https://caddyserver.com/docs/caddyfile/directives/rewrite`,
 	// 	`nginx`:   `https://nginx.org/en/docs/http/ngx_http_rewrite_module.html#rewrite`,
 	// })).
 	Add(`basicauth`, echo.T(`BasicAuth`), echo.KVOptHKV(`turnable`, true)).
-	Add(`ratelimit`, echo.T(`限流`), echo.KVOptHKV(`turnable`, true)).
+	Add(`ratelimit`, echo.T(`限流`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineInvalid`, `caddy2`)).
 	Add(`cors`, echo.T(`跨域支持(CORS)`), echo.KVOptHKV(`turnable`, true)).
-	Add(`jwt`, echo.T(`JWT`), echo.KVOptHKV(`turnable`, true)).
-	Add(`login`, echo.T(`Login`), echo.KVOptHKV(`turnable`, true)).
-	Add(`locale`, echo.T(`多语言`), echo.KVOptHKV(`turnable`, true)).
-	Add(`nobots`, echo.T(`反爬虫`), echo.KVOptHKV(`turnable`, true)).
-	Add(`prometheus`, echo.T(`Prometheus`), echo.KVOptHKV(`turnable`, true)).
-	Add(`s3browser`, echo.T(`S3Browser`), echo.KVOptHKV(`turnable`, true)).
-	Add(`webdav`, echo.T(`WebDAV`), echo.KVOptHKV(`turnable`, true))
+	Add(`jwt`, echo.T(`JWT`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`)).
+	Add(`login`, echo.T(`Login`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`)).
+	Add(`locale`, echo.T(`多语言`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`)).
+	Add(`nobots`, echo.T(`反爬虫`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`)).
+	Add(`prometheus`, echo.T(`Prometheus`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`)).
+	Add(`s3browser`, echo.T(`S3Browser`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`)).
+	Add(`webdav`, echo.T(`WebDAV`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`))

@@ -17,8 +17,8 @@
 <div class="tab-container tab-left tab-flex">
     <ul class="nav nav-tabs flat-tabs">
     {{- range $k, $v := $.Stored.moduleList -}}
-      <li{{if eq $k 0}} class="active"{{end}}><a href="#tabVhost-{{$v.K}}" data-toggle="tab">{{$v.V|$.T}}</a></li>
-    {{- end -}}
+      <li class="{{if $v.H.engineValid}}engine-show-{{$v.H.engineValid}}{{else if $v.H.engineInvalid}}engine-hide-{{$v.H.engineInvalid}}{{end}}{{if eq $k 0}} active{{end}}"><a href="#tabVhost-{{$v.K}}" data-toggle="tab">{{$v.V|$.T}}</a></li>
+    {{- end -}} 
     </ul>
     <div class="tab-content">
     {{- range $k, $v := $.Stored.moduleList -}}
