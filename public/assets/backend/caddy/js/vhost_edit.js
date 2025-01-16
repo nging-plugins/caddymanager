@@ -67,6 +67,19 @@ $('#vhostForm [data-slide-settings]').each(function(){
   var eid='#'+$(this).attr('name')+'-settings';
   if($(eid).data('history'))$(eid).data('history',null);
 });
+function changeTabsTitleStatus(tabPanel,show){
+  if(tabPanel.length<1) return;
+  var tabPanelId = tabPanel.attr('id');
+  if(!tabPanelId) return;
+  var tabLink=$('.nav-tabs>li>a[href="#'+tabPanelId+'"]');
+  if(tabLink.length<1) return;
+  var tabItem=$('.nav-tabs>li>a[href="#'+tabPanelId+'"]').parent('li');
+  if(show){
+    tabItem.removeClass('disabled');
+  }else if(!tabItem.hasClass('disabled')){
+    tabItem.addClass('disabled');
+  }
+}
 var requiredWWWRootPathFields=['fastcgi','browse'];//必须设置“网站位置”的模块
 $('#vhostForm [data-slide-settings]').on('click',function(){
   var slide=$(this).data('slide-settings'),name=$(this).attr('name');
@@ -114,19 +127,8 @@ $('#vhostForm [data-slide-settings]').on('click',function(){
     $(innerid).empty();
     $(eid).addClass('hide');
   }
-
   var tabPanel=$(this).closest('.tab-pane');
-  if(tabPanel.length>0) {
-    var tabPanelId = tabPanel.attr('id');
-    if(tabPanelId) {
-      var tabItem=$('.nav-tabs>li>a[href="#'+tabPanelId+'"]').parent('li');
-      if($(this).val()=='1'){
-        tabItem.removeClass('disabled');
-      }else if(!tabItem.hasClass('disabled')){
-        tabItem.addClass('disabled');
-      }
-    }
-  }
+  changeTabsTitleStatus(tabPanel,$(this).val()=='1');
 });
 $('#vhostForm [data-slide-settings="show"]:checked').trigger('click');
 $('#request-placeholders-modal .modal-body table tbody td b').off().on('click',function(){
