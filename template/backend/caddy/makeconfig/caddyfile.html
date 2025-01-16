@@ -164,7 +164,7 @@
     index {{$v.Get "index"}}
     {{end}}
 
-    {{if $v.Get "header_path"}}
+    {{if and (ne ($v.Get "header") `0`) ($v.Get "header_path")}}
     header {{$v.Get "header_path"}} {
         {{$v.IteratorKV "header" "" "        " true}}
     }
