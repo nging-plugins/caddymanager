@@ -10,15 +10,15 @@
             <h3 class="hthin">{{$v.V|$.T}}</h3>
             <div class="form-group">
                 <div class="col-sm-12">
-                  {{- $v := $.Form $v.K "1" -}}
+                  {{- $val := $.Form $v.K "1" -}}
                   <div class="radio radio-primary radio-inline"> 
-                    <input type="radio" value="1" id="{{$v.K}}-enable" name="{{$v.K}}" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="{{$v.K}}-enable">{{"启用"|$.T}}</label> 
+                    <input type="radio" value="1" id="{{$v.K}}-enable" name="{{$v.K}}" data-slide-settings="show"{{if eq $val `1`}} checked{{end}}><label for="{{$v.K}}-enable">{{"启用"|$.T}}</label> 
                   </div>
                   <div class="radio radio-danger radio-inline"> 
-                    <input type="radio" value="0" id="{{$v.K}}-disable" name="{{$v.K}}" data-slide-settings="hide"{{if eq $v `0` ``}} checked{{end}}><label for="{{$v.K}}-disable">{{"禁用"|$.T}}</label> 
+                    <input type="radio" value="0" id="{{$v.K}}-disable" name="{{$v.K}}" data-slide-settings="hide"{{if eq $val `0` ``}} checked{{end}}><label for="{{$v.K}}-disable">{{"禁用"|$.T}}</label> 
                   </div>
                   <div class="fieldset bg-fc hide" id="{{$v.K}}-settings">
-                    {{- if eq $v "1"}}{{Include "caddy/addon/form/log"}}{{end -}}
+                    {{- if eq $val "1"}}{{Include "caddy/addon/form/log"}}{{end -}}
                   </div>
                 </div>
             </div><!-- /form-group -->
