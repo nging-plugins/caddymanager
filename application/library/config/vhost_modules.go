@@ -34,11 +34,11 @@ var VhostModules = echo.NewKVData().
 	//Add(`expires`, echo.T(`静态文件缓存`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`docURL`, `https://caddyserver.com/docs/http.expires`)).
 	Add(`ipfilter`, echo.T(`IP过滤`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`docURL`, `https://caddyserver.com/docs/http.ipfilter`)).
 	Add(`filter`, echo.T(`响应内容过滤`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`noWrapper`, true), echo.KVOptHKV(`docURL`, `https://caddyserver.com/docs/http.filter`)).
-	Add(`rewrite`, echo.T(`网址重写`), echo.KVOptHKV(`docURLs`, map[string]string{
-		`default`: `https://caddyserver.com/docs/rewrite`,
-		`caddy2`:  `https://caddyserver.com/docs/caddyfile/directives/rewrite`,
-		`nginx`:   `https://nginx.org/en/docs/http/ngx_http_rewrite_module.html#rewrite`,
-	})).
+	// Add(`rewrite`, echo.T(`网址重写`), echo.KVOptHKV(`docURLs`, map[string]string{
+	// 	`default`: `https://caddyserver.com/docs/rewrite`,
+	// 	`caddy2`:  `https://caddyserver.com/docs/caddyfile/directives/rewrite`,
+	// 	`nginx`:   `https://nginx.org/en/docs/http/ngx_http_rewrite_module.html#rewrite`,
+	// })).
 	Add(`basicauth`, echo.T(`BasicAuth`), echo.KVOptHKV(`turnable`, true)).
 	Add(`ratelimit`, echo.T(`限流`), echo.KVOptHKV(`turnable`, true)).
 	Add(`cors`, echo.T(`跨域支持(CORS)`), echo.KVOptHKV(`turnable`, true)).
