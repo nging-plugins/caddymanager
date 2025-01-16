@@ -30,6 +30,7 @@ import (
 	"github.com/coscms/webcore/library/backend"
 	"github.com/coscms/webcore/library/common"
 	"github.com/nging-plugins/caddymanager/application/dbschema"
+	mconfig "github.com/nging-plugins/caddymanager/application/library/config"
 	"github.com/nging-plugins/caddymanager/application/library/engine"
 	"github.com/nging-plugins/caddymanager/application/model"
 )
@@ -157,6 +158,7 @@ func setVhostForm(ctx echo.Context) {
 	svr := model.NewVhostServer(ctx)
 	svr.ListByOffset(nil, nil, 0, -1, db.Cond{`disabled`: common.BoolN})
 	ctx.Set(`serverList`, svr.Objects())
+	ctx.Set(`moduleList`, mconfig.VhostModules.Slice())
 }
 
 func VhostDelete(ctx echo.Context) error {
