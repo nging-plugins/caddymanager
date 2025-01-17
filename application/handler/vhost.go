@@ -238,7 +238,7 @@ func VhostEdit(ctx echo.Context) error {
 				len(ctx.Form(`restart`)) > 0,
 				m.Disabled == common.BoolN && removeCachedCert == `1`,
 			)
-			ctx.End(err == nil)
+			ctx.Commit()
 		}
 		if err == nil {
 			common.SendOk(ctx, ctx.T(`操作成功`))
