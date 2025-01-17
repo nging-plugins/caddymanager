@@ -2,10 +2,12 @@ package config
 
 import "github.com/webx-top/echo"
 
+var multiple = false
+
 var VhostModules = echo.NewKVData().
 	Add(`basic`, echo.T(`通用设置`)).
 	//Add(`log`, echo.T(`访问日志`), echo.KVOptHKV(`turnable`, true)).
-	Add(`header`, echo.T(`响应Header`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`multiple`, true), echo.KVOptHKV(`engineInvalid`, `nginx`), echo.KVOptHKV(`docURL`, `https://caddyserver.com/docs/header`)).
+	Add(`header`, echo.T(`响应Header`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`multiple`, multiple), echo.KVOptHKV(`engineInvalid`, `nginx`), echo.KVOptHKV(`docURL`, `https://caddyserver.com/docs/header`)).
 	// Add(`tls`, echo.T(`HTTPS`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`docURLs`, map[string]string{
 	// 	`default`: `https://caddyserver.com/docs/tls`,
 	// 	`caddy2`:  `https://caddyserver.com/docs/caddyfile/directives/tls`,
@@ -42,9 +44,9 @@ var VhostModules = echo.NewKVData().
 	Add(`basicauth`, echo.T(`BasicAuth`), echo.KVOptHKV(`turnable`, true)).
 	Add(`ratelimit`, echo.T(`限流`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineInvalid`, `caddy2`)).
 	Add(`cors`, echo.T(`跨域支持(CORS)`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`multiple`, true)).
-	Add(`jwt`, echo.T(`JWT`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`), echo.KVOptHKV(`multiple`, true)).
+	Add(`jwt`, echo.T(`JWT`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`), echo.KVOptHKV(`multiple`, multiple)).
 	Add(`login`, echo.T(`Login`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`)).
-	Add(`locale`, echo.T(`多语言`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`), echo.KVOptHKV(`multiple`, true)).
+	Add(`locale`, echo.T(`多语言`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`), echo.KVOptHKV(`multiple`, multiple)).
 	Add(`nobots`, echo.T(`反爬虫`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`)).
 	Add(`prometheus`, echo.T(`Prometheus`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`)).
 	Add(`s3browser`, echo.T(`S3Browser`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`)).

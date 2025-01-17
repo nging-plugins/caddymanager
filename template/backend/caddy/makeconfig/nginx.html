@@ -4,10 +4,11 @@
 {{- range $key,$val := $v.GetNginxDomainList}}
 {{$.Set `DomainInfo` $val}}
 {{if $v.IsEnabled "fastcgi"}}
-{{$upstream := $v.Get "fastcgi_upstream"}}
+{{range $kk,$vv := $v.GetExtraList `fastcgi`}}
+{{$upstream := $vv.Get "upstream"}}
     {{if $upstream}}
-upstream nging_fastcgi_{{$id}}{
-    {{$policy := $v.Get "fastcgi_policy"}}
+upstream nging_fastcgi_{{$id}}_{{$kk}}{
+    {{$policy := $vv.Get "policy"}}
     {{if $policy}}
     {{if eq $policy `least_conn` `ip_hash`}}
     {{$policy}};
@@ -18,27 +19,29 @@ upstream nging_fastcgi_{{$id}}{
     {{end}}
     
     #ip_hash;
-    server {{$v.Get "fastcgi_endpoint"}};
+    server {{$vv.Get "endpoint"}};
     {{range $v.SplitBySpace $upstream}}
     server {{.}};
     {{end}}
 
-    {{$keepalive := $v.Get "fastcgi_policy"}}
+    {{$keepalive := $vv.Get "keepalive"}}
     {{if and $keepalive (ne $keepalive `0`)}}
     keepalive {{$keepalive}};
     {{end}}
 }
     {{end}}
 {{end}}
+{{end}}
 
 
 {{if $v.IsEnabled "proxy"}}
-{{$upstream := $v.Get "proxy_upstream"}}
+{{range $kk,$vv := $v.GetExtraList `proxy`}}
+{{$upstream := $vv.Get "upstream"}}
     {{if $upstream}}
-    {{$policy := $v.Get "proxy_policy"}}
-    {{$serverGroup := $v.ServerGroup "proxy_to" (printf `nging_proxy_%d` $id)}}
-    {{$.Set `proxyServerGroup` $serverGroup}}
-upstream nging_proxy_{{$id}}{
+    {{$policy := $vv.Get "policy"}}
+    {{$serverGroup := $v.ServerGroup "to" (printf `nging_proxy_%d_%d` $id $kk)}}
+    {{$.Set (printf `proxyServerGroup%d` $kk) $serverGroup}}
+upstream nging_proxy_{{$id}}_{{$kk}}{
     {{if eq $policy `ip_hash`}}
     ip_hash;
     {{else if eq $policy `least_conn`}}
@@ -53,12 +56,13 @@ upstream nging_proxy_{{$id}}{
     server {{.}};
     {{end}}
 
-    {{$keepalive := $v.Get "proxy_keepalive"}}
+    {{$keepalive := $vv.Get "keepalive"}}
     {{if and $keepalive (ne $keepalive `0`)}}
     keepalive $keepalive;
     {{end}}
 }
     {{end}}
+{{end}}
 {{end}}
 
 
@@ -68,8 +72,9 @@ log_format nging_log_format_{{$id}} '{{$v.AsNginxLogFormat|$v.AddSlashesSingleQu
 
 
 {{if $v.IsEnabled "cors"}}
-{{$domains := $v.Get `cors_domains`}}
-map $http_host $allow_cors_host_{{$id}} {
+{{range $kk,$vv := $v.GetExtraList `cors`}}
+{{$domains := $vv.Get `domains`}}
+map $http_host $allow_cors_host_{{$id}}_{{$kk}} {
     {{if $domains}}
     default 0;
     "~^{{Join ($v.SplitBySpaceWithRegexpQuote $domains) `|`|$v.AddSlashes|ToHTML}}$" 1;
@@ -77,14 +82,15 @@ map $http_host $allow_cors_host_{{$id}} {
     default 1;
     {{end}}
 }
-map $http_origin $allow_cors_origin_{{$id}} {
-    {{if $v.Get `cors_origin_regexp`}}
+map $http_origin $allow_cors_origin_{{$id}}_{{$kk}} {
+    {{if $vv.Get `origin_regexp`}}
     default 0;
-    "~*{{$v.Get `cors_origin_regexp`|$v.AddSlashes|ToHTML}}" 1;
+    "~*{{$vv.Get `origin_regexp`|$v.AddSlashes|ToHTML}}" 1;
     {{else}}
     default 1;
     {{end}}
 }
+{{end}}
 {{end}}
 
 
@@ -129,9 +135,11 @@ server {
         {{$item.Key}} {{$item.Val}} {{- range $item.Args}} {{.}}{{end}};
         {{end}}
         {{else if eq $def.Module `header`}}
-        {{$v.IteratorHeaderKV "header" "" "        add_header " "" true}}
+        {{$def.ExtraItem.IteratorHeaderKV "" "        add_header " "" true}}
         {{else}}
         {{$.Set `currentPath` $path}}
+        {{$.Set `_vv` $def.ExtraItem}}
+        {{$.Set `_kk` $def.ExtraIndex}}
         {{$.Fetch (printf `caddy/makeconfig/nginx/%s` $def.Module) $}}
         {{end}}
     {{end}}
@@ -148,6 +156,8 @@ server {
         {{end}}
         {{else}}
         {{$.Set `currentPath` $path}}
+        {{$.Set `_vv` $def.ExtraItem}}
+        {{$.Set `_kk` $def.ExtraIndex}}
         {{$.Fetch (printf `caddy/makeconfig/nginx/%s` $def.Module) $}}
         {{end}}
     {{end}}

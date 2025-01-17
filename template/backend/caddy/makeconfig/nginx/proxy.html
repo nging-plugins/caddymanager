@@ -1,45 +1,49 @@
 {{$v := $.Get `values`}}
-{{$except := $v.Get "proxy_except"}}
+{{$id := $.Get `id`}}
+{{if $v.IsEnabled "proxy"}}
+{{$vv := $.Get `_vv`}}
+{{$kk := $.Get `_kk`}}
+{{$except := $vv.Get "except"}}
         {{if $except}}
         location ~ "^({{Join ($v.SplitBySpaceWithRegexpQuote $except) `|`|$v.AddSlashes|ToHTML}})" {
             return 404;
         }
         {{end}}
 
-        {{if $v.Get "proxy_upstream"}}
-        {{$upstreamInfo := $.Get `proxyServerGroup`}}
+        {{if $vv.Get "upstream"}}
+        {{$upstreamInfo := $.Get (printf `proxyServerGroup%d` $kk)}}
         {{$upstreamInfo.Rewrite|ToHTML}}
         proxy_pass {{$upstreamInfo.String}};
         {{else}}
-        {{$upstreamInfo := $v.ServerGroup "proxy_to" ""}}
+        {{$upstreamInfo := $vv.ServerGroup "to" ""}}
         {{$upstreamInfo.Rewrite|ToHTML}}
         proxy_pass {{$upstreamInfo.String}};
         {{end}}
 
-        {{$keepalive := $v.Get "proxy_keepalive"}}
+        {{$keepalive := $vv.Get "keepalive"}}
         {{if and $keepalive (ne $keepalive `0`)}}
         proxy_http_version 1.1;
         proxy_set_header Connection "";
         {{end}}
         
-        {{if $v.Get "proxy_fail_timeout"}}
-        proxy_connect_timeout {{$v.Get "proxy_fail_timeout"}};
+        {{if $vv.Get "fail_timeout"}}
+        proxy_connect_timeout {{$vv.Get "fail_timeout"}};
         {{end}}
         
-        {{if $v.Get "proxy_max_fails"}}
-        proxy_next_upstream_tries {{$v.Get "proxy_max_fails"}};
+        {{if $vv.Get "max_fails"}}
+        proxy_next_upstream_tries {{$vv.Get "max_fails"}};
         {{end}}
         
-        {{if $v.Get "proxy_try_duration"}}
-        proxy_next_upstream_timeout {{$v.Get "proxy_try_duration"}};
+        {{if $vv.Get "try_duration"}}
+        proxy_next_upstream_timeout {{$vv.Get "try_duration"}};
         {{end}}
         
-        {{$v.IteratorHeaderKV "proxy" "header_upstream" "        proxy_set_header    " "" true}}
-        {{$v.IteratorNginxProxyHeaderKV}}
+        {{$vv.IteratorHeaderKV "header_upstream" "        proxy_set_header    " "" true}}
+        {{$vv.IteratorNginxProxyHeaderKV}}
         
         #proxy_socket_keepalive on;
         
-        {{range $v.Values.proxy_preset}}
+        {{range $vv.GetValues `preset`}}
             {{if eq . "insecure_skip_verify"}}
         proxy_ssl_verify off;
             {{else if eq . "websocket"}}
@@ -56,3 +60,4 @@
         {{end}}
         
         #proxy_limit_rate 0;
+{{end}}

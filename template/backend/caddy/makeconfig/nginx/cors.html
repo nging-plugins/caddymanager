@@ -1,34 +1,36 @@
 {{$v := $.Get `values`}}
 {{$id := $.Get `id`}}
 {{if $v.IsEnabled "cors"}}
-        set $allow "${allow_cors_host_{{$id}}}${allow_cors_origin_{{$id}}}";
+{{$vv := $.Get `_vv`}}
+{{$kk := $.Get `_kk`}}
+        set $allow "${allow_cors_host_{{$id}}_{{$kk}}}${allow_cors_origin_{{$id}}_{{$kk}}}";
         if ( $allow =  "11" ) {
             add_header Access-Control-Allow-Origin $http_origin always;
         }
-        {{$origin := $v.Get `cors_origin`}}
+        {{$origin := $vv.Get `origin`}}
         {{if $origin}}
         if ( $allow =  "10" ) {
             add_header Access-Control-Allow-Origin {{Join ($v.SplitBySpace $origin) `,`}} always;
         }
         {{end}}
     
-        if ( $allow_cors_host_{{$id}} = 1 ) {
-            {{if $v.Get `cors_methods`}}
-            add_header Access-Control-Allow-Methods {{$v.Get `cors_methods`}} always;
+        if ( $allow_cors_host_{{$id}}_{{$kk}} = 1 ) {
+            {{if $vv.Get `methods`}}
+            add_header Access-Control-Allow-Methods {{$vv.Get `methods`}} always;
             {{end}}
             
-            add_header Access-Control-Allow-Credentials {{$v.GetAttrVal "cors" "allow_credentials" "false"}} always;
+            add_header Access-Control-Allow-Credentials {{$vv.GetAttrVal "allow_credentials" "false"}} always;
             
-            {{if $v.Get `cors_allowed_headers`}}
-            add_header Access-Control-Allow-Headers {{$v.Get `cors_allowed_headers`}} always;
+            {{if $vv.Get `allowed_headers`}}
+            add_header Access-Control-Allow-Headers {{$vv.Get `allowed_headers`}} always;
             {{end}}
             
-            {{if $v.Get `cors_exposed_headers`}}
-            add_header Access-Control-Expose-Headers {{$v.Get `cors_exposed_headers`}} always;
+            {{if $vv.Get `exposed_headers`}}
+            add_header Access-Control-Expose-Headers {{$vv.Get `exposed_headers`}} always;
             {{end}}
             
-            {{if $v.Get `cors_max_age`}}
-            add_header Access-Control-Max-Age {{$v.Get `cors_max_age`}} always;
+            {{if $vv.Get `max_age`}}
+            add_header Access-Control-Max-Age {{$vv.Get `max_age`}} always;
             {{end}}
         }
     

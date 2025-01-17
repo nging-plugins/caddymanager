@@ -33,11 +33,13 @@ var allPathFieldsForNginx = []string{
 }
 
 type LocationDef struct {
-	PathKey  string
-	Module   string
-	Location string
-	IsRegexp bool
-	Items    []*Item
+	PathKey    string
+	Module     string
+	Location   string
+	IsRegexp   bool
+	Items      []*Item
+	ExtraItem  *ExtraItem
+	ExtraIndex int
 }
 
 type Item struct {
@@ -184,7 +186,7 @@ func (v Values) GetNginxDomainList() []NginxDomainInfo {
 		}
 		portsDomains[portN] = append(portsDomains[portN], host)
 	}
-	sort.Sort(sort.IntSlice(ports))
+	sort.Ints(ports)
 	isTLS := v.Values.Get(`tls`) == `1`
 	for _, portN := range ports {
 		info := NginxDomainInfo{
@@ -230,11 +232,15 @@ func (u UpstreamInfo) String() string {
 }
 
 func (v Values) ServerGroup(key string, customHost string, withQuotes ...bool) interface{} {
+	val := v.Get(key)
+	return v.serverGroup(val, customHost, withQuotes...)
+}
+
+func (v Values) serverGroup(val string, customHost string, withQuotes ...bool) interface{} {
 	var withQuote bool
 	if len(withQuotes) > 0 {
 		withQuote = withQuotes[0]
 	}
-	val := v.Get(key)
 	sh := strings.SplitN(val, `://`, 2)
 	var scheme string
 	var host string
@@ -295,11 +301,14 @@ func (v Values) IteratorHeaderKV(addon string, item string, plusPrefix string, m
 		addon += `_`
 	}
 	k := addon + item + `_k`
-	keys, _ := v.Values[k]
+	keys := v.Values[k]
 
 	k = addon + item + `_v`
-	values, _ := v.Values[k]
+	values := v.Values[k]
+	return v.iteratorHeaderKV(keys, values, plusPrefix, minusPrefix, withValueAndQuotes...)
+}
 
+func (v Values) iteratorHeaderKV(keys []string, values []string, plusPrefix string, minusPrefix string, withValueAndQuotes ...bool) interface{} {
 	var r, t string
 	var withValueAndQuote bool
 	if len(withValueAndQuotes) > 0 {
@@ -348,11 +357,14 @@ func (v Values) IteratorNginxProxyHeaderKV() interface{} {
 		addon += `_`
 	}
 	k := addon + item + `_k`
-	keys, _ := v.Values[k]
+	keys := v.Values[k]
 
 	k = addon + item + `_v`
-	values, _ := v.Values[k]
+	values := v.Values[k]
+	return v.iteratorNginxProxyHeaderKV(keys, values)
+}
 
+func (v Values) iteratorNginxProxyHeaderKV(keys []string, values []string) interface{} {
 	var r, t string
 	l := len(values)
 	suffix := `;`

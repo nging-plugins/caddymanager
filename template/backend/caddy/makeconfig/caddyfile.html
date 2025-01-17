@@ -22,15 +22,17 @@
     {{end}}
 
     {{if $v.IsEnabled "cors"}}
-    cors {{$v.GetAttrVal "cors" "path" "/"}} {{$v.GetAttrVal "cors" "domains"}} {
-        {{$v.AddonAttr "cors" "origin"}}
-        {{$v.AddonAttr "cors" "origin_regexp"}}
-        {{$v.AddonAttr "cors" "methods"}}
-        {{$v.AddonAttr "cors" "allow_credentials" "false"}}
-        {{$v.AddonAttr "cors" "max_age"}}
-        {{$v.AddonAttr "cors" "allowed_headers"}}
-        {{$v.AddonAttr "cors" "exposed_headers"}}
+    {{range $kk,$vv := $v.GetExtraList `cors`}}
+    cors {{$vv.GetAttrVal "path" "/"}} {{$vv.GetAttrVal "domains"}} {
+        {{$vv.AddonAttr "origin"}}
+        {{$vv.AddonAttr "origin_regexp"}}
+        {{$vv.AddonAttr "methods"}}
+        {{$vv.AddonAttr "allow_credentials" "false"}}
+        {{$vv.AddonAttr "max_age"}}
+        {{$vv.AddonAttr "allowed_headers"}}
+        {{$vv.AddonAttr "exposed_headers"}}
     }
+    {{end}}
     {{end}}
 
     {{if $v.IsEnabled "jwt"}}
@@ -192,42 +194,48 @@
     {{end}}
 
     {{if $v.IsEnabled "fastcgi"}}
-    fastcgi {{$v.Get "fastcgi_path"}} {{$v.Get "fastcgi_endpoint"}} {{$v.Get "fastcgi_preset"}} {
-        {{$v.AddonAttr "fastcgi" "ext"}}
-        {{$v.AddonAttr "fastcgi" "split"}}
-        {{$v.AddonAttr "fastcgi" "index"}}
-        {{$v.IteratorKV "fastcgi" "env" "        env    "}}
-        {{$v.AddonAttr "fastcgi" "root"}}
-        {{$v.AddonAttr "fastcgi" "except"}}
-        {{$v.AddonAttr "fastcgi" "upstream"}}
-        {{$v.AddonAttr "fastcgi" "connect_timeout"}}
-        {{$v.AddonAttr "fastcgi" "read_timeout"}}
-        {{$v.AddonAttr "fastcgi" "send_timeout"}}
+    {{range $kk,$vv := $v.GetExtraList `fastcgi`}}
+    fastcgi {{$vv.Get "path"}} {{$vv.Get "endpoint"}} {{$vv.Get "preset"}} {
+        {{$vv.AddonAttr "ext"}}
+        {{$vv.AddonAttr "split"}}
+        {{$vv.AddonAttr "index"}}
+        {{$vv.IteratorKV "env" "        env    "}}
+        {{$vv.AddonAttr "root"}}
+        {{$vv.AddonAttr "except"}}
+        {{$vv.AddonAttr "upstream"}}
+        {{$vv.AddonAttr "connect_timeout"}}
+        {{$vv.AddonAttr "read_timeout"}}
+        {{$vv.AddonAttr "send_timeout"}}
     }
+    {{end}}
     {{end}}
     
     {{if $v.IsEnabled "proxy"}}
-    proxy {{$v.Get "proxy_from"}} {{$v.Get "proxy_to"}} {
-        {{$v.AddonAttr "proxy" "policy"}}
-        {{$v.AddonAttr "proxy" "fail_timeout"}}
-        {{$v.AddonAttr "proxy" "max_fails"}}
-        {{$v.AddonAttr "proxy" "try_duration"}}
-        {{$v.AddonAttr "proxy" "try_interval"}}
-        {{$v.AddonAttr "proxy" "health_check"}}
-        {{$v.AddonAttr "proxy" "health_check_interval"}}
-        {{$v.AddonAttr "proxy" "health_check_timeout"}}
-        {{$v.IteratorKV "proxy" "header_upstream" "        header_upstream    " true}}
-        {{$v.IteratorKV "proxy" "header_downstream" "        header_downstream    " true}}
-        {{$v.AddonAttr "proxy" "keepalive"}}
-        {{$v.AddonAttr "proxy" "without"}}
-        {{$v.AddonAttr "proxy" "except"}}
-        {{$v.AddonAttr "proxy" "upstream"}}
-        {{$v.Iterator "proxy" "preset" "        "}}
+    {{range $kk,$vv := $v.GetExtraList `proxy`}}
+    proxy {{$vv.Get "from"}} {{$vv.Get "to"}} {
+        {{$vv.AddonAttr "policy"}}
+        {{$vv.AddonAttr "fail_timeout"}}
+        {{$vv.AddonAttr "max_fails"}}
+        {{$vv.AddonAttr "try_duration"}}
+        {{$vv.AddonAttr "try_interval"}}
+        {{$vv.AddonAttr "health_check"}}
+        {{$vv.AddonAttr "health_check_interval"}}
+        {{$vv.AddonAttr "health_check_timeout"}}
+        {{$vv.IteratorKV "header_upstream" "        header_upstream    " true}}
+        {{$vv.IteratorKV "header_downstream" "        header_downstream    " true}}
+        {{$vv.AddonAttr "keepalive"}}
+        {{$vv.AddonAttr "without"}}
+        {{$vv.AddonAttr "except"}}
+        {{$vv.AddonAttr "upstream"}}
+        {{$vv.Iterator "preset" "        "}}
     }
+    {{end}}
     {{end}}
 
     {{if $v.IsEnabled "browse"}}
-    browse {{$v.Get "browse_path"}} {{$v.Get "browse_tmpl"}}
+    {{range $kk,$vv := $v.GetExtraList `browse`}}
+    browse {{$vv.Get "path"}} {{$vv.Get "tmpl"}}
+    {{end}}
     {{end}}
 
     {{if $v.IsEnabled "expires"}}

@@ -20,33 +20,35 @@
 
 
     {{if $v.IsEnabled "cors"}}
-    @cors_matcher {
-        path {{$v.GetAttrVal "cors" "path" "/"}}
-        {{$v.AddonAttrFullKey "cors_domains" "host"}}
+    {{range $kk,$vv := $v.GetExtraList `cors`}}
+    @cors_matcher_{{$kk}} {
+        path {{$vv.GetAttrVal "path" "/"}}
+        {{$vv.AddonAttrFromKey "domains" "host"}}
     }
 
-    {{$originRegexp := $v.Get `cors_origin_regexp`}}
+    {{$originRegexp := $vv.Get `regexp`}}
     {{if $originRegexp}}
-    @cors_origin_matcher {
+    @cors_origin_matcher_{{$kk}} {
         header_regexp Origin "{{$originRegexp|$v.AddSlashes|ToHTML}}" 
     }
-    vars @cors_origin_matcher r_origin "{request>headers>Origin}"
-    {{$origin := $v.Get `cors_origin`}}
-    vars r_origin "{{Join ($v.SplitBySpace $origin) `,`}}"
+    vars @cors_origin_matcher_{{$kk}} r_origin_{{$kk}} "{request>headers>Origin}"
+    {{$origin := $vv.Get `origin`}}
+    vars r_origin_{{$kk}} "{{Join ($v.SplitBySpace $origin) `,`}}"
     {{end}}
 
-    header @cors_matcher {
-        Access-Control-Allow-Origin "{vars.r_origin}"
-        {{Include "caddy/makeconfig/caddy2/cors" $}}
+    header @cors_matcher_{{$kk}} {
+        Access-Control-Allow-Origin "{vars.r_origin_{{$kk}}}"
+        {{Include "caddy/makeconfig/caddy2/cors" $vv}}
     }
-    @cors_preflight {
+    @cors_preflight_{{$kk}} {
         method OPTIONS
     }
-    header @cors_preflight {
-        Access-Control-Allow-Origin "{vars.r_origin}"
-        {{Include "caddy/makeconfig/caddy2/cors" $}}
+    header @cors_preflight_{{$kk}} {
+        Access-Control-Allow-Origin "{vars.r_origin_{{$kk}}}"
+        {{Include "caddy/makeconfig/caddy2/cors" $vv}}
     }
-    respond @cors_preflight 204
+    respond @cors_preflight_{{$kk}} 204
+    {{end}}
     {{end}}
 
     {{if $v.IsEnabled "log"}}
@@ -133,57 +135,60 @@
     {{end}}
 
     {{if $v.IsEnabled "fastcgi"}}
-    @php_fastcgi_matcher {
-        path {{$v.Get "fastcgi_path"|$v.AddPathWildcardSuffix}}
-        {{if $v.Get `fastcgi_ext`}}
-        path_regexp {{$v.Get "fastcgi_ext"|$v.RegexpQuote}}
+    {{range $kk,$vv := $v.GetExtraList `fastcgi`}}
+    @php_fastcgi_matcher_{{$kk}} {
+        path {{$vv.Get "path"|$v.AddPathWildcardSuffix}}
+        {{if $vv.Get `ext`}}
+        path_regexp {{$vv.Get "ext"|$v.RegexpQuote}}
         {{end}}
-        {{$except := $v.Get "fastcgi_except"}}
+        {{$except := $vv.Get "except"}}
         {{if $except}}
         not path_regexp "^({{Join ($v.SplitBySpaceWithRegexpQuote $except) `|`|$v.AddSlashes|ToHTML}})"
         {{end}}
     }
-    php_fastcgi @php_fastcgi_matcher {{$v.Get "fastcgi_endpoint"}} {
-        {{$v.AddonAttr "fastcgi" "root"}}
-        {{$v.AddonAttr "fastcgi" "split"}}
-        {{$v.IteratorKV "fastcgi" "env" "        env    "}}
-        {{$v.AddonAttr "fastcgi" "index"}}
-        {{$v.AddonAttrFullKey "fastcgi_upstream" "to"}}
-        {{$v.AddonAttrFullKey "fastcgi_connect_timeout" "dial_timeout"}}
-        {{$v.AddonAttrFullKey "fastcgi_read_timeout" "read_timeout"}}
-        {{$v.AddonAttrFullKey "fastcgi_send_timeout" "write_timeout"}}
+    php_fastcgi @php_fastcgi_matcher_{{$kk}} {{$vv.Get "endpoint"}} {
+        {{$vv.AddonAttr "root"}}
+        {{$vv.AddonAttr "split"}}
+        {{$vv.IteratorKV "env" "        env    "}}
+        {{$vv.AddonAttr "index"}}
+        {{$vv.AddonAttrFromKey "upstream" "to"}}
+        {{$vv.AddonAttrFromKey "connect_timeout" "dial_timeout"}}
+        {{$vv.AddonAttrFromKey "read_timeout" "read_timeout"}}
+        {{$vv.AddonAttrFromKey "send_timeout" "write_timeout"}}
     }
+    {{end}}
     {{end}}
     
     {{if $v.IsEnabled "proxy"}}
-    @reverse_proxy_matcher {
-        path {{$v.Get "proxy_from"|$v.AddPathWildcardSuffix}}
-        {{$excepts := $v.SplitBySpaceWithPathWildcardSuffix "proxy_except"}}
+    {{range $kk,$vv := $v.GetExtraList `proxy`}}
+    @reverse_proxy_matcher_{{$kk}} {
+        path {{$vv.Get "from"|$v.AddPathWildcardSuffix}}
+        {{$excepts := $v.SplitBySpaceWithPathWildcardSuffix ($vv.Get "except")}}
         {{if gt (len $excepts) 0}}
         not path {{Join $excepts ` `}}
         {{end}}
     }
-    reverse_proxy @reverse_proxy_matcher {{$v.Get "proxy_to"}} {
-        {{$v.AddonAttrFullKey "proxy_upstream" "to"}}
-        {{if $.Get `proxy_upstream`}}
-        {{$v.AddonAttrFullKey "proxy_policy" "lb_policy"}}
-        {{$v.AddonAttrFullKey "proxy_fail_timeout" "fail_duration"}}
-        {{$v.AddonAttrFullKey "proxy_max_fails" "lb_retries"}}
-        {{$v.AddonAttrFullKey "proxy_try_duration" "lb_try_duration"}}
-        {{$v.AddonAttrFullKey "proxy_try_interval" "lb_try_interval"}}
-        {{$v.AddonAttrFullKey "proxy_health_check" "health_uri"}}
-        {{$v.AddonAttrFullKey "proxy_health_check_interval" "health_interval"}}
-        {{$v.AddonAttrFullKey "proxy_health_check_timeout" "health_timeout"}}
+    reverse_proxy @reverse_proxy_matcher_{{$kk}} {{$vv.Get "to"}} {
+        {{$vv.AddonAttrFromKey "upstream" "to"}}
+        {{if $vv.Get `upstream`}}
+        {{$vv.AddonAttrFromKey "policy" "lb_policy"}}
+        {{$vv.AddonAttrFromKey "fail_timeout" "fail_duration"}}
+        {{$vv.AddonAttrFromKey "max_fails" "lb_retries"}}
+        {{$vv.AddonAttrFromKey "try_duration" "lb_try_duration"}}
+        {{$vv.AddonAttrFromKey "try_interval" "lb_try_interval"}}
+        {{$vv.AddonAttrFromKey "health_check" "health_uri"}}
+        {{$vv.AddonAttrFromKey "health_check_interval" "health_interval"}}
+        {{$vv.AddonAttrFromKey "health_check_timeout" "health_timeout"}}
         {{end}}
-        {{$v.IteratorKV "proxy" "header_upstream" "        header_up    " true}}
-        {{$v.IteratorKV "proxy" "header_downstream" "        header_down    " true}}
+        {{$vv.IteratorKV "header_upstream" "        header_up    " true}}
+        {{$vv.IteratorKV "header_downstream" "        header_down    " true}}
 
-        {{if $v.Get "proxy_without"}}
-        uri strip_prefix {{$v.Get "proxy_without"}}
+        {{if $vv.Get "without"}}
+        uri strip_prefix {{$vv.Get "without"}}
         {{end}}
 
-        {{$insecureSkipVerify := InSlice `insecure_skip_verify` ($v.GetValueList `proxy` `preset`)}}
-        {{$keepalive := $v.Get "proxy_keepalive"}}
+        {{$insecureSkipVerify := InSlice `insecure_skip_verify` ($v.GetValueList `preset`)}}
+        {{$keepalive := $vv.Get "keepalive"}}
         {{if or $insecureSkipVerify (and $keepalive (ne $keepalive `0`))}}
         transport http {
             {{if $insecureSkipVerify}}
@@ -196,15 +201,18 @@
         {{end}}
     }
     {{end}}
+    {{end}}
 
     {{if $v.IsEnabled "browse"}}
-    file_server {{$v.Get "browse_path"|$v.AddPathWildcardSuffix}} {{$v.Get "browse_tmpl"|Default `browse`}} {
+    {{range $kk,$vv := $v.GetExtraList `browse`}}
+    file_server {{$vv.Get "path"|$v.AddPathWildcardSuffix}} {{$vv.Get "tmpl"|Default `browse`}} {
         {{$root := $v.Get `root`}}
         {{if $root}}
         root "{{$root|$v.AddSlashes|ToHTML}}"
         {{end}}
         hide .git    
     }
+    {{end}}
     {{end}}
 
     {{if $v.IsEnabled "expires"}}

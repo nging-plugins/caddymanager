@@ -3,29 +3,30 @@
 {{$id := $.Get `id`}}
 
     {{if $v.IsEnabled "fastcgi"}}
-        {{$fastCgiPath := $v.Get "fastcgi_path"}}
+    {{range $kk,$vv := $v.GetExtraList `fastcgi`}}
+        {{$fastCgiPath := $vv.Get "path"}}
         {{if $fastCgiPath}}
-    location ~ ^{{$fastCgiPath|$v.RegexpQuote}}.*{{$v.Get "fastcgi_ext"|$v.RegexpQuote}}$ {
+    location ~ ^{{$fastCgiPath|$v.RegexpQuote}}.*{{$vv.Get "ext"|$v.RegexpQuote}}$ {
         {{else}}
-    location ~ {{$v.Get "fastcgi_ext"|$v.RegexpQuote}}$ {
+    location ~ {{$vv.Get "ext"|$v.RegexpQuote}}$ {
         {{end}}
 
-        {{$except := $v.Get "fastcgi_except"}}
+        {{$except := $vv.Get "except"}}
         {{if $except}}
         location ~ "^({{Join ($v.SplitBySpaceWithRegexpQuote $except) `|`|$v.AddSlashes|ToHTML}})" {
             return 404;
         }
         {{end}}
 
-        {{if $v.Get "fastcgi_upstream"}}
-        fastcgi_pass nging_fastcgi_{{$id}};
+        {{if $vv.Get "upstream"}}
+        fastcgi_pass nging_fastcgi_{{$id}}_{{$kk}};
         {{else}}
-        fastcgi_pass {{$v.Get "fastcgi_endpoint"}};
+        fastcgi_pass {{$vv.Get "endpoint"}};
         {{end}}
 
-        fastcgi_index {{$v.Get "fastcgi_index"}};
+        fastcgi_index {{$vv.Get "index"}};
         {{$root := $v.Get "root"}}
-        {{$fastCgiRoot := $v.Get "fastcgi_root"}}
+        {{$fastCgiRoot := $vv.Get "root"}}
         {{if $fastCgiRoot}}
         fastcgi_param SCRIPT_FILENAME {{$fastCgiRoot}}/$fastcgi_script_name;
         {{else if $root}}
@@ -34,26 +35,27 @@
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
         {{end}}
 
-        {{$fastCgiSplit := $v.Get "fastcgi_split"}}
+        {{$fastCgiSplit := $vv.Get "split"}}
         #fastcgi_split_path_info ^((?U).+{{$fastCgiSplit|$v.RegexpQuote}})(/?.+)$; {{/* # 非贪婪模式 */}}
         fastcgi_split_path_info ^(.+{{$fastCgiSplit|$v.RegexpQuote}})(/.*)$; {{/* # 贪婪模式 */}}
         fastcgi_param PATH_INFO $fastcgi_path_info;
 
-        {{$v.IteratorKV "fastcgi" "env" "        fastcgi_param "}}
+        {{$vv.IteratorKV "env" "        fastcgi_param "}}
 
-        {{if $v.Get "fastcgi_connect_timeout"}}
-        fastcgi_connect_timeout {{$v.Get "fastcgi_connect_timeout"}};
+        {{if $vv.Get "connect_timeout"}}
+        fastcgi_connect_timeout {{$vv.Get "connect_timeout"}};
         {{end}}
 
-        {{if $v.Get "fastcgi_read_timeout"}}
-        fastcgi_read_timeout {{$v.Get "fastcgi_read_timeout"}};
+        {{if $vv.Get "read_timeout"}}
+        fastcgi_read_timeout {{$vv.Get "read_timeout"}};
         {{end}}
 
-        {{if $v.Get "fastcgi_send_timeout"}}
-        fastcgi_send_timeout {{$v.Get "fastcgi_send_timeout"}};
+        {{if $vv.Get "send_timeout"}}
+        fastcgi_send_timeout {{$vv.Get "send_timeout"}};
         {{end}}
         
         include fastcgi_params;
     }
+    {{end}}
     {{end}}
     

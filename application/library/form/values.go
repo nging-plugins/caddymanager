@@ -54,6 +54,28 @@ func (v Values) VhostConfigDir() string {
 	return dir
 }
 
+func (v Values) getExtraIndexes(addon string) []string {
+	return v.Values[addon+`_extra_index[]`]
+}
+
+func (v Values) GetExtraList(addon string) []*ExtraItem {
+	indexes := v.getExtraIndexes(addon)
+	results := make([]*ExtraItem, len(indexes)+1)
+	results[0] = &ExtraItem{
+		addon:  addon,
+		Values: v,
+	}
+	for i, index := range indexes {
+		results[i+1] = &ExtraItem{
+			addon:  addon,
+			prefix: addon + `_extra`,
+			index:  index,
+			Values: v,
+		}
+	}
+	return results
+}
+
 func (v Values) GetWebdavUser() []*webdav.WebdavUser {
 	return webdav.ParseUserForm(v.Values)
 }
@@ -111,7 +133,7 @@ func (v Values) SliceRegexpQuote(content []string) []string {
 }
 
 func (v Values) GetSlice(key string) param.StringSlice {
-	values, _ := v.Values[key]
+	values := v.Values[key]
 	return param.StringSlice(values)
 }
 
@@ -128,11 +150,14 @@ func (v Values) IteratorKV(addon string, item string, prefix string, withQuotes 
 		addon += `_`
 	}
 	k := addon + item + `_k`
-	keys, _ := v.Values[k]
+	keys := v.Values[k]
 
 	k = addon + item + `_v`
-	values, _ := v.Values[k]
+	values := v.Values[k]
+	return v.iteratorKV(keys, values, prefix, withQuotes...)
+}
 
+func (v Values) iteratorKV(keys []string, values []string, prefix string, withQuotes ...bool) interface{} {
 	var r, t string
 	var withQuote bool
 	var ignoreSlash bool
@@ -216,10 +241,10 @@ func (v Values) GetKVList(addon string, itemOr ...string) []echo.KV {
 		addon += `_`
 	}
 	k := addon + item + `_k`
-	keys, _ := v.Values[k]
+	keys := v.Values[k]
 
 	k = addon + item + `_v`
-	values, _ := v.Values[k]
+	values := v.Values[k]
 
 	l := len(values)
 	result := make([]echo.KV, 0, len(keys))
@@ -243,10 +268,10 @@ func (v Values) GetKVData(addon string, itemOr ...string) *echo.KVData {
 		addon += `_`
 	}
 	k := addon + item + `_k`
-	keys, _ := v.Values[k]
+	keys := v.Values[k]
 
 	k = addon + item + `_v`
-	values, _ := v.Values[k]
+	values := v.Values[k]
 
 	l := len(values)
 	result := echo.NewKVData()
@@ -270,7 +295,11 @@ func (v Values) GetValueList(addon string, itemOr ...string) []string {
 		addon += `_`
 	}
 	k := addon + item
-	values, _ := v.Values[k]
+	values := v.Values[k]
+	return v.getValueList(values)
+}
+
+func (v Values) getValueList(values []string) []string {
 	result := make([]string, 0, len(values))
 	for _, v := range values {
 		if len(v) > 0 {
@@ -285,7 +314,11 @@ func (v Values) Iterator(addon string, item string, prefix string, withQuotes ..
 		addon += `_`
 	}
 	k := addon + item
-	values, _ := v.Values[k]
+	values := v.Values[k]
+	return v.iterator(values, prefix, withQuotes...)
+}
+
+func (v Values) iterator(values []string, prefix string, withQuotes ...bool) interface{} {
 	var r, t string
 	var withQuote bool
 	var ignoreSlash bool
@@ -316,6 +349,38 @@ func (v Values) GroupByLocations(fields []string) Locations {
 	var staticPathList []string
 	var regexpPathList []string
 	groupByPath := map[string][]*LocationDef{}
+	var addPath = func(pathKey, moduleName, path string, extraIndex int, extraItem *ExtraItem, isRegexp bool) {
+		data := &LocationDef{
+			PathKey:    pathKey,
+			Module:     moduleName,
+			Location:   path,
+			ExtraIndex: extraIndex,
+			ExtraItem:  extraItem,
+		}
+		if _, ok := groupByPath[path]; !ok {
+			groupByPath[path] = []*LocationDef{}
+			if isRegexp {
+				regexpPathList = append(regexpPathList, path)
+			} else {
+				staticPathList = append(staticPathList, path)
+			}
+		}
+		groupByPath[path] = append(groupByPath[path], data)
+	}
+	var addPath2 = func(pathKey, moduleName, path string, extraIndex int, extraItem *ExtraItem) {
+		if _, ok := groupByPath[path]; !ok {
+			groupByPath[path] = []*LocationDef{}
+			staticPathList = append(staticPathList, path)
+		}
+		data := &LocationDef{
+			PathKey:    pathKey,
+			Module:     moduleName,
+			Location:   path,
+			ExtraIndex: extraIndex,
+			ExtraItem:  extraItem,
+		}
+		groupByPath[path] = append(groupByPath[path], data)
+	}
 	for _, pathKey := range fields {
 		if strings.HasSuffix(pathKey, `[]`) {
 			pathKey = strings.TrimSuffix(pathKey, `[]`)
@@ -323,45 +388,27 @@ func (v Values) GroupByLocations(fields []string) Locations {
 			if !v.IsEnabled(moduleName) {
 				continue
 			}
-			if len(v.Values[pathKey]) != 1 {
-				continue
-			}
 			var isRegexp bool
 			if pathKey == `expires_match_k` {
 				isRegexp = true
 			}
-			for _, path := range v.Values[pathKey] {
-				data := &LocationDef{
-					PathKey:  pathKey,
-					Module:   moduleName,
-					Location: path,
+			extraList := v.GetExtraList(moduleName)
+			for index, extraItem := range extraList {
+				values := extraItem.GetValues(pathKey)
+				if len(values) == 1 {
+					addPath(extraItem.GenName(pathKey), moduleName, values[0], index, extraItem, isRegexp)
 				}
-				if _, ok := groupByPath[path]; !ok {
-					groupByPath[path] = []*LocationDef{}
-					if isRegexp {
-						regexpPathList = append(regexpPathList, path)
-					} else {
-						staticPathList = append(staticPathList, path)
-					}
-				}
-				groupByPath[path] = append(groupByPath[path], data)
 			}
 		} else {
 			moduleName := strings.SplitN(pathKey, `_`, 2)[0]
 			if !v.IsEnabled(moduleName) {
 				continue
 			}
-			path := v.Get(pathKey)
-			if _, ok := groupByPath[path]; !ok {
-				groupByPath[path] = []*LocationDef{}
-				staticPathList = append(staticPathList, path)
+			extraList := v.GetExtraList(moduleName)
+			for index, extraItem := range extraList {
+				path := extraItem.Get(pathKey)
+				addPath2(extraItem.GenName(pathKey), moduleName, path, index, extraItem)
 			}
-			data := &LocationDef{
-				PathKey:  pathKey,
-				Module:   moduleName,
-				Location: path,
-			}
-			groupByPath[path] = append(groupByPath[path], data)
 		}
 	}
 	sort.Sort(SortByLen(regexpPathList))
