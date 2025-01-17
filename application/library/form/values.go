@@ -382,14 +382,18 @@ func (v Values) GroupByLocations(fields []string) Locations {
 		groupByPath[path] = append(groupByPath[path], data)
 	}
 	for _, pathKey := range fields {
+		parts := strings.SplitN(pathKey, `_`, 2)
+		moduleName := parts[0]
+		if !v.IsEnabled(moduleName) {
+			continue
+		}
+		if len(parts) == 2 {
+			pathKey = parts[1]
+		}
 		if strings.HasSuffix(pathKey, `[]`) {
 			pathKey = strings.TrimSuffix(pathKey, `[]`)
-			moduleName := strings.SplitN(pathKey, `_`, 2)[0]
-			if !v.IsEnabled(moduleName) {
-				continue
-			}
 			var isRegexp bool
-			if pathKey == `expires_match_k` {
+			if moduleName+`_`+pathKey == `expires_match_k` {
 				isRegexp = true
 			}
 			extraList := v.GetExtraList(moduleName)
@@ -400,10 +404,6 @@ func (v Values) GroupByLocations(fields []string) Locations {
 				}
 			}
 		} else {
-			moduleName := strings.SplitN(pathKey, `_`, 2)[0]
-			if !v.IsEnabled(moduleName) {
-				continue
-			}
 			extraList := v.GetExtraList(moduleName)
 			for index, extraItem := range extraList {
 				path := extraItem.Get(pathKey)

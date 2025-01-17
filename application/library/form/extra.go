@@ -19,6 +19,9 @@ func (t *ExtraItem) GenName(name string) string {
 		name = t.addon + `_` + name
 		return name
 	}
+	if len(t.addon) > 0 {
+		name = t.addon + `_` + name
+	}
 	name = t.prefix + `[` + t.index + `]` + GenNameSuffix(name)
 	return name
 }

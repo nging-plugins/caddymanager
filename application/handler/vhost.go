@@ -22,7 +22,6 @@ import (
 	"encoding/json"
 	"html/template"
 	"net/url"
-	"strings"
 
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
@@ -33,6 +32,7 @@ import (
 	"github.com/nging-plugins/caddymanager/application/dbschema"
 	mconfig "github.com/nging-plugins/caddymanager/application/library/config"
 	"github.com/nging-plugins/caddymanager/application/library/engine"
+	"github.com/nging-plugins/caddymanager/application/library/form"
 	"github.com/nging-plugins/caddymanager/application/model"
 )
 
@@ -151,21 +151,14 @@ func VhostAdd(ctx echo.Context) error {
 
 func setVhostForm(ctx echo.Context) {
 	ctx.SetFunc(`Val`, func(name, defaultValue string) string {
+		if v, y := ctx.Get(`namePrefix`).(string); y && len(v) > 0 {
+			name = v + form.GenNameSuffix(name)
+		}
 		return ctx.Form(name, defaultValue)
 	})
 	ctx.SetFunc(`Key`, func(name string) string {
 		if v, y := ctx.Get(`namePrefix`).(string); y && len(v) > 0 {
-			if strings.HasSuffix(name, `]`) {
-				pos := strings.Index(name, `[`)
-				if pos > 0 {
-					return v + `[` + name[0:pos] + `]` + name[pos:]
-				}
-				if pos == 0 {
-					return v + name
-				}
-				return v + `[` + name
-			}
-			return v + `[` + name + `]`
+			return v + form.GenNameSuffix(name)
 		}
 		return name
 	})
