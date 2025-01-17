@@ -5,7 +5,7 @@ import "github.com/webx-top/echo"
 var VhostModules = echo.NewKVData().
 	Add(`basic`, echo.T(`通用设置`)).
 	//Add(`log`, echo.T(`访问日志`), echo.KVOptHKV(`turnable`, true)).
-	Add(`header`, echo.T(`响应Header`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineInvalid`, `nginx`), echo.KVOptHKV(`docURL`, `https://caddyserver.com/docs/header`)).
+	Add(`header`, echo.T(`响应Header`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`multiple`, true), echo.KVOptHKV(`engineInvalid`, `nginx`), echo.KVOptHKV(`docURL`, `https://caddyserver.com/docs/header`)).
 	// Add(`tls`, echo.T(`HTTPS`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`docURLs`, map[string]string{
 	// 	`default`: `https://caddyserver.com/docs/tls`,
 	// 	`caddy2`:  `https://caddyserver.com/docs/caddyfile/directives/tls`,
@@ -16,17 +16,17 @@ var VhostModules = echo.NewKVData().
 	// 	`caddy2`:  `https://caddyserver.com/docs/caddyfile/directives/encode`,
 	// 	`nginx`:   `https://nginx.org/en/docs/http/ngx_http_gzip_module.html#gzip`,
 	// })).
-	Add(`fastcgi`, echo.T(`FastCGI`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`docURLs`, map[string]string{
+	Add(`fastcgi`, echo.T(`FastCGI`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`multiple`, true), echo.KVOptHKV(`docURLs`, map[string]string{
 		`default`: `https://caddyserver.com/docs/fastcgi`,
 		`caddy2`:  `https://caddyserver.com/docs/caddyfile/directives/php_fastcgi#syntax`,
 		`nginx`:   `https://nginx.org/en/docs/http/ngx_http_fastcgi_module.html#fastcgi_pass`,
 	})).
-	Add(`proxy`, echo.T(`反向代理`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`docURLs`, map[string]string{
+	Add(`proxy`, echo.T(`反向代理`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`multiple`, true), echo.KVOptHKV(`docURLs`, map[string]string{
 		`default`: `https://caddyserver.com/docs/proxy`,
 		`caddy2`:  `https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#syntax`,
 		`nginx`:   `https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass`,
 	})).
-	Add(`browse`, echo.T(`文件服务`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`docURLs`, map[string]string{
+	Add(`browse`, echo.T(`文件服务`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`multiple`, true), echo.KVOptHKV(`docURLs`, map[string]string{
 		`default`: `https://caddyserver.com/docs/browse`,
 		`caddy2`:  `https://caddyserver.com/docs/caddyfile/directives/file_server#syntax`,
 		`nginx`:   `https://nginx.org/en/docs/http/ngx_http_autoindex_module.html`,
@@ -41,10 +41,10 @@ var VhostModules = echo.NewKVData().
 	// })).
 	Add(`basicauth`, echo.T(`BasicAuth`), echo.KVOptHKV(`turnable`, true)).
 	Add(`ratelimit`, echo.T(`限流`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineInvalid`, `caddy2`)).
-	Add(`cors`, echo.T(`跨域支持(CORS)`), echo.KVOptHKV(`turnable`, true)).
-	Add(`jwt`, echo.T(`JWT`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`)).
+	Add(`cors`, echo.T(`跨域支持(CORS)`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`multiple`, true)).
+	Add(`jwt`, echo.T(`JWT`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`), echo.KVOptHKV(`multiple`, true)).
 	Add(`login`, echo.T(`Login`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`)).
-	Add(`locale`, echo.T(`多语言`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`)).
+	Add(`locale`, echo.T(`多语言`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`), echo.KVOptHKV(`multiple`, true)).
 	Add(`nobots`, echo.T(`反爬虫`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`)).
 	Add(`prometheus`, echo.T(`Prometheus`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`)).
 	Add(`s3browser`, echo.T(`S3Browser`), echo.KVOptHKV(`turnable`, true), echo.KVOptHKV(`engineValid`, `default`)).
