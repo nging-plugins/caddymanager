@@ -32,7 +32,7 @@ function addKVs(obj,k,v){
   tmpl=tmpl.replace(/\{v\}/g,v);
   $(obj).parent().before(tmpl);
 }
-function addKs(obj,k,v){
+function addKs(obj,k){
   var tmpl=$('#tmplAddVariableRowSingleCell').html(),namePrefix=$(obj).closest('table').data('nameprefix');
   if(namePrefix){
     var newName=formInputNameWithPrefix(k,namePrefix);
