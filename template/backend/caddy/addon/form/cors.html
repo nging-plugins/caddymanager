@@ -38,13 +38,13 @@
     <div class="col-sm-4">
         {{$v := $.Form "cors_allow_credentials"}}
         <div class="radio radio-primary radio-inline"> 
-          <input type="radio" value="true" id="cors_allow_credentials-t" name="{{call $.Func.Key `cors_allow_credentials`}}"{{if eq $v `true`}} checked{{end}}><label for="cors_allow_credentials-t">{{"设置为true"|$.T}}</label> 
+          <input type="radio" value="true" id="{{$.Get `namePrefix`}}cors_allow_credentials-t" name="{{call $.Func.Key `cors_allow_credentials`}}"{{if eq $v `true`}} checked{{end}}><label for="{{$.Get `namePrefix`}}cors_allow_credentials-t">{{"设置为true"|$.T}}</label> 
         </div>
         <div class="radio radio-danger radio-inline"> 
-          <input type="radio" value="false" id="cors_allow_credentials-f" name="{{call $.Func.Key `cors_allow_credentials`}}"{{if eq $v `false`}} checked{{end}}><label for="cors_allow_credentials-f">{{"设置为false"|$.T}}</label> 
+          <input type="radio" value="false" id="{{$.Get `namePrefix`}}cors_allow_credentials-f" name="{{call $.Func.Key `cors_allow_credentials`}}"{{if eq $v `false`}} checked{{end}}><label for="{{$.Get `namePrefix`}}cors_allow_credentials-f">{{"设置为false"|$.T}}</label> 
         </div>
         <div class="radio radio-default radio-inline"> 
-          <input type="radio" value="" id="cors_allow_credentials-n" name="{{call $.Func.Key `cors_allow_credentials`}}"{{if eq $v ``}} checked{{end}}><label for="cors_allow_credentials-n">{{"不设置"|$.T}}</label> 
+          <input type="radio" value="" id="{{$.Get `namePrefix`}}cors_allow_credentials-n" name="{{call $.Func.Key `cors_allow_credentials`}}"{{if eq $v ``}} checked{{end}}><label for="{{$.Get `namePrefix`}}cors_allow_credentials-n">{{"不设置"|$.T}}</label> 
         </div>
         <div class="help-block">
             {{"设置响应Header中的Access-Control-Allow-Credential值"|$.T}}

@@ -25,7 +25,7 @@
 <div class="form-group">
     <label class="col-sm-2 control-label">{{"允许值"|$.T}}</label>
     <div class="col-sm-10">
-       <table>
+       <table data-nameprefix="{{$.Get `namePrefix`}}">
             <thead>
                 <tr>
                     <th style="width:50%;">{{"名称"|$.T}}</th>
@@ -72,7 +72,7 @@
 <div class="form-group">
     <label class="col-sm-2 control-label">{{"禁止值"|$.T}}</label>
     <div class="col-sm-10">
-       <table>
+       <table data-nameprefix="{{$.Get `namePrefix`}}">
             <thead>
                 <tr>
                     <th style="width:50%;">{{"名称"|$.T}}</th>
@@ -126,7 +126,7 @@
 <div class="form-group">
     <label class="col-sm-2 control-label">{{"公钥文件"|$.T}}</label>
     <div class="col-sm-10">
-        <table>
+        <table data-nameprefix="{{$.Get `namePrefix`}}">
 			<thead>
 				<tr>
 					<th>{{"公钥文件路径"|$.T}}</th>
@@ -146,7 +146,7 @@
 </tr>
             {{- end -}}
 				<tr>
-					<td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" id="jwtPublickeyBtn" onclick="addKs(this,'jwt_publickey');"><i class="fa fa-plus"></i></td>
+					<td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" onclick="addKs(this,'jwt_publickey');"><i class="fa fa-plus"></i></td>
 				</tr>
 			</tbody>
 		</table>
@@ -167,18 +167,18 @@
     <label class="col-sm-2 control-label">{{"令牌来源"|$.T}}</label>
     <div class="col-sm-10">
         <div class="checkbox checkbox-primary"> 
-          <input type="checkbox" value="header" id="jwt_token_source-header" name="{{call $.Func.Key `jwt_token_source_header`}}"{{if eq ($.Form (call $.Func.Key `jwt_token_source_header`)) `header`}} checked{{end}}><label for="jwt_token_source-header">Header</label>
+          <input type="checkbox" value="header" id="{{$.Get `namePrefix`}}jwt_token_source-header" name="{{call $.Func.Key `jwt_token_source_header`}}"{{if eq ($.Form (call $.Func.Key `jwt_token_source_header`)) `header`}} checked{{end}}><label for="{{$.Get `namePrefix`}}jwt_token_source-header">Header</label>
         </div>
         <div class="checkbox checkbox-primary"> 
-          <input type="checkbox" value="cookie" id="jwt_token_source-cookie" name="{{call $.Func.Key `jwt_token_source_cookie`}}"{{if eq ($.Form (call $.Func.Key `jwt_token_source_cookie`)) `cookie`}} checked{{end}} onclick="if($(this).prop('checked')){$('#jwt_token_source-cookie_name').show();}else{$('#jwt_token_source-cookie_name').hide();}"><label for="jwt_token_source-cookie">Cookie</label>
-          <div class="input-group" id="jwt_token_source-cookie_name"{{if ne ($.Form (call $.Func.Key `jwt_token_source_cookie`)) `cookie`}} style="display:none"{{end}}>
+          <input type="checkbox" value="cookie" id="{{$.Get `namePrefix`}}jwt_token_source-cookie" name="{{call $.Func.Key `jwt_token_source_cookie`}}"{{if eq ($.Form (call $.Func.Key `jwt_token_source_cookie`)) `cookie`}} checked{{end}} onclick="if($(this).prop('checked')){$(this).siblings('.input-group').show();}else{$(this).siblings('.input-group').hide();}"><label for="{{$.Get `namePrefix`}}jwt_token_source-cookie">Cookie</label>
+          <div class="input-group"{{if ne ($.Form (call $.Func.Key `jwt_token_source_cookie`)) `cookie`}} style="display:none"{{end}}>
               <span class="input-group-addon">{{"Cookie名称"|$.T}}</span>
               <input type="text" class="form-control" name="{{call $.Func.Key `jwt_token_source_cookie_name`}}" value="{{$.Form (call $.Func.Key `jwt_token_source_cookie_name`) `jwt_token`}}" placeholder="jwt_token">
             </div>
         </div>
         <div class="checkbox checkbox-primary"> 
-          <input type="checkbox" value="query_param" id="jwt_token_source-query_param" name="{{call $.Func.Key `jwt_token_source_query_param`}}"{{if eq ($.Form (call $.Func.Key `jwt_token_source_query_param`)) `query_param`}} checked{{end}} onclick="if($(this).prop('checked')){$('#jwt_token_source-query_param_name').show();}else{$('#jwt_token_source-query_param_name').hide();}"><label for="jwt_token_source-query_param">{{"网址参数"|$.T}}</label>
-          <div class="input-group" id="jwt_token_source-query_param_name"{{if ne ($.Form (call $.Func.Key `jwt_token_source_query_param`)) `query_param`}} style="display:none"{{end}}>
+          <input type="checkbox" value="query_param" id="{{$.Get `namePrefix`}}jwt_token_source-query_param" name="{{call $.Func.Key `jwt_token_source_query_param`}}"{{if eq ($.Form (call $.Func.Key `jwt_token_source_query_param`)) `query_param`}} checked{{end}} onclick="if($(this).prop('checked')){$(this).siblings('.input-group').show();}else{$(this).siblings('.input-group').hide();}"><label for="{{$.Get `namePrefix`}}jwt_token_source-query_param">{{"网址参数"|$.T}}</label>
+          <div class="input-group"{{if ne ($.Form (call $.Func.Key `jwt_token_source_query_param`)) `query_param`}} style="display:none"{{end}}>
               <span class="input-group-addon">{{"参数名称"|$.T}}</span>
               <input type="text" class="form-control" name="{{call $.Func.Key `jwt_token_source_query_param_name`}}" value="{{$.Form (call $.Func.Key `jwt_token_source_query_param_name`) `token`}}" placeholder="token">
             </div>

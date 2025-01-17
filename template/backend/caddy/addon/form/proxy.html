@@ -75,7 +75,7 @@
                         <div class="form-group">
                           <label class="col-sm-2 control-label">{{"传递给后端的Header"|$.T}}</label>
                           <div class="col-sm-10">
-                            <table>
+                            <table data-nameprefix="{{$.Get `namePrefix`}}">
 								              <thead>
 								              	<tr>
 								              		<th style="width:50%;">{{"名称"|$.T}}</th>
@@ -103,7 +103,7 @@
                                     {{- end -}}
                                 {{- end -}}
 								              	<tr>
-								              		<td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" id="proxyHeaderUpstreamBtn" onclick="addKVs(this,'proxy_header_upstream_k','proxy_header_upstream_v');"><i class="fa fa-plus"></i></td>
+								              		<td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" onclick="addKVs(this,'proxy_header_upstream_k','proxy_header_upstream_v');"><i class="fa fa-plus"></i></td>
 								              	</tr>
 								              </tbody>
 							            </table>
@@ -116,7 +116,7 @@
                         <div class="form-group">
                           <label class="col-sm-2 control-label">{{"重写响应Header"|$.T}}</label>
                           <div class="col-sm-10">
-                            <table>
+                            <table data-nameprefix="{{$.Get `namePrefix`}}">
 								              <thead>
 								              	<tr>
 								              		<th style="width:50%;">{{"名称"|$.T}}</th>
@@ -144,7 +144,7 @@
                                     {{- end -}}
                                 {{- end -}}
 								              	<tr>
-								              		<td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" id="proxyHeaderDownstreamBtn" onclick="addKVs(this,'proxy_header_downstream_k','proxy_header_downstream_v');"><i class="fa fa-plus"></i></td>
+								              		<td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" onclick="addKVs(this,'proxy_header_downstream_k','proxy_header_downstream_v');"><i class="fa fa-plus"></i></td>
 								              	</tr>
 								              </tbody>
 							            </table>

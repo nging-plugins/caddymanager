@@ -23,8 +23,8 @@
        </div>
        {{- $hasCookie := InSlice "cookie" $vals -}}
        <div class="checkbox checkbox-primary"> 
-         <input type="checkbox" value="cookie" id="{{$.Get `namePrefix`}}locale_detect-cookie" name="{{$inputName}}"{{if $hasCookie}} checked{{end}} onclick="if($(this).prop('checked')){$('#locale_detect-cookie-name').show()}else{$('#locale_detect-cookie-name').hide()}"><label for="{{$.Get `namePrefix`}}locale_detect-cookie">Cookie</label>
-         <div class="input-group" id="locale_detect-cookie-name"{{if not $hasCookie}} style="display:none"{{end}}>
+         <input type="checkbox" value="cookie" id="{{$.Get `namePrefix`}}locale_detect-cookie" name="{{$inputName}}"{{if $hasCookie}} checked{{end}} onclick="if($(this).prop('checked')){$(this).siblings('.input-group').show()}else{$(this).siblings('.input-group').hide()}"><label for="{{$.Get `namePrefix`}}locale_detect-cookie">Cookie</label>
+         <div class="input-group"{{if not $hasCookie}} style="display:none"{{end}}>
              <span class="input-group-addon">{{"Cookie名称"|$.T}}</span>
              <input type="text" class="form-control" name="{{call $.Func.Key `locale_cookie`}}" value="{{$.Form (call $.Func.Key `locale_cookie`)}}" placeholder="locale">
            </div>

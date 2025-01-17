@@ -10,7 +10,7 @@
     <div class="form-group">
           <label class="col-sm-2 control-label">{{"设置Header"|$.T}}</label>
           <div class="col-sm-9">
-    <table>
+    <table data-nameprefix="{{$.Get `namePrefix`}}">
                         <thead>
                             <tr>
                                 <th style="width:50%;">{{"字段名"|$.T}}</th>
@@ -38,7 +38,7 @@
                     {{- end -}}
                 {{- end -}}
                             <tr>
-                                <td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" id="headerAddVarBtn" onclick="addKVs(this,'header_k','header_v');"><i class="fa fa-plus"></i></td>
+                                <td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" onclick="addKVs(this,'header_k','header_v');"><i class="fa fa-plus"></i></td>
                             </tr>
                         </tbody>
                   </table>

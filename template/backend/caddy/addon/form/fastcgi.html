@@ -43,7 +43,7 @@
                         <div class="form-group">
                           <label class="col-sm-2 control-label">{{"环境变量"|$.T}}</label>
                           <div class="col-sm-10">
-                            <table>
+                            <table data-nameprefix="{{$.Get `namePrefix`}}">
 								              <thead>
 								              	<tr>
 								              		<th style="width:50%;">{{"变量名"|$.T}}</th>
@@ -71,7 +71,7 @@
                                     {{- end -}}
                                 {{- end -}}
 								              	<tr>
-								              		<td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" id="fastcgiAddEnvVarBtn" onclick="addKVs(this,'fastcgi_env_k','fastcgi_env_v');"><i class="fa fa-plus"></i></td>
+								              		<td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" onclick="addKVs(this,'fastcgi_env_k','fastcgi_env_v');"><i class="fa fa-plus"></i></td>
 								              	</tr>
 								              </tbody>
 							            </table>
