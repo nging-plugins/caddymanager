@@ -36,13 +36,32 @@ function addKs(obj,k,v){
 function initReqPlaceholdersModal(){
   $('#request-placeholders-modal').find('.modal-body').css({"max-height":$(window).height()-200});
 }
-function copyFormHTML(boxElem){
+function copyFormHTML(boxElem,namePrefix){
   var base = $(boxElem).children('.fieldset:first');
   var closeBtn = '<a href="javascript:;" class="label label-danger extra-page-remove" onclick="removeFormHTML(this);" data-toggle="tooltip" title="'+App.t('删除')+'"><i class="fa fa-times"></i></a>';
   var copied = base.clone();
   copied.prepend(closeBtn);
   copied.find('input[type="text"]').val('');
   copied.find('textarea').text('');
+  if(namePrefix){
+    copied.find('[name]').each(function(){
+      var name=$(this).attr('name');
+      if(name.startsWith(namePrefix)) return;
+      if(name.endsWith(']')){
+        var pos=name.indexOf('['),newName='';
+        if(pos>0){
+          newName=namePrefix+'['+name.substring(0,pos)+']'+name.substring(pos);
+        }else if(pos==0){
+          newName=namePrefix+name;
+        }else{
+          newName=namePrefix+'['+name;
+        }
+      }else{
+        newName=namePrefix+'['+name+']';
+      }
+      $(this).attr('name',newName);
+    })
+  }
   if(base.next('.fieldset').length>0){
     base.siblings('.fieldset:last').after(copied);
   }else{
