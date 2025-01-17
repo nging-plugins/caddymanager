@@ -61,7 +61,7 @@
                       {{- $.Set `namePrefix` `` -}}
                     </div>
                     {{- end -}}
-                    <a href="javascript:;" onclick="copyFormHTML('#{{$v.K}}-settings','{{$v.K}}_extra')" class="vhost-section-add" title="{{`增加规则`|$.T}}"><i class="fa fa-plus"></i></a>
+                    <a href="javascript:;" onclick="copyFormHTML('#{{$v.K}}-settings','{{$v.K}}_extra',true)" class="vhost-section-add" title="{{`增加规则`|$.T}}"><i class="fa fa-plus"></i></a>
                   </div>
                   {{- else -}}
                   <div class="fieldset bg-fc hide" id="{{$v.K}}-settings">

@@ -69,13 +69,15 @@ function addNamePrefix(a,namePrefix){
   $(a).attr('id',namePrefix+id);
   $(a).next('label[for="'+id+'"]').attr('for',namePrefix+id);
 }
-function copyFormHTML(boxElem,namePrefix){
+function copyFormHTML(boxElem,namePrefix,noClean){
   var base = $(boxElem).children('.fieldset:first');
   var closeBtn = '<a href="javascript:;" class="label label-danger extra-page-remove" onclick="removeFormHTML(this);" data-toggle="tooltip" title="'+App.t('删除')+'"><i class="fa fa-times"></i></a>';
   var copied = base.clone();
   copied.prepend(closeBtn);
-  copied.find('input[type="text"]').val('');
-  copied.find('textarea').text('');
+  if(!noClean){
+    copied.find('input[type="text"]').val('');
+    copied.find('textarea').text('');
+  }
   if(copied[0].hasAttribute('id')) copied[0].removeAttribute('id');
   if(namePrefix) {
     var indexName=namePrefix+'_index[]',index=$(boxElem).find('input[name="'+indexName+'"]:last').val()||0;
