@@ -39,7 +39,7 @@ upstream nging_fastcgi_{{$id}}_{{$kk}}{
 {{$upstream := $vv.Get "upstream"}}
     {{if $upstream}}
     {{$policy := $vv.Get "policy"}}
-    {{$serverGroup := $v.ServerGroup "to" (printf `nging_proxy_%d_%d` $id $kk)}}
+    {{$serverGroup := $vv.ServerGroup "to" (printf `nging_proxy_%d_%d` $id $kk)}}
     {{$.Set (printf `proxyServerGroup%d` $kk) $serverGroup}}
 upstream nging_proxy_{{$id}}_{{$kk}}{
     {{if eq $policy `ip_hash`}}

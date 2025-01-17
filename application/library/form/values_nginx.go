@@ -233,10 +233,10 @@ func (u UpstreamInfo) String() string {
 
 func (v Values) ServerGroup(key string, customHost string, withQuotes ...bool) interface{} {
 	val := v.Get(key)
-	return v.serverGroup(val, customHost, withQuotes...)
+	return v.serverGroup(val, customHost, v.Get, withQuotes...)
 }
 
-func (v Values) serverGroup(val string, customHost string, withQuotes ...bool) interface{} {
+func (v Values) serverGroup(val string, customHost string, get func(string) string, withQuotes ...bool) interface{} {
 	var withQuote bool
 	if len(withQuotes) > 0 {
 		withQuote = withQuotes[0]
@@ -265,9 +265,9 @@ func (v Values) serverGroup(val string, customHost string, withQuotes ...bool) i
 	}
 	var rewrite string
 	if scheme == `http` || scheme == `https` {
-		stripPrefix := v.Get(`proxy_without`)
+		stripPrefix := get(`proxy_without`)
 		if len(stripPrefix) > 0 {
-			proxyPath := v.Get(`proxy_from`)
+			proxyPath := get(`proxy_from`)
 			if stripPrefix == proxyPath {
 				ppath = `/`
 			} else {

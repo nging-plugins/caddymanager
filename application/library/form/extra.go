@@ -22,8 +22,15 @@ func (t *ExtraItem) GenName(name string) string {
 	if len(t.addon) > 0 {
 		name = t.addon + `_` + name
 	}
-	name = t.prefix + `[` + t.index + `]` + GenNameSuffix(name)
+	name = t.FullPrefix() + GenNameSuffix(name)
 	return name
+}
+
+func (t *ExtraItem) FullPrefix() string {
+	if len(t.prefix) == 0 {
+		return ``
+	}
+	return t.prefix + `[` + t.index + `]`
 }
 
 func GenNameSuffix(name string) string {
@@ -106,7 +113,9 @@ func (t *ExtraItem) Iterator(item string, prefix string, withQuotes ...bool) int
 
 func (t *ExtraItem) ServerGroup(key string, customHost string, withQuotes ...bool) interface{} {
 	val := t.Get(key)
-	return t.Values.serverGroup(val, customHost, withQuotes...)
+	return t.Values.serverGroup(val, customHost, func(name string) string {
+		return t.Values.Get(t.FullPrefix() + GenNameSuffix(name))
+	}, withQuotes...)
 }
 
 func (t *ExtraItem) IteratorHeaderKV(item string, plusPrefix string, minusPrefix string, withValueAndQuotes ...bool) interface{} {
