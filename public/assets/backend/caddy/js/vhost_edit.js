@@ -23,18 +23,47 @@ function insertCondForRewrite(obj){
   App.insertAtCursor($('#rewrite_rule')[0],$(obj).children('strong').text()+' ');
 }
 function addKVs(obj,k,v){
-  var tmpl=$('#tmplAddVariableRow').html();
+  var tmpl=$('#tmplAddVariableRow').html(),namePrefix=$(obj).closest('table').data('nameprefix');
+  if(namePrefix){
+    var newName=formInputNameWithPrefix(k,namePrefix);
+    if(newName!=='') k=newName;
+  }
   tmpl=tmpl.replace(/\{k\}/g,k);
   tmpl=tmpl.replace(/\{v\}/g,v);
   $(obj).parent().before(tmpl);
 }
 function addKs(obj,k,v){
-  var tmpl=$('#tmplAddVariableRowSingleCell').html();
+  var tmpl=$('#tmplAddVariableRowSingleCell').html(),namePrefix=$(obj).closest('table').data('nameprefix');
+  if(namePrefix){
+    var newName=formInputNameWithPrefix(k,namePrefix);
+    if(newName!=='') k=newName;
+  }
   tmpl=tmpl.replace(/\{k\}/g,k);
   $(obj).parent().before(tmpl);
 }
 function initReqPlaceholdersModal(){
   $('#request-placeholders-modal').find('.modal-body').css({"max-height":$(window).height()-200});
+}
+function formInputNameWithPrefix(name,namePrefix){
+  if(name.startsWith(namePrefix)) return '';
+  if(name.endsWith(']')){
+    var pos=name.indexOf('['),newName='';
+    if(pos>0){
+      newName=namePrefix+'['+name.substring(0,pos)+']'+name.substring(pos);
+    }else if(pos==0){
+      newName=namePrefix+name;
+    }else{
+      newName=namePrefix+'['+name;
+    }
+  }else{
+    newName=namePrefix+'['+name+']';
+  }
+  return newName;
+}
+function addNamePrefix(a,namePrefix){
+  var name=$(a).attr('name'), newName=formInputNameWithPrefix(name,namePrefix);
+  if(newName==='') return;
+  $(a).attr('name',newName);
 }
 function copyFormHTML(boxElem,namePrefix){
   var base = $(boxElem).children('.fieldset:first');
@@ -44,24 +73,9 @@ function copyFormHTML(boxElem,namePrefix){
   copied.find('input[type="text"]').val('');
   copied.find('textarea').text('');
   if(copied[0].hasAttribute('id')) copied[0].removeAttribute('id');
-  if(namePrefix){
-    copied.find('[name]').each(function(){
-      var name=$(this).attr('name');
-      if(name.startsWith(namePrefix)) return;
-      if(name.endsWith(']')){
-        var pos=name.indexOf('['),newName='';
-        if(pos>0){
-          newName=namePrefix+'['+name.substring(0,pos)+']'+name.substring(pos);
-        }else if(pos==0){
-          newName=namePrefix+name;
-        }else{
-          newName=namePrefix+'['+name;
-        }
-      }else{
-        newName=namePrefix+'['+name+']';
-      }
-      $(this).attr('name',newName);
-    })
+  if(namePrefix) {
+    copied.find('[name]').each(function(){addNamePrefix(this,namePrefix)});
+    copied.find('.form-group table').attr('data-nameprefix',namePrefix);
   }
   if(base.next('.fieldset').length>0){
     base.siblings('.fieldset:last').after(copied);
