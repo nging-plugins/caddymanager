@@ -116,7 +116,7 @@ func VhostAdd(ctx echo.Context) error {
 				m.Disabled == common.BoolN && len(ctx.Form(`restart`)) > 0,
 				m.Disabled == common.BoolN && len(ctx.Form(`removeCachedCert`)) > 0,
 			)
-			ctx.End(err == nil)
+			ctx.Commit()
 		}
 		if err == nil {
 			common.SendOk(ctx, ctx.T(`操作成功`))
