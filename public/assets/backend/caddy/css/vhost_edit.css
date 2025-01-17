@@ -3,5 +3,5 @@
 .nav-tabs > li > a{font-weight:bold;}
 .nav-tabs > li.not-enabled > a{font-weight:normal;font-style:italic;opacity:.8;}
 .vhost-section-add{width:100%;display:block;text-align:center;}
-.vhost-section-add::before{content:"";height:2px;width:100%;display:block;background-color:#2494F2;}
-.vhost-section-add>i.fa{border-radius:0 0 20px 20px;padding:2px 5px 5px 5px;position:absolute;margin-top:-2px;background-color:#2494F2;color:white}
+.vhost-section-add::before{content:"";height:5px;width:100%;display:block;background-color:#2494F2;border-radius:0 0 10px 10px;}
+.vhost-section-add>i.fa{border-radius:0 0 20px 20px;padding:2px 5px 5px 5px;position:absolute;margin-top:-4px;background-color:#2494F2;color:white}
