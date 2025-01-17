@@ -48,8 +48,8 @@
                     {{- if eq $val `1`}}{{$.Fetch (printf "caddy/addon/form/%s" $v.K) $}}{{end -}}
                   </div>
                   {{- else if $v.H.multiple -}}
-                  <div class="hide" id="{{$v.K}}-settings">
-                    <div class="fieldset bg-fc">
+                  <div class="hide" id="{{$v.K}}-settings" multiple>
+                    <div class="fieldset bg-fc spacer-bottom-xs" id="{{$v.K}}-settings-inner">
                       {{- if eq $val `1`}}{{$.Fetch (printf "caddy/addon/form/%s" $v.K) $}}{{end -}}
                     </div>
                     <a href="javascript:;" onclick="copyFormHTML('#{{$v.K}}-settings','{{$v.K}}_extra')" class="vhost-section-add" title="{{`增加规则`|$.T}}"><i class="fa fa-plus"></i></a>

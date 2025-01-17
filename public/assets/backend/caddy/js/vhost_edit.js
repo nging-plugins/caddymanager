@@ -43,6 +43,7 @@ function copyFormHTML(boxElem,namePrefix){
   copied.prepend(closeBtn);
   copied.find('input[type="text"]').val('');
   copied.find('textarea').text('');
+  if(copied.hasAttr('id')) copied.removeAttr('id');
   if(namePrefix){
     copied.find('[name]').each(function(){
       var name=$(this).attr('name');
