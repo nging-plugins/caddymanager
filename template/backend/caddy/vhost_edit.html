@@ -52,6 +52,15 @@
                     <div class="fieldset bg-fc spacer-bottom-xs" id="{{$v.K}}-settings-inner">
                       {{- if eq $val `1`}}{{$.Fetch (printf "caddy/addon/form/%s" $v.K) $}}{{end -}}
                     </div>
+                    {{- $indexName := printf `%s_extra_index[]` $v.K -}}
+                    {{- range $index, $value := $.FormxValues $indexName -}}
+                    <div class="fieldset bg-fc spacer-bottom-xs">
+                      {{- $.Set `namePrefix` (printf `%s_extra[%v]` $v.K $value) -}}
+                      <input type="hidden" name="{{$indexName}}" value="{{$value}}" />
+                      {{$.Fetch (printf "caddy/addon/form/%s" $v.K) $}}
+                      {{- $.Set `namePrefix` `` -}}
+                    </div>
+                    {{- end -}}
                     <a href="javascript:;" onclick="copyFormHTML('#{{$v.K}}-settings','{{$v.K}}_extra')" class="vhost-section-add" title="{{`增加规则`|$.T}}"><i class="fa fa-plus"></i></a>
                   </div>
                   {{- else -}}

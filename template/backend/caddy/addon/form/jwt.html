@@ -1,21 +1,21 @@
 <div class="form-group">
     <label class="col-sm-2 control-label">{{"路径"|$.T}}</label>
     <div class="col-sm-10">
-       <input type="text" class="form-control" value="{{$.Form `jwt_path` `/`}}" name="jwt_path" required="required" placeholder="">
+       <input type="text" class="form-control" value="{{$.Form (call $.Func.Key `jwt_path`) `/`}}" name="{{call $.Func.Key `jwt_path`}}" required="required" placeholder="">
        <div class="help-block">{{"访问路径，默认为“/”"|$.T}}</div>
     </div>
   </div>
 <div class="form-group">
     <label class="col-sm-2 control-label">{{"跳转网址"|$.T}}</label>
     <div class="col-sm-10">
-       <input type="text" class="form-control" value="{{$.Form `jwt_redirect`}}" name="jwt_redirect" placeholder="">
+       <input type="text" class="form-control" value="{{$.Form (call $.Func.Key `jwt_redirect`)}}" name="{{call $.Func.Key `jwt_redirect`}}" placeholder="">
        <div class="help-block">{{"验证失败后的跳转网址或路径，如果不设置，则返回带访问受限状态码的页面"|$.T}}</div>
     </div>
   </div>
 <div class="form-group">
     <label class="col-sm-2 control-label">{{"公开路径"|$.T}}</label>
     <div class="col-sm-10">
-       <input type="text" class="form-control" value="{{$.Form `jwt_except`}}" name="jwt_except" placeholder="">
+       <input type="text" class="form-control" value="{{$.Form (call $.Func.Key `jwt_except`)}}" name="{{call $.Func.Key `jwt_except`}}" placeholder="">
        <div class="help-block">
         {{"无需JWT验证的路径。比如："|$.T}}<code>/login</code>
         {{"一般与上面的“跳转网址”中设置的路径保持一致"}}
@@ -34,13 +34,15 @@
                 </tr>
             </thead>
             <tbody>
-           {{- $vals := $.FormValues "jwt_allow_v" -}}
+              {{- $allowKeyName := call $.Func.Key `jwt_allow_k` -}}
+              {{- $allowValName := call $.Func.Key `jwt_allow_v` -}}
+           {{- $vals := $.FormValues $allowValName -}}
            {{- $vlen := len $vals -}}
-           {{- range $k,$v:=$.FormValues "jwt_allow_k" -}}
+           {{- range $k,$v:=$.FormValues $allowKeyName -}}
                {{- if lt $k $vlen -}}
 <tr>
-<td><input type="text" class="form-control" name="jwt_allow_k" value="{{$v}}"></td>
-<td><input type="text" class="form-control" name="jwt_allow_v" value="{{index $vals $k}}"></td>
+<td><input type="text" class="form-control" name="{{$allowKeyName}}" value="{{$v}}"></td>
+<td><input type="text" class="form-control" name="{{$allowValName}}" value="{{index $vals $k}}"></td>
 <td class="text-center">
 <button type="button" class="btn btn-danger" onclick="$(this).parent().parent().remove()">
 <i class="fa fa-times"></i>
@@ -79,13 +81,15 @@
                 </tr>
             </thead>
             <tbody>
-           {{- $vals := $.FormValues "jwt_deny_v" -}}
+              {{- $denyKeyName := call $.Func.Key `jwt_deny_k` -}}
+              {{- $denyValName := call $.Func.Key `jwt_deny_v` -}}
+           {{- $vals := $.FormValues $denyValName -}}
            {{- $vlen := len $vals -}}
-           {{- range $k,$v:=$.FormValues "jwt_deny_k" -}}
+           {{- range $k,$v:=$.FormValues $denyKeyName -}}
                {{- if lt $k $vlen -}}
 <tr>
-<td><input type="text" class="form-control" name="jwt_deny_k" value="{{$v}}"></td>
-<td><input type="text" class="form-control" name="jwt_deny_v" value="{{index $vals $k}}"></td>
+<td><input type="text" class="form-control" name="{{$denyKeyName}}" value="{{$v}}"></td>
+<td><input type="text" class="form-control" name="{{$denyValName}}" value="{{index $vals $k}}"></td>
 <td class="text-center">
 <button type="button" class="btn btn-danger" onclick="$(this).parent().parent().remove()">
 <i class="fa fa-times"></i>
@@ -107,13 +111,13 @@
     <label class="col-sm-2 control-label">{{"其它设置"|$.T}}</label>
     <div class="col-sm-10">
         <div class="checkbox checkbox-primary checkbox-inline"> 
-          <input type="checkbox" value="1" id="jwt_allowroot" name="jwt_allowroot"{{if eq ($.Form `jwt_allowroot`) `1`}} checked{{end}}><label for="jwt_allowroot">{{"允许公开根路径"|$.T}}</label> 
+          <input type="checkbox" value="1" id="jwt_allowroot" name="{{call $.Func.Key `jwt_allowroot`}}"{{if eq ($.Form (call $.Func.Key `jwt_allowroot`)) `1`}} checked{{end}}><label for="jwt_allowroot">{{"允许公开根路径"|$.T}}</label> 
         </div>
         <div class="checkbox checkbox-danger checkbox-inline"> 
-          <input type="checkbox" value="1" id="jwt_passthrough" name="jwt_passthrough"{{if eq ($.Form `jwt_passthrough`) `1`}} checked{{end}}><label for="jwt_passthrough">{{"忽略验证"|$.T}}</label> 
+          <input type="checkbox" value="1" id="jwt_passthrough" name="{{call $.Func.Key `jwt_passthrough`}}"{{if eq ($.Form (call $.Func.Key `jwt_passthrough`)) `1`}} checked{{end}}><label for="jwt_passthrough">{{"忽略验证"|$.T}}</label> 
         </div>
         <div class="checkbox checkbox-primary checkbox-inline"> 
-          <input type="checkbox" value="1" id="jwt_strip_header" name="jwt_strip_header"{{if eq ($.Form `jwt_strip_header`) `1`}} checked{{end}}><label for="jwt_strip_header">{{"Claims数据中的键名取最后一个“/”后面的值"|$.T}} (strip_header)</label> 
+          <input type="checkbox" value="1" id="jwt_strip_header" name="{{call $.Func.Key `jwt_strip_header`}}"{{if eq ($.Form (call $.Func.Key `jwt_strip_header`)) `1`}} checked{{end}}><label for="jwt_strip_header">{{"Claims数据中的键名取最后一个“/”后面的值"|$.T}} (strip_header)</label> 
         </div>
         <div class="help-block">
         </div>
@@ -130,16 +134,17 @@
 				</tr>
 			</thead>
 			<tbody>
-            {{range $k,$v:=$.FormValues "jwt_publickey"}}
+        {{- $inputName := call $.Func.Key `jwt_publickey` -}}
+            {{- range $k,$v:=$.FormValues $inputName -}}
 <tr>
-	<td><input type="text" class="form-control" name="jwt_publickey" value="{{$v}}"></td>
+	<td><input type="text" class="form-control" name="{{$inputName}}" value="{{$v}}"></td>
 	<td class="text-center">
     <button type="button" class="btn btn-danger" onclick="$(this).parent().parent().remove()">
       <i class="fa fa-times"></i>
     </button>
   </td>
 </tr>
-            {{end}}
+            {{- end -}}
 				<tr>
 					<td colspan="3" class="text-center primary-emphasis" style="cursor:pointer" id="jwtPublickeyBtn" onclick="addKs(this,'jwt_publickey');"><i class="fa fa-plus"></i></td>
 				</tr>
@@ -152,7 +157,7 @@
 <div class="form-group">
     <label class="col-sm-2 control-label">{{"安全文件"|$.T}}</label>
     <div class="col-sm-10">
-       <input type="text" class="form-control" value="{{$.Form `jwt_secret`}}" name="jwt_secret" placeholder="/path/to/secret.txt">
+       <input type="text" class="form-control" value="{{$.Form (call $.Func.Key `jwt_secret`)}}" name="{{call $.Func.Key `jwt_secret`}}" placeholder="/path/to/secret.txt">
        <div class="help-block">{{"用于HMAC格式的令牌(Token)"|$.T}}</div>
     </div>
   </div>
@@ -162,20 +167,20 @@
     <label class="col-sm-2 control-label">{{"令牌来源"|$.T}}</label>
     <div class="col-sm-10">
         <div class="checkbox checkbox-primary"> 
-          <input type="checkbox" value="header" id="jwt_token_source-header" name="jwt_token_source_header"{{if eq ($.Form `jwt_token_source_header`) `header`}} checked{{end}}><label for="jwt_token_source-header">Header</label>
+          <input type="checkbox" value="header" id="jwt_token_source-header" name="{{call $.Func.Key `jwt_token_source_header`}}"{{if eq ($.Form (call $.Func.Key `jwt_token_source_header`)) `header`}} checked{{end}}><label for="jwt_token_source-header">Header</label>
         </div>
         <div class="checkbox checkbox-primary"> 
-          <input type="checkbox" value="cookie" id="jwt_token_source-cookie" name="jwt_token_source_cookie"{{if eq ($.Form `jwt_token_source_cookie`) `cookie`}} checked{{end}} onclick="if($(this).prop('checked')){$('#jwt_token_source-cookie_name').show();}else{$('#jwt_token_source-cookie_name').hide();}"><label for="jwt_token_source-cookie">Cookie</label>
-          <div class="input-group" id="jwt_token_source-cookie_name"{{if ne ($.Form `jwt_token_source_cookie`) `cookie`}} style="display:none"{{end}}>
+          <input type="checkbox" value="cookie" id="jwt_token_source-cookie" name="{{call $.Func.Key `jwt_token_source_cookie`}}"{{if eq ($.Form (call $.Func.Key `jwt_token_source_cookie`)) `cookie`}} checked{{end}} onclick="if($(this).prop('checked')){$('#jwt_token_source-cookie_name').show();}else{$('#jwt_token_source-cookie_name').hide();}"><label for="jwt_token_source-cookie">Cookie</label>
+          <div class="input-group" id="jwt_token_source-cookie_name"{{if ne ($.Form (call $.Func.Key `jwt_token_source_cookie`)) `cookie`}} style="display:none"{{end}}>
               <span class="input-group-addon">{{"Cookie名称"|$.T}}</span>
-              <input type="text" class="form-control" name="jwt_token_source_cookie_name" value="{{$.Form `jwt_token_source_cookie_name` `jwt_token`}}" placeholder="jwt_token">
+              <input type="text" class="form-control" name="{{call $.Func.Key `jwt_token_source_cookie_name`}}" value="{{$.Form (call $.Func.Key `jwt_token_source_cookie_name`) `jwt_token`}}" placeholder="jwt_token">
             </div>
         </div>
         <div class="checkbox checkbox-primary"> 
-          <input type="checkbox" value="query_param" id="jwt_token_source-query_param" name="jwt_token_source_query_param"{{if eq ($.Form `jwt_token_source_query_param`) `query_param`}} checked{{end}} onclick="if($(this).prop('checked')){$('#jwt_token_source-query_param_name').show();}else{$('#jwt_token_source-query_param_name').hide();}"><label for="jwt_token_source-query_param">{{"网址参数"|$.T}}</label>
-          <div class="input-group" id="jwt_token_source-query_param_name"{{if ne ($.Form `jwt_token_source_query_param`) `query_param`}} style="display:none"{{end}}>
+          <input type="checkbox" value="query_param" id="jwt_token_source-query_param" name="{{call $.Func.Key `jwt_token_source_query_param`}}"{{if eq ($.Form (call $.Func.Key `jwt_token_source_query_param`)) `query_param`}} checked{{end}} onclick="if($(this).prop('checked')){$('#jwt_token_source-query_param_name').show();}else{$('#jwt_token_source-query_param_name').hide();}"><label for="jwt_token_source-query_param">{{"网址参数"|$.T}}</label>
+          <div class="input-group" id="jwt_token_source-query_param_name"{{if ne ($.Form (call $.Func.Key `jwt_token_source_query_param`)) `query_param`}} style="display:none"{{end}}>
               <span class="input-group-addon">{{"参数名称"|$.T}}</span>
-              <input type="text" class="form-control" name="jwt_token_source_query_param_name" value="{{$.Form `jwt_token_source_query_param_name` `token`}}" placeholder="token">
+              <input type="text" class="form-control" name="{{call $.Func.Key `jwt_token_source_query_param_name`}}" value="{{$.Form (call $.Func.Key `jwt_token_source_query_param_name`) `token`}}" placeholder="token">
             </div>
         </div>
         <div class="help-block">

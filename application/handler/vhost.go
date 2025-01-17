@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"html/template"
 	"net/url"
+	"strings"
 
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
@@ -151,6 +152,22 @@ func VhostAdd(ctx echo.Context) error {
 func setVhostForm(ctx echo.Context) {
 	ctx.SetFunc(`Val`, func(name, defaultValue string) string {
 		return ctx.Form(name, defaultValue)
+	})
+	ctx.SetFunc(`Key`, func(name string) string {
+		if v, y := ctx.Get(`namePrefix`).(string); y && len(v) > 0 {
+			if strings.HasSuffix(name, `]`) {
+				pos := strings.Index(name, `[`)
+				if pos > 0 {
+					return v + `[` + name[0:pos] + `]` + name[pos:]
+				}
+				if pos == 0 {
+					return v + name
+				}
+				return v + `[` + name
+			}
+			return v + `[` + name + `]`
+		}
+		return name
 	})
 	g := model.NewVhostGroup(ctx)
 	g.ListByOffset(nil, nil, 0, -1)

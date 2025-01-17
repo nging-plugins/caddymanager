@@ -64,6 +64,10 @@ function addNamePrefix(a,namePrefix){
   var name=$(a).attr('name'), newName=formInputNameWithPrefix(name,namePrefix);
   if(newName==='') return;
   $(a).attr('name',newName);
+  var id=$(a).attr('id');
+  if(!id) return;
+  $(a).attr('id',namePrefix+id);
+  $(a).next('label[for="'+id+'"]').attr('for',namePrefix+id);
 }
 function copyFormHTML(boxElem,namePrefix){
   var base = $(boxElem).children('.fieldset:first');
@@ -74,8 +78,12 @@ function copyFormHTML(boxElem,namePrefix){
   copied.find('textarea').text('');
   if(copied[0].hasAttribute('id')) copied[0].removeAttribute('id');
   if(namePrefix) {
+    var indexName=namePrefix+'_index[]',index=$(boxElem).find('input[name="'+indexName+'"]:last').val()||0;
+    index++;
+    namePrefix=namePrefix+'['+index+']';
     copied.find('[name]').each(function(){addNamePrefix(this,namePrefix)});
     copied.find('.form-group table').attr('data-nameprefix',namePrefix);
+    copied.prepend('<input type="hidden" name="'+indexName+'" value="'+index+'" />');
   }
   if(base.next('.fieldset').length>0){
     base.siblings('.fieldset:last').after(copied);
