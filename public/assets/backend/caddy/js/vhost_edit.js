@@ -38,8 +38,9 @@ function initReqPlaceholdersModal(){
 }
 function copyFormHTML(boxElem){
   var base = $(boxElem).children('.fieldset:first');
+  var closeBtn = '<a href="javascript:;" class="label label-danger extra-page-remove" onclick="removeFormHTML(this);" data-toggle="tooltip" title="'+App.t('删除')+'"><i class="fa fa-times"></i></a>';
   var copied = base.clone();
-  copied.prepend('<a href="javascript:;" class="label label-danger extra-page-remove" onclick="removeFormHTML(this);" data-toggle="tooltip" title="'+App.t('删除')+'"><i class="fa fa-times"></i></a>');
+  copied.prepend(closeBtn);
   copied.find('input[type="text"]').val('');
   copied.find('textarea').text('');
   if(base.next('.fieldset').length>0){
