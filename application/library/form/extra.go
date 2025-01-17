@@ -113,9 +113,13 @@ func (t *ExtraItem) Iterator(item string, prefix string, withQuotes ...bool) int
 
 func (t *ExtraItem) ServerGroup(key string, customHost string, withQuotes ...bool) interface{} {
 	val := t.Get(key)
-	return t.Values.serverGroup(val, customHost, func(name string) string {
-		return t.Values.Get(t.FullPrefix() + GenNameSuffix(name))
-	}, withQuotes...)
+	prefix := t.FullPrefix()
+	if len(prefix) > 0 {
+		return t.Values.serverGroup(val, customHost, func(name string) string {
+			return t.Values.Get(prefix + GenNameSuffix(name))
+		}, withQuotes...)
+	}
+	return t.Values.serverGroup(val, customHost, t.Values.Get, withQuotes...)
 }
 
 func (t *ExtraItem) IteratorHeaderKV(item string, plusPrefix string, minusPrefix string, withValueAndQuotes ...bool) interface{} {
