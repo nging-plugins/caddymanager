@@ -6,12 +6,7 @@
 <li class="active">{{$.Stored.title}}</li>
 {{/Block}}
 {{Block "headEnd"}}
-<style type="text/css">
-.extra-page-remove{position:absolute;display:none;border-radius:0 0 50px 0;z-index:2;}
-.fieldset:hover .extra-page-remove{display:block;}
-.nav-tabs > li > a{font-weight:bold;}
-.nav-tabs > li.not-enabled > a{font-weight:normal;font-style:italic;opacity:.8;}
-</style>
+<link rel="stylesheet" href="{{AssetsURL}}/caddy/css/vhost_edit.css?t={{BuildTime}}" />
 {{/Block}}
 {{Block "main"}}
 <div class="row">

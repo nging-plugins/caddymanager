@@ -1,0 +1,7 @@
+.extra-page-remove{position:absolute;display:none;border-radius:0 0 50px 0;z-index:2;}
+.fieldset:hover .extra-page-remove{display:block;}
+.nav-tabs > li > a{font-weight:bold;}
+.nav-tabs > li.not-enabled > a{font-weight:normal;font-style:italic;opacity:.8;}
+a.label.section-add{width:100%;display:block;}
+a.label.section-add::before{content:"";height:2px;width:100%;background-color:#2494F2;}
+a.label.section-add>i.fa{text-align:center;}
