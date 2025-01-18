@@ -187,7 +187,7 @@
         uri strip_prefix {{$vv.Get "without"}}
         {{end}}
 
-        {{$insecureSkipVerify := InSlice `insecure_skip_verify` ($v.GetValueList `preset`)}}
+        {{$insecureSkipVerify := InSlice `insecure_skip_verify` ($vv.GetValueList `preset`)}}
         {{$keepalive := $vv.Get "keepalive"}}
         {{if or $insecureSkipVerify (and $keepalive (ne $keepalive `0`))}}
         transport http {
@@ -210,7 +210,7 @@
         {{if $root}}
         root "{{$root|$v.AddSlashes|ToHTML}}"
         {{end}}
-        hide .git    
+        hide .git
     }
     {{end}}
     {{end}}
