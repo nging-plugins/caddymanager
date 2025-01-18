@@ -21,7 +21,7 @@ require (
 	github.com/caddy-plugins/caddy-locale v0.0.2
 	github.com/caddy-plugins/caddy-prometheus v0.1.0
 	github.com/caddy-plugins/caddy-rate-limit v1.7.0
-	github.com/caddy-plugins/caddy-s3browser v0.1.3
+	github.com/caddy-plugins/caddy-s3browser v0.2.0
 	github.com/caddy-plugins/cors v0.0.3
 	github.com/caddy-plugins/ipfilter v1.1.8
 	github.com/caddy-plugins/loginsrv v0.1.9
