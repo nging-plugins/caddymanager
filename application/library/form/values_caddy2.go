@@ -49,6 +49,13 @@ func (v Values) AddPathWildcardSuffix(path string) string {
 	return path + `*`
 }
 
+func (v Values) MustAddPathWildcardSuffix(path string) string {
+	if strings.HasSuffix(path, `*`) {
+		return path
+	}
+	return path + `*`
+}
+
 func (v Values) BCrypt(password string) string {
 	password, _ = htpasswd.HashBCrypt(password)
 	return password

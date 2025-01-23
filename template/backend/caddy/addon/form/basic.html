@@ -149,15 +149,15 @@
           {{`语法：`|$.T}} <strong>rewrite</strong> <em>[&lt;matcher&gt;]</em> <em>&lt;to&gt;</em><br />
           {{`例如：`|$.T}}  
           <pre>rewrite * /foo.html
-  rewrite /api/* ?a=b
-  rewrite /api/* ?{query}&a=b
-  rewrite * /index.php?{query}&p={path}</pre>
+rewrite /api/* ?a=b
+rewrite /api/* ?{query}&a=b
+rewrite * /index.php?{query}&p={path}</pre>
         </div><!-- /.engine-show-caddy2 -->
         <div class="engine-show-nginx">
           {{`语法：`|$.T}} <strong>rewrite</strong> <em>regex</em> <em>replacement</em> <em>[flag]</em>;<br />
           {{`例如：`|$.T}} 
           <pre>rewrite ^(/download/.*)/media/(.*)\..*$ $1/mp3/$2.mp3 last;
-  rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra  last;</pre>
+rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra last;</pre>
         </div><!-- /.engine-show-nginx -->
       </div><!-- /.help-block -->
     </div> 

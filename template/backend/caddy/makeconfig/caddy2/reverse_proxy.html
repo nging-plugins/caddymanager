@@ -1,0 +1,27 @@
+{{$vv := .}}
+        {{$vv.AddonAttrFromKey "upstream" "to"}}
+{{if $vv.Get `upstream`}}
+        {{$vv.AddonAttrFromKey "policy" "lb_policy"}}
+        {{$vv.AddonAttrFromKey "fail_timeout" "fail_duration"}}
+        {{$vv.AddonAttrFromKey "max_fails" "lb_retries"}}
+        {{$vv.AddonAttrFromKey "try_duration" "lb_try_duration"}}
+        {{$vv.AddonAttrFromKey "try_interval" "lb_try_interval"}}
+        {{$vv.AddonAttrFromKey "health_check" "health_uri"}}
+        {{$vv.AddonAttrFromKey "health_check_interval" "health_interval"}}
+        {{$vv.AddonAttrFromKey "health_check_timeout" "health_timeout"}}
+{{end}}
+{{$vv.IteratorKV "header_upstream" "        header_up    " true}}
+{{$vv.IteratorKV "header_downstream" "        header_down    " true}}
+
+{{$insecureSkipVerify := InSlice `insecure_skip_verify` ($vv.GetValueList `preset`)}}
+{{$keepalive := $vv.Get "keepalive"}}
+{{if or $insecureSkipVerify (and $keepalive (ne $keepalive `0`))}}
+        transport http {
+        {{if $insecureSkipVerify}}
+            tls_insecure_skip_verify
+        {{end}}
+        {{if $keepalive}}
+            keepalive {{$keepalive}}s
+        {{end}}
+        }
+{{end}}

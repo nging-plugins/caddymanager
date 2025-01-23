@@ -9,10 +9,10 @@
     {{if $v.IsEnabled "basicauth"}}
     {{$resources := $v.GetValueList "basicauth" "resources"}}
     {{if gt (len $resources) 0}}
-    @basicauth_matcher {
+    @basic_auth_matcher {
         path {{Join ($v.SliceAddPathWildcardSuffix $resources) ` `}}
     }
-    basicauth @basicauth_matcher bcrypt "{{$v.GetAttrVal "basicauth" "realm" "Restricted"|$v.AddSlashes|ToHTML}}" {
+    basic_auth @basic_auth_matcher bcrypt "{{$v.GetAttrVal "basicauth" "realm" "Restricted"|$v.AddSlashes|ToHTML}}" {
         "{{$v.GetAttrVal "basicauth" "username"|$v.AddSlashes|ToHTML}}" "{{$v.GetAttrVal "basicauth" "password"|$v.BCrypt|Base64Encode|ToHTML}}"
     }
     {{end}}
@@ -161,45 +161,39 @@
     
     {{if $v.IsEnabled "proxy"}}
     {{range $kk,$vv := $v.GetExtraList `proxy`}}
+    {{$from := $vv.Get "from"}}
+    {{$without := $vv.Get "without"}}
+
+    {{if $without}}
+    handle_path {{$without|$v.AddPathWildcardSuffix}} {
+        {{$excepts := $v.SplitBySpaceWithPathWildcardSuffix ($vv.Get "except")}}
+        {{if gt (len $excepts) 0}}
+        @reverse_proxy_matcher_{{$kk}} {
+            not path {{Join $excepts ` `}}
+        }
+        reverse_proxy @reverse_proxy_matcher_{{$kk}} {{$vv.Get "to"}} {
+            {{Include "caddy/makeconfig/caddy2/reverse_proxy" $vv}}
+        }
+        {{else}}
+        reverse_proxy {{$vv.Get "to"}} {
+            {{Include "caddy/makeconfig/caddy2/reverse_proxy" $vv}}
+        }
+        {{end}}
+    }
+    {{else}}
+
     @reverse_proxy_matcher_{{$kk}} {
-        path {{$vv.Get "from"|$v.AddPathWildcardSuffix}}
+        path {{$from|$v.AddPathWildcardSuffix}}
         {{$excepts := $v.SplitBySpaceWithPathWildcardSuffix ($vv.Get "except")}}
         {{if gt (len $excepts) 0}}
         not path {{Join $excepts ` `}}
         {{end}}
     }
     reverse_proxy @reverse_proxy_matcher_{{$kk}} {{$vv.Get "to"}} {
-        {{$vv.AddonAttrFromKey "upstream" "to"}}
-        {{if $vv.Get `upstream`}}
-        {{$vv.AddonAttrFromKey "policy" "lb_policy"}}
-        {{$vv.AddonAttrFromKey "fail_timeout" "fail_duration"}}
-        {{$vv.AddonAttrFromKey "max_fails" "lb_retries"}}
-        {{$vv.AddonAttrFromKey "try_duration" "lb_try_duration"}}
-        {{$vv.AddonAttrFromKey "try_interval" "lb_try_interval"}}
-        {{$vv.AddonAttrFromKey "health_check" "health_uri"}}
-        {{$vv.AddonAttrFromKey "health_check_interval" "health_interval"}}
-        {{$vv.AddonAttrFromKey "health_check_timeout" "health_timeout"}}
-        {{end}}
-        {{$vv.IteratorKV "header_upstream" "        header_up    " true}}
-        {{$vv.IteratorKV "header_downstream" "        header_down    " true}}
-
-        {{if $vv.Get "without"}}
-        uri strip_prefix {{$vv.Get "without"}}
-        {{end}}
-
-        {{$insecureSkipVerify := InSlice `insecure_skip_verify` ($vv.GetValueList `preset`)}}
-        {{$keepalive := $vv.Get "keepalive"}}
-        {{if or $insecureSkipVerify (and $keepalive (ne $keepalive `0`))}}
-        transport http {
-            {{if $insecureSkipVerify}}
-            tls_insecure_skip_verify
-            {{end}}
-            {{if $keepalive}}
-            keepalive {{$keepalive}}s
-            {{end}}
-        }
-        {{end}}
+        {{Include "caddy/makeconfig/caddy2/reverse_proxy" $vv}}
     }
+    {{end}}<!-- end:without -->
+
     {{end}}
     {{end}}
 
