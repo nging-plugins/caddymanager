@@ -176,10 +176,12 @@ func (v Values) iteratorKV(keys []string, values []string, prefix string, withQu
 		if i < l {
 			val := values[i]
 			if withQuote {
-				if ignoreSlash {
-					val = `"` + v.AddSlashes(val) + `"`
-				} else {
-					val = `"` + com.AddCSlashes(val, '"') + `"`
+				if val == `"` || (!strings.HasPrefix(val, `"`) && !strings.HasSuffix(val, `"`)) {
+					if ignoreSlash {
+						val = `"` + v.AddSlashes(val) + `"`
+					} else {
+						val = `"` + com.AddCSlashes(val, '"') + `"`
+					}
 				}
 			}
 			r += t + prefix + k + `   ` + val + suffix
