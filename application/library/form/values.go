@@ -173,6 +173,9 @@ func (v Values) iteratorKV(keys []string, values []string, prefix string, withQu
 		suffix = `;`
 	}
 	for i, k := range keys {
+		if len(k) == 0 {
+			continue
+		}
 		if i < l {
 			val := values[i]
 			if withQuote {
@@ -331,6 +334,9 @@ func (v Values) iterator(values []string, prefix string, withQuotes ...bool) int
 		}
 	}
 	for _, val := range values {
+		if len(val) == 0 {
+			continue
+		}
 		if withQuote {
 			if ignoreSlash {
 				val = `"` + v.AddSlashes(val) + `"`

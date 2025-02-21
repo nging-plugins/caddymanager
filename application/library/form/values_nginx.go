@@ -320,6 +320,9 @@ func (v Values) iteratorHeaderKV(keys []string, values []string, plusPrefix stri
 		suffix = `;`
 	}
 	for i, k := range keys {
+		if len(k) == 0 {
+			continue
+		}
 		if i < l {
 			prefix := plusPrefix
 			if strings.HasPrefix(k, `-`) {
@@ -369,6 +372,9 @@ func (v Values) iteratorNginxProxyHeaderKV(keys []string, values []string) inter
 	l := len(values)
 	suffix := `;`
 	for i, k := range keys {
+		if len(k) == 0 {
+			continue
+		}
 		if i < l {
 			var prefix string
 			if strings.HasPrefix(k, `-`) {
