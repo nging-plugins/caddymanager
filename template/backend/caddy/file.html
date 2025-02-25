@@ -53,7 +53,7 @@
 							<th style="width:80px"><strong>{{"类型"|$.T}}</strong></th>
 							<th style="width:80px"><strong>{{"大小"|$.T}}</strong></th>
 							<th style="width:85px"><strong>{{"权限"|$.T}}</strong></th>
-							<th style="width:80px" class="text-center"><strong>{{"操作"|$.T}}</strong></th>
+							<th style="width:80px"><strong>{{"操作"|$.T}}</strong></th>
 						</tr>
 					</thead>
 					<tbody class="no-border-y" id="tbody-content">
@@ -67,7 +67,7 @@
 							<td></td>
 							<td></td>
 							<td></td>
-							<td class="text-center"></td>
+							<td></td>
 						</tr>
                         {{- end -}}
                         {{- range $k,$v := $.Stored.dirs -}}
@@ -105,21 +105,19 @@
                                 {{end}}</td>
 							<td>{{if $v.IsDir}}-{{else}}{{$v.Size|FormatByte}}{{end}}</td>
 							<td>{{$mode}}</td>
-							<td>
+							<td class="label-group">
                                 <a title="{{`删除`|$.T}}" class="label label-danger" href="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&do=delete&path={{if $path}}{{$path}}/{{end}}{{$v.Name}}" onclick="return confirm('{{$.T `真的要删除“%v”吗？` $v.Name}}');" data-toggle="tooltip">
                                 <i class="fa fa-times"></i>
                                 </a>
                                 {{- if not $v.IsDir -}}
                                 {{- if call $.Func.Editable $v.Name -}}
-                                &nbsp;
-                                <a title="{{`编辑`|$.T}}" class="label label-success" href="javascript:;" data-url="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&do=edit&path={{if $path}}{{$path}}/{{end}}{{$v.Name}}" onclick="fileEdit(this,'{{$v.Name}}')" data-toggle="tooltip">
+                                &nbsp;<a title="{{`编辑`|$.T}}" class="label label-success" href="javascript:;" data-url="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&do=edit&path={{if $path}}{{$path}}/{{end}}{{$v.Name}}" onclick="fileEdit(this,'{{$v.Name}}')" data-toggle="tooltip">
                                 <i class="fa fa-pencil"></i>
                                 </a>
                                 {{- end -}}
                                 {{- $mediaMime:= call $.Func.Playable $v.Name -}}
                                 {{- if $mediaMime -}}
-                                &nbsp;
-                                <a title="{{`播放`|$.T}}" class="label label-primary" href="javascript:;" playable data-mime="{{$mediaMime}}" data-name="{{$v.Name}}" data-url="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&path={{if $path}}{{$path}}/{{end}}{{$v.Name}}" onclick="filePlay(this)" data-toggle="tooltip">
+                                &nbsp;<a title="{{`播放`|$.T}}" class="label label-primary" href="javascript:;" playable data-mime="{{$mediaMime}}" data-name="{{$v.Name}}" data-url="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&path={{if $path}}{{$path}}/{{end}}{{$v.Name}}" onclick="filePlay(this)" data-toggle="tooltip">
                                 <i class="fa fa-play"></i>
                                 </a>
                                 {{- end -}}
