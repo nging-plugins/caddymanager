@@ -33,7 +33,6 @@
               {{- end -}}
             </h3>
             <div class="form-group">
-                <div class="col-sm-12">
                   {{- if $v.H.turnable -}}
                   {{- $val := $.Form $v.K `0` -}}
                   <div class="radio radio-primary radio-inline"> 
@@ -72,7 +71,6 @@
                   {{- else -}}
                     {{- $.Fetch (printf "caddy/addon/form/%s" $v.K) $ -}}
                   {{- end -}}
-                </div>
             </div><!-- /form-group -->
       </div>
     {{- end -}}

@@ -1,6 +1,6 @@
 <div class="form-group">
     <label class="col-sm-2 control-label">{{"分组"|$.T}}</label>
-    <div class="col-sm-3">
+    <div class="col-sm-4">
         {{- $v := $.Form "groupId" -}}
         <select class="form-control" name="groupId">
             <option value="">{{"<无>"|$.T}}</option>
@@ -10,7 +10,7 @@
         </select>
     </div>
     <label class="col-sm-2 control-label">{{"引擎配置"|$.T}}</label>
-    <div class="col-sm-3">{{$v := $.Form "serverIdent"}}
+    <div class="col-sm-4">{{$v := $.Form "serverIdent"}}
         <select class="form-control" id="serverIdent" name="serverIdent">
             <option value="default" data-engine="default" data-environ="local">{{"<默认>"|$.T}}</option>
             {{- range $k,$g:=$.Stored.Get "serverList" -}}
@@ -21,7 +21,7 @@
 </div>
 <div class="form-group">
   <label class="col-sm-2 control-label">{{"监听地址"|$.T}}</label>
-  <div class="col-sm-8">
+  <div class="col-sm-10">
       <input type="text" id="bind-address" name="domain" class="form-control" required="required" value="{{$.Form `domain`}}">
       <div class="help-block">
         {{"可以是网址、域名或IP。如果不提供端口则默认为2005，如果不提供协议(比如https://)则默认为http，如果不提供IP和域名则默认为0.0.0.0，如果只想允许本机访问请设置为localhost或127.0.0.1。"|$.T}}<br />
@@ -37,14 +37,14 @@
 </div>
 <div class="form-group">
   <label class="col-sm-2 control-label">{{"网站位置"|$.T}}</label>
-  <div class="col-sm-8">
+  <div class="col-sm-10">
       <input type="text" id="www-root-path" name="root" class="form-control typeahead" value="{{$.Form `root`}}" data-provide="typeahead">
       <div class="help-block">{{"网站文件夹在服务器上的绝对路径"|$.T}}</div>
   </div>
 </div>
 <div class="form-group">
   <label class="col-sm-2 control-label">{{"网站名称"|$.T}}</label>
-  <div class="col-sm-8">
+  <div class="col-sm-10">
       <input type="text" name="name" class="form-control" value="{{$.Form `name`}}">
       <div class="help-block">
         {{"为了提高辨识度，您可以给网站起一个名字。"|$.T}}
@@ -53,7 +53,7 @@
 </div>
 <div class="form-group">
   <label class="col-sm-2 control-label">{{"默认首页"|$.T}}</label>
-  <div class="col-sm-8">
+  <div class="col-sm-10">
       <input type="text" name="index" class="form-control" value="{{$.Form `index`}}">
       <div class="help-block">{{"默认首页文件，多个之间用半角空格隔开，如不填写，默认为："|$.T}}<br/> 
         index.html index.htm index.txt default.html default.htm default.txt
@@ -62,7 +62,7 @@
 </div>
 <div class="form-group">
   <label class="col-sm-2 control-label">{{"访问日志"|$.T}}</label>
-  <div class="col-sm-8">
+  <div class="col-sm-10">
     {{- $v := $.Form `log` `1` -}}
     <div class="radio radio-primary radio-inline"> 
       <input type="radio" value="1" id="log-enable" name="log" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="log-enable">{{"启用"|$.T}}</label> 
@@ -82,7 +82,7 @@
     <a class="engine-show-caddy2" href="https://caddyserver.com/docs/caddyfile/directives/tls" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
     <a class="engine-show-nginx" href="https://nginx.org/en/docs/http/ngx_http_ssl_module.html#ssl" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
   </label>
-  <div class="col-sm-8">
+  <div class="col-sm-10">
       {{- $v := $.Form "tls" -}}
       <div class="radio radio-primary radio-inline"> 
         <input type="radio" value="1" id="tls-enable" name="tls" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="tls-enable">{{"启用"|$.T}}</label> 
@@ -102,7 +102,7 @@
     <a class="engine-show-caddy2" href="https://caddyserver.com/docs/caddyfile/directives/encode" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
     <a class="engine-show-nginx" href="https://nginx.org/en/docs/http/ngx_http_gzip_module.html#gzip" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
   </label>
-  <div class="col-sm-8">
+  <div class="col-sm-10">
     {{- $v := $.Form "gzip" -}}
     <div class="radio radio-primary radio-inline"> 
       <input type="radio" value="1" id="gzip-enable" name="gzip" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="gzip-enable">{{"启用"|$.T}}</label> 
@@ -121,7 +121,7 @@
       {{"静态文件缓存"|$.T}}
       <a class="engine-show-default" href="https://caddyserver.com/docs/http.expires" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
     </label>
-    <div class="col-sm-8">
+    <div class="col-sm-10">
       {{- $v := $.Form "expires" -}}
       <div class="radio radio-primary radio-inline"> 
         <input type="radio" value="1" id="expires-enable" name="expires" data-slide-settings="show"{{if eq $v `1`}} checked{{end}}><label for="expires-enable">{{"启用"|$.T}}</label> 
@@ -141,7 +141,7 @@
       <a class="engine-show-caddy2" href="https://caddyserver.com/docs/caddyfile/directives/rewrite" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
       <a class="engine-show-nginx" href="https://nginx.org/en/docs/http/ngx_http_rewrite_module.html#rewrite" target="_blank" data-toggle="tooltip" title="{{`查看文档`|$.T}}" class="normal">(?)</a>
     </label>
-    <div class="col-sm-8">
+    <div class="col-sm-10">
       <textarea type="text" id="rewrite_rule" class="form-control" style="min-height:200px" name="rewrite_rule">{{$.Form `rewrite_rule`}}</textarea>
       <div class="help-block">
         <div class="engine-show-default">{{Include "caddy/addon/help_rewrite"}}</div><!-- /.engine-show-default -->
@@ -165,13 +165,13 @@ rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra last;</pre>
 
 <div class="form-group">
     <label class="col-sm-2 control-label">{{"备注"|$.T}}</label>
-    <div class="col-sm-8">
+    <div class="col-sm-10">
       <textarea class="form-control" name="remark">{{$.Form `remark`}}</textarea>
     </div>
   </div>
   <div class="form-group">
     <label class="col-sm-2 control-label">{{"网站状态"|$.T}}</label>
-    <div class="col-sm-8">
+    <div class="col-sm-10">
       {{- $v := $.Form "disabled" -}}
       <div class="radio radio-primary radio-inline"> 
         <input type="radio" value="N" id="disabled-N" name="disabled"{{if eq $v `N` ``}} checked{{end}}><label for="disabled-N">{{"启用"|$.T}}</label> 
@@ -183,7 +183,7 @@ rewrite ^(/download/.*)/audio/(.*)\..*$ $1/mp3/$2.ra last;</pre>
   </div>
   <div class="form-group">
     <label class="col-sm-2 control-label">{{"附加操作"|$.T}}</label>
-    <div class="col-sm-8">
+    <div class="col-sm-10">
       <div class="checkbox checkbox-success checkbox-inline"> 
         <input type="checkbox" value="1" id="restart-enable" name="restart" checked="checked"><label for="restart-enable" class="text-left">{{"重启服务"|$.T}}</label>
       </div>
