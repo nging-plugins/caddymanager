@@ -713,8 +713,8 @@ github.com/caddy-plugins/cors v0.0.3 h1:XQ5LQyIVyHM95jUzAtfCpG4w98SxY0tZKhy9C1Zy
 github.com/caddy-plugins/cors v0.0.3/go.mod h1:TG62m0I4N7ZgeMlnSSjDAdzI0PMk5wxTt2RmGs7SPuE=
 github.com/caddy-plugins/ipfilter v1.1.8 h1:ZdYWofBa9Atb60ipbAMjCPz7jUcX6Bc0XcWiFx+P6Uw=
 github.com/caddy-plugins/ipfilter v1.1.8/go.mod h1:mmifiHqKlpRnh2L0c6UFjBv+p3r/CGYJrhTnewyiF34=
-github.com/caddy-plugins/loginsrv v0.1.10 h1:TYi7EXefLjTp6Q7NnYts57gTKS7FXMMSKF/+JKPvkJQ=
-github.com/caddy-plugins/loginsrv v0.1.10/go.mod h1:uCd8WEzvbR4DiAiuRFp3KZaIGhNYHdfsdQzSajZw/FY=
+github.com/caddy-plugins/loginsrv v0.1.11 h1:w/eqWxBkmtMPWpT/sc7wt4KSUjzf3FMPWkjUSS0o6Rs=
+github.com/caddy-plugins/loginsrv v0.1.11/go.mod h1:f8A/jklWmyDM9DDcOoJrhwqu2Xfxd8fZDMC/TPqRu04=
 github.com/caddy-plugins/nobots v0.2.1 h1:ovxdgd16KiIhV4Y5pY0vkgo1x6PWKd6DuydX1vTXBlE=
 github.com/caddy-plugins/nobots v0.2.1/go.mod h1:mQkL/iKuMG0Ps90+v4sWyViR3i1VXWC6SuUoNqleiu8=
 github.com/caddy-plugins/webdav v1.2.10 h1:46XIP7z817ozXwMI35KKbEZfQRXUWC8/KkBBSmUKzck=
@@ -1046,8 +1046,9 @@ github.com/google/go-cmp v0.5.6/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/go-cmp v0.5.7/go.mod h1:n+brtR0CgQNWTVd5ZUFpTBC8YFBDLK/h/bpaJ8/DtOE=
 github.com/google/go-cmp v0.5.8/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/google/go-cmp v0.5.9/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
-github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
 github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
+github.com/google/go-cmp v0.7.0 h1:wk8382ETsv4JYUZwIsn6YpYiWiBsYLSJiTsyBybVuN8=
+github.com/google/go-cmp v0.7.0/go.mod h1:pXiqmnSA92OHEEa9HXL2W4E7lf9JzCmGVUdgjX3N/iU=
 github.com/google/go-github v17.0.0+incompatible/go.mod h1:zLgOLi98H3fifZn+44m+umXrS52loVEgC2AApnigrVQ=
 github.com/google/go-github/v32 v32.1.0/go.mod h1:rIEpZD9CTDQwDK9GDrtMTycQNA4JU3qBsCizh3q2WCI=
 github.com/google/go-querystring v1.0.0/go.mod h1:odCYkC5MyYFN7vkCjXpyrEuKhc/BUO6wN/zVPAxq5ck=
