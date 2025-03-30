@@ -114,7 +114,7 @@
 								{{- "更新"|$.T}}: {{if gt $v.Updated 0}}{{(Date $v.Updated).Format "2006-01-02 15:04:05"}}{{end -}}
 							</td>
 							<td>
-								<a class="text-primary" href="javascript:;" data-url="{{BackendURL}}/caddy/vhost_log?id={{$v.Id}}" title="{{`查看格式化日志`|$.T}}" data-toggle="tooltip" onclick="App.logShow(this,true,'access');">{{"格式化日志"|$.T}}</a><br />
+								<a class="text-primary access-log-pretty-show" href="javascript:;" data-url="{{BackendURL}}/caddy/vhost_log?id={{$v.Id}}" title="{{`查看格式化日志`|$.T}}" data-toggle="tooltip">{{"格式化日志"|$.T}}</a><br />
 								<a class="text-info" href="javascript:;" data-url="{{BackendURL}}/caddy/vhost_log?id={{$v.Id}}" title="{{`查看原始日志`|$.T}}" data-toggle="tooltip" onclick="App.logShow(this,true,'');">{{"原始日志"|$.T}}</a>
 							</td>
 							<td class="label-group">
@@ -142,11 +142,7 @@
 {{/Block}}
 {{Block "footer"}}
 {{call $.Func.Modal "__TMPL__/server/log_show.yaml"}}
-<script>
-$(function(){
-	App.bindSwitch('input.switch-disabled','click','caddy/vhost_edit');
-	App.logShow('#caddy-log-show');
-});
-</script>
+<script type="text/javascript" src="{{AssetsURL}}/js/behaviour/http-status-texts.min.js?t={{BuildTime}}"></script>
+<script type="text/javascript" src="{{AssetsURL}}/caddy/js/vhost_list.js?t={{BuildTime}}"></script>
 {{/Block}}
 {{/Strip}}
