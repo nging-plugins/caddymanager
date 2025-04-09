@@ -400,7 +400,7 @@ func (c *Config) makeRequestCertUpdate(ctx echo.Context, isLocal bool, domains [
 		return
 	}
 
-	up = item.X.(engine.CertUpdater)
+	up = item.X
 
 	command := strings.TrimSpace(c.Command)
 	command = strings.TrimSuffix(command, `.exe`)

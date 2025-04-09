@@ -13,7 +13,7 @@ import (
 )
 
 func init() {
-	CertUpdaters.Add(`certbot`, `Certbot`, echo.KVOptX(CertUpdater{
+	CertUpdaters.Add(`certbot`, `Certbot`, echo.KVxOptX[CertUpdater, any](CertUpdater{
 		MakeCommand: MakeCertbotCommand,
 		Update:      RenewCertByCertbot,
 		PathFormat: CertPathFormat{

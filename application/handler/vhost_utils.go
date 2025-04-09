@@ -326,7 +326,7 @@ func setCertPathForDomains(ctx echo.Context, cfg engine.Configer, values url.Val
 	if cuc, ok := cfg.(engine.CertUpdaterGetter); ok {
 		updaterName := strings.SplitN(cuc.CertUpdater(), `:`, 2)[0]
 		if item := engine.CertUpdaters.GetItem(updaterName); item != nil {
-			domainSanitizer = item.X.(engine.CertUpdater).DomainSanitizer
+			domainSanitizer = item.X.DomainSanitizer
 		}
 	}
 	if len(pathCert) == 0 {

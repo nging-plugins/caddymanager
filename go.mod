@@ -10,6 +10,7 @@ require (
 	gitee.com/admpub/certmagic v0.8.9
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
 	github.com/admpub/caddy v1.2.8
+	github.com/admpub/go-download/v2 v2.1.15
 	github.com/admpub/goth v0.0.4
 	github.com/admpub/log v1.3.6
 	github.com/admpub/null v8.0.4+incompatible
@@ -45,8 +46,10 @@ require (
 require (
 	cloud.google.com/go/compute/metadata v0.6.0 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/VividCortex/ewma v1.2.0 // indirect
 	github.com/abbot/go-http-auth v0.4.0 // indirect
 	github.com/abh/errorutil v1.0.0 // indirect
+	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d // indirect
 	github.com/admpub/9t v0.0.0-20190605154903-a68069ace5e1 // indirect
 	github.com/admpub/captcha-go v0.0.1 // indirect
 	github.com/admpub/ccs-gm v0.0.5 // indirect
@@ -64,7 +67,6 @@ require (
 	github.com/admpub/gifresize v1.0.2 // indirect
 	github.com/admpub/go-bindata-assetfs v0.0.0-20170428090253-36eaa4c19588 // indirect
 	github.com/admpub/go-captcha/v2 v2.0.5 // indirect
-	github.com/admpub/go-download/v2 v2.1.15 // indirect
 	github.com/admpub/go-figure v0.0.0-20180619031829-18b2b544842c // indirect
 	github.com/admpub/go-isatty v0.0.11 // indirect
 	github.com/admpub/go-password v0.1.3 // indirect
@@ -193,6 +195,7 @@ require (
 	github.com/tklauser/numcpus v0.9.0 // indirect
 	github.com/tuotoo/qrcode v0.0.0-20220425170535-52ccc2bebf5d // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
+	github.com/vbauerster/mpb/v6 v6.0.4 // indirect
 	github.com/volatiletech/inflect v0.0.1 // indirect
 	github.com/volatiletech/strmangle v0.0.8 // indirect
 	github.com/webx-top/captcha v0.1.0 // indirect

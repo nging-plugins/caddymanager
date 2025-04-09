@@ -30,4 +30,4 @@ type RequestCertUpdate struct {
 	Env            []string
 }
 
-var CertUpdaters = echo.NewKVData()
+var CertUpdaters = echo.NewKVxData[CertUpdater, any]()
