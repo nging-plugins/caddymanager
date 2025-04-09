@@ -56,6 +56,7 @@ func MakeLegoCommand(data RequestCertUpdate) (command string, args []string, env
 		args = append(args,
 			`--http.webroot`, data.CertVerifyDir,
 			`--agree-tos`,
+			`--pem`,
 			`run`,
 		)
 	} else {
