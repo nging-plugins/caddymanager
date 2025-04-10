@@ -25,6 +25,9 @@ func initLegoCommand() {
 		return
 	}
 	legoBinary := filepath.Join(echo.Wd(), `support`, `lego`, `lego`)
+	if com.IsWindows {
+		legoBinary += `.exe`
+	}
 	if com.IsFile(legoBinary) {
 		legoCommand = legoBinary
 		return
@@ -154,6 +157,9 @@ func legoInstall(tarFile string) error {
 		return fmt.Errorf("untar error: %w", err)
 	}
 	binaryPath := filepath.Join(installDir, `lego`)
+	if com.IsWindows {
+		binaryPath += `.exe`
+	}
 	err = os.Chmod(binaryPath, 0755)
 	return err
 }
