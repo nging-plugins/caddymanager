@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/admpub/log"
 	"github.com/admpub/once"
 	"github.com/nging-plugins/caddymanager/application/library/github"
 	"github.com/webx-top/com"
@@ -33,15 +32,7 @@ func initLegoCommand() {
 		return
 	}
 	legoCommand = `lego`
-	// 先尝试安装
-	err := LegoInstall()
-	if err != nil {
-		log.Error(err)
-		return
-	}
-	// 安装成功
-	// 重新设置命令
-	legoCommand = legoBinary
+	legoOnce.Reset()
 }
 
 func LegoCommand() string {
