@@ -330,13 +330,13 @@ func setCertPathForDomains(ctx echo.Context, cfg engine.Configer, values url.Val
 		}
 	}
 	if len(pathCert) == 0 {
-		pathCert = `/etc/letsencrypt/live/{domain}/fullchain.pem`
+		pathCert = engine.BuildCertSaveDir(`letsencrypt/live/{domain}/fullchain.pem`)
 	}
 	if len(pathKey) == 0 {
-		pathKey = `/etc/letsencrypt/live/{domain}/privkey.pem`
+		pathKey = engine.BuildCertSaveDir(`letsencrypt/live/{domain}/privkey.pem`)
 	}
 	if len(pathTrust) == 0 {
-		pathTrust = `/etc/letsencrypt/live/{domain}/chain.pem`
+		pathTrust = engine.BuildCertSaveDir(`letsencrypt/live/{domain}/chain.pem`)
 	}
 	repler := strings.NewReplacer(`{workDir}`, echo.Wd())
 	pathCert = repler.Replace(pathCert)

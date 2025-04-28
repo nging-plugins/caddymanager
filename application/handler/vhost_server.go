@@ -109,6 +109,13 @@ func setServerForm(ctx echo.Context) {
 	}
 	ctx.Set(`configDirs`, configDirs)
 	ctx.Set(`environList`, engine.Environs.Slice())
+
+	pathCert := engine.BuildCertSaveDir(`letsencrypt/live/{domain}/fullchain.pem`)
+	pathKey := engine.BuildCertSaveDir(`letsencrypt/live/{domain}/privkey.pem`)
+	pathTrust := engine.BuildCertSaveDir(`letsencrypt/live/{domain}/chain.pem`)
+	ctx.Set(`defaultPathCert`, pathCert)
+	ctx.Set(`defaultPathKey`, pathKey)
+	ctx.Set(`defaultPathTrust`, pathTrust)
 }
 
 func ServerEdit(ctx echo.Context) error {

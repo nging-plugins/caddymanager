@@ -1,7 +1,10 @@
 package engine
 
 import (
+	"path/filepath"
+
 	"github.com/nging-plugins/caddymanager/application/dbschema"
+	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 )
 
@@ -24,4 +27,15 @@ func Thirdparty() []echo.KV {
 		r = append(r, *v)
 	}
 	return r
+}
+
+func certSaveDir(dir string) string {
+	if com.IsWindows {
+		return filepath.Join(echo.Wd(), `data`, dir)
+	}
+	return filepath.Join(`/etc/`, dir)
+}
+
+func BuildCertSaveDir(dir string) string {
+	return certSaveDir(dir)
 }

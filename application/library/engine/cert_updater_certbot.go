@@ -12,15 +12,17 @@ import (
 	"github.com/webx-top/echo/param"
 )
 
+var certbotPathFormat = CertPathFormat{
+	Cert:  certSaveDir(`letsencrypt/live/{domain}/fullchain.pem`),
+	Key:   certSaveDir(`letsencrypt/live/{domain}/privkey.pem`),
+	Trust: certSaveDir(`letsencrypt/live/{domain}/chain.pem`),
+}
+
 func init() {
 	CertUpdaters.Add(`certbot`, `Certbot`, echo.KVxOptX[CertUpdater, any](CertUpdater{
-		MakeCommand: MakeCertbotCommand,
-		Update:      RenewCertByCertbot,
-		PathFormat: CertPathFormat{
-			Cert:  `/etc/letsencrypt/live/{domain}/fullchain.pem`,
-			Key:   `/etc/letsencrypt/live/{domain}/privkey.pem`,
-			Trust: `/etc/letsencrypt/live/{domain}/chain.pem`,
-		},
+		MakeCommand:     MakeCertbotCommand,
+		Update:          RenewCertByCertbot,
+		PathFormat:      certbotPathFormat,
 		DomainSanitizer: LegoSanitizedDomain,
 	}))
 }

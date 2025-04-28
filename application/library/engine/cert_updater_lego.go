@@ -40,15 +40,17 @@ func LegoCommand() string {
 	return legoCommand
 }
 
+var legoPathFormat = CertPathFormat{
+	Cert:  certSaveDir(`letsencrypt/.lego/certificates/{domain}.crt`),
+	Key:   certSaveDir(`letsencrypt/.lego/certificates/{domain}.key`),
+	Trust: ``,
+}
+
 func init() {
 	CertUpdaters.Add(`lego`, `Lego`, echo.KVxOptX[CertUpdater, any](CertUpdater{
-		MakeCommand: MakeLegoCommand,
-		Update:      RenewCertByLego,
-		PathFormat: CertPathFormat{
-			Cert:  `/etc/letsencrypt/.lego/certificates/{domain}.crt`,
-			Key:   `/etc/letsencrypt/.lego/certificates/{domain}.key`,
-			Trust: ``,
-		},
+		MakeCommand:     MakeLegoCommand,
+		Update:          RenewCertByLego,
+		PathFormat:      legoPathFormat,
 		DomainSanitizer: LegoSanitizedDomain,
 	}))
 }
@@ -66,7 +68,7 @@ func init() {
 func MakeLegoCommand(data RequestCertUpdate) (command string, args []string, env []string) {
 	command = LegoCommand()
 	args = []string{command}
-	saveDir := `/etc/letsencrypt`
+	saveDir := certSaveDir(`letsencrypt`)
 	if len(data.CertSaveDir) > 0 {
 		saveDir = data.CertSaveDir
 	}

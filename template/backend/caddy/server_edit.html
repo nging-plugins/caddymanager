@@ -229,7 +229,7 @@
                         <input type="text" class="form-control" name="certPathFormatCert" value="{{$.Form `certPathFormatCert`}}">
                         <div class="help-block">
                           {{`用于生成 ssl_certificate 路径，支持标签：`|$.T}}<code>{domain}</code>({{`此标签最终会被替换成域名`|$.T}})<br />
-                          {{`默认为：`|$.T}} /etc/letsencrypt/live/{domain}/fullchain.pem
+                          {{`默认为：`|$.T}} {{$.Stored.defaultPathCert}}
                         </div>
                       </div>
                     </div><!-- form-group -->
@@ -239,7 +239,7 @@
                         <input type="text" class="form-control" name="certPathFormatKey" value="{{$.Form `certContainerKey`}}">
                         <div class="help-block">
                           {{`用于生成 ssl_certificate_key 路径，支持标签：`|$.T}}<code>{domain}</code>({{`此标签最终会被替换成域名`|$.T}})<br />
-                          {{`默认为：`|$.T}} /etc/letsencrypt/live/{domain}/privkey.pem
+                          {{`默认为：`|$.T}} {{$.Stored.defaultPathKey}}
                         </div>
                       </div>
                     </div><!-- form-group -->
@@ -249,7 +249,7 @@
                         <input type="text" class="form-control" name="certPathFormatTrust" value="{{$.Form `certPathFormatTrust`}}">
                         <div class="help-block">
                           {{`用于生成 ssl_trusted_certificate 路径，支持标签：`|$.T}}<code>{domain}</code>({{`此标签最终会被替换成域名`|$.T}})<br />
-                          {{`默认为：`|$.T}} /etc/letsencrypt/live/{domain}/chain.pem
+                          {{`默认为：`|$.T}} {{$.Stored.defaultPathTrust}}
                         </div>
                       </div>
                     </div><!-- form-group -->
