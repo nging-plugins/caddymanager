@@ -25,6 +25,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/admpub/log"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/param"
@@ -430,7 +431,8 @@ func (v Values) GroupByLocations(fields []string) Locations {
 
 func (v Values) ParseHost(urlStr string) string {
 	u, err := url.Parse(urlStr)
-	if err == nil {
+	if err != nil {
+		log.Error(err)
 		return ``
 	}
 	return u.Host
