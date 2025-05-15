@@ -298,7 +298,7 @@
         {{$v.AddonAttr "s3browser" "cdnurl"}}
 		secure {{if $secure}}true{{else}}false{{end}}
         {{else}}
-        account {{$s3account}}
+        account {{$account}}
         {{end}}
         {{$v.AddonAttr "s3browser" "prefix"}}
 		{{$v.AddonAttr "s3browser" "refresh"}}
@@ -309,7 +309,7 @@
     {{$proxypath := $v.Get "s3browser_proxypath"}}
     {{if $proxypath}}
 	proxy {{$proxypath}} {{if $cdnURL}}{{$cdnURL}}{{else}}http{{if $secure}}s{{end}}://{{$v.Get "s3browser_bucket"}}.{{$v.Get "s3browser_endpoint"}}{{end}} {
-		header_upstream Host {{if $cdnURL}}{{$v.ParseHost $cdnURL}}{{else}}{{$v.Get "s3browser_bucket"}}.{{$v.Get "s3browser_endpoint"}}{{end}}
+		header_upstream {{if $cdnURL}}{{$v.ParseHost $cdnURL}}{{else}}{{$v.Get "s3browser_bucket"}}.{{$v.Get "s3browser_endpoint"}}{{end}}
     }
     {{end}}
     {{end}}
