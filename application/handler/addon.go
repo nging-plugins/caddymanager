@@ -21,7 +21,11 @@ package handler
 import (
 	"net/http"
 
+	"github.com/admpub/log"
+	"github.com/coscms/webcore/dbschema"
+	"github.com/coscms/webcore/model"
 	"github.com/webx-top/com"
+	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 )
 
@@ -47,6 +51,21 @@ func AddonForm(ctx echo.Context) error {
 	ctx.SetFunc(`Key`, func(name string) string {
 		return name
 	})
+	ctx.SetFunc(`ListS3Accounts`, func() []*dbschema.NgingCloudStorage {
+		return listS3Accounts(ctx)
+	})
 	index := ctx.Queryx(`index`, `0`).Int()
 	return ctx.Render(`caddy/addon/form/`+addon, index)
+}
+
+func listS3Accounts(ctx echo.Context) []*dbschema.NgingCloudStorage {
+	m := model.NewCloudStorage(ctx)
+	_, err := m.ListByOffset(nil, func(r db.Result) db.Result {
+		return r.OrderBy(`-id`)
+	}, 0, -1)
+	if err != nil {
+		log.Warn(err)
+		return nil
+	}
+	return m.Objects()
 }

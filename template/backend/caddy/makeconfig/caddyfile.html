@@ -285,25 +285,35 @@
     {{$v.Get "rewrite_rule"|ToHTML}}
 
     {{if $v.IsEnabled "s3browser"}}
+    {{$account := $v.Get "s3browser_account"}}
+    {{$cdnURL := $v.Get "s3browser_cdnurl"}}
     {{$secure := $v.IsEnabled "s3browser_secure"}}
 	s3browser {
+        {{if eq $account `custom` ``}}
 		{{$v.AddonAttr "s3browser" "key"}}
 		{{$v.AddonAttr "s3browser" "secret"|ToHTML}}
 		{{$v.AddonAttr "s3browser" "bucket"}}
 		{{$v.AddonAttr "s3browser" "region"}}
 		{{$v.AddonAttr "s3browser" "endpoint"}}
-        {{$v.AddonAttr "s3browser" "prefix"}}
         {{$v.AddonAttr "s3browser" "cdnurl"}}
 		secure {{if $secure}}true{{else}}false{{end}}
+        {{else}}
+        account {{$s3account}}
+        {{end}}
+        {{$v.AddonAttr "s3browser" "prefix"}}
 		{{$v.AddonAttr "s3browser" "refresh"}}
 		debug {{if $v.IsEnabled "s3browser_debug"}}true{{else}}false{{end}}
     }
+
+    {{if eq $account `custom` ``}}
     {{$proxypath := $v.Get "s3browser_proxypath"}}
     {{if $proxypath}}
-	proxy {{$proxypath}} http{{if $secure}}s{{end}}://{{$v.Get "s3browser_bucket"}}.{{$v.Get "s3browser_endpoint"}} {
-		header_upstream Host {{$v.Get "s3browser_bucket"}}.{{$v.Get "s3browser_endpoint"}}
+	proxy {{$proxypath}} {{if $cdnURL}}{{$cdnURL}}{{else}}http{{if $secure}}s{{end}}://{{$v.Get "s3browser_bucket"}}.{{$v.Get "s3browser_endpoint"}}{{end}} {
+		header_upstream Host {{if $cdnURL}}{{$v.ParseHost $cdnURL}}{{else}}{{$v.Get "s3browser_bucket"}}.{{$v.Get "s3browser_endpoint"}}{{end}}
     }
     {{end}}
+    {{end}}
+    
     {{end}}
 
 

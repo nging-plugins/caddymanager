@@ -23,6 +23,7 @@ import (
 	"html/template"
 	"net/url"
 
+	dbschemaNG "github.com/coscms/webcore/dbschema"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
@@ -169,6 +170,9 @@ func setVhostForm(ctx echo.Context) {
 	svr.ListByOffset(nil, nil, 0, -1, db.Cond{`disabled`: common.BoolN})
 	ctx.Set(`serverList`, svr.Objects())
 	ctx.Set(`moduleList`, mconfig.VhostModules.Slice())
+	ctx.SetFunc(`ListS3Accounts`, func() []*dbschemaNG.NgingCloudStorage {
+		return listS3Accounts(ctx)
+	})
 }
 
 func VhostDelete(ctx echo.Context) error {

@@ -427,3 +427,11 @@ func (v Values) GroupByLocations(fields []string) Locations {
 		GroupByPath:      groupByPath,
 	}
 }
+
+func (v Values) ParseHost(urlStr string) string {
+	u, err := url.Parse(urlStr)
+	if err == nil {
+		return ``
+	}
+	return u.Host
+}

@@ -19,6 +19,8 @@
 package caddy
 
 import (
+	"fmt"
+	"strconv"
 	"strings"
 
 	_ "github.com/caddy-plugins/caddy-expires"
@@ -27,7 +29,7 @@ import (
 	_ "github.com/caddy-plugins/caddy-locale"
 	_ "github.com/caddy-plugins/caddy-prometheus"
 	_ "github.com/caddy-plugins/caddy-rate-limit"
-	_ "github.com/caddy-plugins/caddy-s3browser"
+	s3browser "github.com/caddy-plugins/caddy-s3browser"
 	_ "github.com/caddy-plugins/cors/caddy"
 	_ "github.com/caddy-plugins/ipfilter"
 	_ "github.com/caddy-plugins/loginsrv/caddy"
@@ -39,6 +41,8 @@ import (
 	"github.com/admpub/goth"
 	"github.com/caddy-plugins/loginsrv/oauth2"
 	"github.com/coscms/webcore/library/backend/oauth2nging"
+	"github.com/coscms/webcore/model"
+	"github.com/webx-top/echo/defaults"
 )
 
 func init() {
@@ -49,4 +53,27 @@ func init() {
 		}
 		return oauth2nging.New(cfg.ClientID, cfg.ClientSecret, cfg.GetRedirectURI(), hostURL, `profile`)
 	})
+	s3browser.AccountGetter = getS3Account
+}
+
+func getS3Account(arg string) (s3browser.Account, error) {
+	id, err := strconv.ParseUint(arg, 10, 0)
+	if err != nil {
+		return s3browser.Account{}, fmt.Errorf(`[s3browser]failed to parse uint %q: %w`, arg, err)
+	}
+	ctx := defaults.NewMockContext()
+	m := model.NewCloudStorage(ctx)
+	err = m.Get(nil, `id`, id)
+	if err != nil {
+		return s3browser.Account{}, fmt.Errorf(`[s3browser]failed to get account by id %d: %w`, id, err)
+	}
+	return s3browser.Account{
+		Key:      m.Key,
+		Bucket:   m.Bucket,
+		Secret:   m.Secret,
+		Region:   m.Region,
+		CDNURL:   m.Baseurl,
+		Endpoint: m.Endpoint,
+		Secure:   m.Secure == `Y`,
+	}, nil
 }

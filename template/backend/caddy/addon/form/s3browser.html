@@ -1,3 +1,22 @@
+{{Strip}}
+<div class="form-group">
+    <label class="col-sm-2 control-label">{{"S3账号"|$.T}}</label>
+    <div class="col-sm-10">
+        <select name="s3browser_account" class="form-control" onchange="this.value===''||this.value=='custom'?$('.s3-account-custom').removeClass('hidden'):$('.s3-account-custom:not(.hidden)').addClass('hidden')">
+            {{- $s3Account := $.Form `s3browser_account` -}}
+            <option value="custom"{{if eq $s3Account `custom`}} selected{{end}}>{{`自定义`|$.T}}</option>
+            {{- $accountList := call $.Func.ListS3Accounts -}}
+            {{- if $accountList -}}
+            {{- range $k, $v := $accountList -}}
+            <option value="{{$v.Id}}"{{if eq $s3Account (Str $v.Id)}} selected{{end}}>{{$v.Name}}</option>
+            {{- end -}}
+            {{- end -}}
+        </select>
+    </div>
+</div>
+
+<section class="s3-account-custom{{if eq $s3Account `custom` ``}} hidden{{end}}">
+
 <div class="xs-margin-bottom" style="background:#efefef;padding:10px">
 <a href="javascript:;" onclick="$('#s3browser-accordion').toggleClass('hide')">常用云存储设置说明</a>
 <div class="panel-group accordion no-margin hide" id="s3browser-accordion">
@@ -43,6 +62,7 @@
         </div>
 </div>
 </div>
+
 <div class="form-group">
     <label class="col-sm-2 control-label">{{"key"|$.T}}</label>
     <div class="col-sm-4">
@@ -81,13 +101,6 @@
     </div>
 </div>
 <div class="form-group">
-    <label class="col-sm-2 control-label">{{"缓存时长"|$.T}}</label>
-    <div class="col-sm-10">
-        <input type="text" class="form-control" name="s3browser_refresh" value="{{$.Form `s3browser_refresh` `5m`}}" placeholder="" required="required">
-        <div class="help-block">{{`缓存时间的格式为数字和单位字母的组合，有效的单位有："ns", "us" (or "µs"), "ms", "s", "m", "h" 分别表示 "纳秒", "微秒", "毫秒", "秒", "分钟", "小时"`|$.T}}</div>
-    </div>
-</div>
-<div class="form-group">
     <label class="col-sm-2 control-label">{{"HTTPS"|$.T}}</label>
     <div class="col-sm-4">{{$v := $.Form "s3browser_secure"}}
         <div class="radio radio-primary radio-inline"> 
@@ -97,8 +110,26 @@
             <input type="radio" value="0" id="s3browser_secure-disable" name="s3browser_secure"{{if eq $v `0`}} checked{{end}}><label for="s3browser_secure-disable">{{"禁用"|$.T}}</label> 
         </div>
     </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-2 control-label">{{"CDN网址"|$.T}}</label>
+    <div class="col-sm-10">
+        <input type="text" class="form-control" name="s3browser_cdnurl" value="{{$.Form `s3browser_cdnurl`}}" placeholder="">
+    </div>
+</div>
+
+</section>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label">{{"缓存时长"|$.T}}</label>
+    <div class="col-sm-10">
+        <input type="text" class="form-control" name="s3browser_refresh" value="{{$.Form `s3browser_refresh` `5m`}}" placeholder="" required="required">
+        <div class="help-block">{{`缓存时间的格式为数字和单位字母的组合，有效的单位有："ns", "us" (or "µs"), "ms", "s", "m", "h" 分别表示 "纳秒", "微秒", "毫秒", "秒", "分钟", "小时"`|$.T}}</div>
+    </div>
+</div>
+<div class="form-group">
     <label class="col-sm-2 control-label">{{"调试模式"|$.T}}</label>
-    <div class="col-sm-4">{{$v := $.Form "s3browser_debug"}}
+    <div class="col-sm-10">{{$v := $.Form "s3browser_debug"}}
         <div class="radio radio-primary radio-inline"> 
             <input type="radio" value="1" id="s3browser_debug-enable" name="s3browser_debug"{{if eq $v `1`}} checked{{end}}><label for="s3browser_debug-enable">{{"启用"|$.T}}</label> 
         </div>
@@ -114,7 +145,7 @@
         <div class="help-block">{{`自定义页面CSS库<code>flat-ui.min.css</code>和<code>bootstrap.min.css</code>文件的CDN网址，网址之间用半角逗号隔开，如果不设置则默认使用内置的内部资源。内置的外部资源网址简称有<code>bootcdn</code>和<code>cloudflare</code>，输入简称可以自动生成对应CDN的完整网址`|$.T|ToHTML}}</div>
     </div>
 </div>
-<div class="form-group">
+<div class="form-group s3-account-custom{{if eq $s3Account `custom` ``}} hidden{{end}}">
     <label class="col-sm-2 control-label">{{"自动代理路径"|$.T}}</label>
     <div class="col-sm-10">{{$v := $.Form "s3browser_proxypath"}}
         <input type="text" class="form-control" name="s3browser_proxypath" value="{{if $v}}{{$v}}{{else if $.Stored.isAdd}}/{{end}}" placeholder="">
@@ -139,9 +170,4 @@ proxy / https://{bucket}.{endpoint} {
         </div>
     </div>
 </div>
-<div class="form-group">
-    <label class="col-sm-2 control-label">{{"CDN网址"|$.T}}</label>
-    <div class="col-sm-10">
-        <input type="text" class="form-control" name="s3browser_cdnurl" value="{{$.Form `s3browser_cdnurl`}}" placeholder="">
-    </div>
-</div>
+{{/Strip}}
