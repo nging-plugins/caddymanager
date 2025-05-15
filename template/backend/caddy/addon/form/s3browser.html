@@ -15,7 +15,7 @@
     </div>
 </div>
 
-<section class="s3-account-custom{{if eq $s3Account `custom` ``}} hidden{{end}}">
+<section class="s3-account-custom{{if eq $s3Account `custom` ``}}{{else}} hidden{{end}}">
 
 <div class="xs-margin-bottom" style="background:#efefef;padding:10px">
 <a href="javascript:;" onclick="$('#s3browser-accordion').toggleClass('hide')">常用云存储设置说明</a>
@@ -145,7 +145,7 @@
         <div class="help-block">{{`自定义页面CSS库<code>flat-ui.min.css</code>和<code>bootstrap.min.css</code>文件的CDN网址，网址之间用半角逗号隔开，如果不设置则默认使用内置的内部资源。内置的外部资源网址简称有<code>bootcdn</code>和<code>cloudflare</code>，输入简称可以自动生成对应CDN的完整网址`|$.T|ToHTML}}</div>
     </div>
 </div>
-<div class="form-group s3-account-custom{{if eq $s3Account `custom` ``}} hidden{{end}}">
+<div class="form-group s3-account-custom{{if eq $s3Account `custom` ``}}{{else}} hidden{{end}}">
     <label class="col-sm-2 control-label">{{"自动代理路径"|$.T}}</label>
     <div class="col-sm-10">{{$v := $.Form "s3browser_proxypath"}}
         <input type="text" class="form-control" name="s3browser_proxypath" value="{{if $v}}{{$v}}{{else if $.Stored.isAdd}}/{{end}}" placeholder="">
