@@ -309,7 +309,7 @@
     {{$proxypath := $v.Get "s3browser_proxypath"}}
     {{if $proxypath}}
 	proxy {{$proxypath}} {{if $cdnURL}}{{$cdnURL}}{{else}}http{{if $secure}}s{{end}}://{{$v.Get "s3browser_bucket"}}.{{$v.Get "s3browser_endpoint"}}{{end}} {
-		header_upstream Host {{if $cdnURL}}{{$v.ParseHost $cdnURL}}{{else}}{{$v.Get "s3browser_bucket"}}.{{$v.Get "s3browser_endpoint"}}{{end}}
+		header_upstream Host {{if $cdnURL}}{{$host := $v.ParseHost $cdnURL}}{{if $host}}{{$host}}{{else}}{{$v.Get "s3browser_bucket"}}.{{$v.Get "s3browser_endpoint"}}{{end}}{{else}}{{$v.Get "s3browser_bucket"}}.{{$v.Get "s3browser_endpoint"}}{{end}}
     }
     {{end}}
     {{end}}
