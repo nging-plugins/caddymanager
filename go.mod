@@ -1,8 +1,6 @@
 module github.com/nging-plugins/caddymanager
 
-go 1.24.0
-
-toolchain go1.24.3
+go 1.24.3
 
 // replace github.com/coscms/webcore => ../../coscms/webcore
 
@@ -24,7 +22,7 @@ require (
 	github.com/caddy-plugins/caddy-locale v0.0.2
 	github.com/caddy-plugins/caddy-prometheus v0.1.0
 	github.com/caddy-plugins/caddy-rate-limit v1.7.0
-	github.com/caddy-plugins/caddy-s3browser v0.2.1
+	github.com/caddy-plugins/caddy-s3browser v0.2.2
 	github.com/caddy-plugins/cors v0.0.3
 	github.com/caddy-plugins/ipfilter v1.1.8
 	github.com/caddy-plugins/loginsrv v0.1.11
