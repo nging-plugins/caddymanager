@@ -27,7 +27,7 @@ require (
 	github.com/caddy-plugins/ipfilter v1.1.8
 	github.com/caddy-plugins/loginsrv v0.1.11
 	github.com/caddy-plugins/nobots v0.2.1
-	github.com/caddy-plugins/webdav v1.2.12
+	github.com/caddy-plugins/webdav v1.3.0
 	github.com/coscms/webcore v0.12.9
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
@@ -99,7 +99,7 @@ require (
 	github.com/admpub/sonyflake v0.0.1 // indirect
 	github.com/admpub/sse v0.0.0-20160126180136-ee05b128a739 // indirect
 	github.com/admpub/timeago v1.3.0 // indirect
-	github.com/admpub/webdav/v4 v4.1.5 // indirect
+	github.com/admpub/webdav/v4 v4.1.7 // indirect
 	github.com/admpub/xencoding v0.0.3 // indirect
 	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
