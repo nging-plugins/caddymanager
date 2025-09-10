@@ -54,7 +54,7 @@ func VhostFile(ctx echo.Context) error {
 	if err == nil && len(m.Root) > 0 {
 
 		if len(filePath) > 0 {
-			filePath = filepath.Clean(filePath)
+			filePath = filepath.Clean(echo.FilePathSeparator + filePath)
 			absPath = filepath.Join(m.Root, filePath)
 		}
 
@@ -87,6 +87,7 @@ func VhostFile(ctx echo.Context) error {
 		case `mkdir`:
 			data := ctx.Data()
 			newName := ctx.Form(`name`)
+			newName = filepath.Clean(echo.FilePathSeparator + newName)
 			err = mgr.Mkdir(filepath.Join(absPath, newName), os.ModePerm)
 			if err != nil {
 				data.SetInfo(err.Error(), 0)
