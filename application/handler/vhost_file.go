@@ -20,23 +20,12 @@ package handler
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
 
-	uploadClient "github.com/webx-top/client/upload"
-	uploadDropzone "github.com/webx-top/client/upload/driver/dropzone"
-	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 
-	"github.com/coscms/webcore/library/backend"
-	"github.com/coscms/webcore/library/common"
-	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/filemanager"
-	"github.com/coscms/webcore/library/notice"
-	"github.com/coscms/webcore/library/respond"
-	uploadChunk "github.com/coscms/webcore/registry/upload/chunk"
+	"github.com/coscms/webcore/library/filemanager/filemanagerhandler"
 
 	"github.com/nging-plugins/caddymanager/application/model"
 )
@@ -44,126 +33,18 @@ import (
 func VhostFile(ctx echo.Context) error {
 	var err error
 	id := ctx.Formx(`id`).Uint()
-	filePath := ctx.Form(`path`)
-	do := ctx.Form(`do`)
 	m := model.NewVhost(ctx)
 	err = m.Get(nil, db.Cond{`id`: id})
-	mgr := filemanager.New(m.Root, config.FromFile().Sys.EditableFileMaxBytes(), ctx)
-	absPath := m.Root
-	user := backend.User(ctx)
-	if err == nil && len(m.Root) > 0 {
-
-		if len(filePath) > 0 {
-			filePath = filepath.Clean(echo.FilePathSeparator + filePath)
-			absPath = filepath.Join(m.Root, filePath)
-		}
-
-		switch do {
-		case `edit`:
-			data := ctx.Data()
-			if _, ok := Editable(absPath); !ok {
-				data.SetInfo(ctx.T(`此文件不能在线编辑`), 0)
-			} else {
-				content := ctx.Form(`content`)
-				encoding := ctx.Form(`encoding`)
-				dat, err := mgr.Edit(absPath, content, encoding)
-				if err != nil {
-					data.SetInfo(err.Error(), 0)
-				} else {
-					data.SetData(dat, 1)
-				}
-			}
-			return ctx.JSON(data)
-		case `rename`:
-			data := ctx.Data()
-			newName := ctx.Form(`name`)
-			err = mgr.Rename(absPath, newName)
-			if err != nil {
-				data.SetInfo(err.Error(), 0)
-			} else {
-				data.SetCode(1)
-			}
-			return ctx.JSON(data)
-		case `mkdir`:
-			data := ctx.Data()
-			newName := ctx.Form(`name`)
-			newName = filepath.Clean(echo.FilePathSeparator + newName)
-			err = mgr.Mkdir(filepath.Join(absPath, newName), os.ModePerm)
-			if err != nil {
-				data.SetInfo(err.Error(), 0)
-			} else {
-				data.SetCode(1)
-			}
-			return ctx.JSON(data)
-		case `delete`:
-			err = mgr.Remove(absPath)
-			if err != nil {
-				common.SendFail(ctx, err.Error())
-			}
-			next := ctx.Referer()
-			if len(next) == 0 {
-				next = ctx.Request().URL().Path() + fmt.Sprintf(`?id=%d&path=%s`, id, com.URLEncode(filepath.Dir(filePath)))
-			}
-			return ctx.Redirect(next)
-		case `upload`:
-			var cu *uploadClient.ChunkUpload
-			var opts []uploadClient.ChunkInfoOpter
-			if user != nil {
-				cu = uploadChunk.NewUploader(fmt.Sprintf(`user/%d`, user.Id))
-				opts = append(opts, uploadClient.OptChunkInfoMapping(uploadDropzone.MappingChunkInfo))
-			}
-			err = mgr.Upload(absPath, cu, opts...)
-			if err != nil {
-				user := backend.User(ctx)
-				if user != nil {
-					notice.OpenMessage(user.Username, `upload`)
-					notice.Send(user.Username, notice.NewMessageWithValue(`upload`, ctx.T(`文件上传出错`), err.Error()))
-				}
-			}
-			return respond.Dropzone(ctx, err, nil)
-		default:
-			var dirs []os.FileInfo
-			var exit bool
-			err, exit, dirs = mgr.List(absPath)
-			if exit {
-				return err
-			}
-			ctx.Set(`dirs`, dirs)
-		}
+	if err != nil {
+		return err
 	}
-	ctx.Set(`data`, m)
-	if filePath == `.` {
-		filePath = ``
-	}
-	pathSlice := strings.Split(strings.Trim(filePath, echo.FilePathSeparator), echo.FilePathSeparator)
-	pathLinks := make(echo.KVList, len(pathSlice))
 	encodedSep := filemanager.EncodedSepa
 	urlPrefix := ctx.Request().URL().Path() + fmt.Sprintf(`?id=%d&path=`, id) + encodedSep
-	for k, v := range pathSlice {
-		urlPrefix += com.URLEncode(v)
-		pathLinks[k] = &echo.KV{K: v, V: urlPrefix}
-		urlPrefix += encodedSep
+	h := filemanagerhandler.New(m.Root, urlPrefix)
+	err = h.Handle(ctx)
+	if err != nil || ctx.Response().Committed() {
+		return err
 	}
-	ctx.Set(`pathLinks`, pathLinks)
-	ctx.Set(`rootPath`, strings.TrimSuffix(m.Root, echo.FilePathSeparator))
-	ctx.Set(`path`, filePath)
-	ctx.Set(`absPath`, absPath)
-	ctx.SetFunc(`Editable`, func(fileName string) bool {
-		_, ok := Editable(fileName)
-		return ok
-	})
-	ctx.SetFunc(`Playable`, func(fileName string) string {
-		mime, _ := Playable(fileName)
-		return mime
-	})
 	ctx.Set(`activeURL`, `/caddy/vhost`)
 	return ctx.Render(`caddy/file`, err)
-}
-
-func Editable(fileName string) (string, bool) {
-	return config.FromFile().Sys.Editable(fileName)
-}
-
-func Playable(fileName string) (string, bool) {
-	return config.FromFile().Sys.Playable(fileName)
 }
