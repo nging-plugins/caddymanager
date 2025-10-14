@@ -21,6 +21,7 @@ package handler
 import (
 	"net/http"
 
+	"github.com/admpub/caddy/dnsproviders"
 	"github.com/admpub/log"
 	"github.com/coscms/webcore/dbschema"
 	"github.com/coscms/webcore/model"
@@ -54,6 +55,7 @@ func AddonForm(ctx echo.Context) error {
 	ctx.SetFunc(`ListS3Accounts`, func() []*dbschema.NgingCloudStorage {
 		return listS3Accounts(ctx)
 	})
+	ctx.SetFunc(`ListDNSProviders`, dnsProvidersInputs)
 	index := ctx.Queryx(`index`, `0`).Int()
 	return ctx.Render(`caddy/addon/form/`+addon, index)
 }
@@ -68,4 +70,14 @@ func listS3Accounts(ctx echo.Context) []*dbschema.NgingCloudStorage {
 		return nil
 	}
 	return m.Objects()
+}
+
+func dnsProvidersInputs() []dnsproviders.Provider {
+	providers := dnsproviders.GetProviders()
+	r := make([]dnsproviders.Provider, len(providers))
+	for i, provider := range providers {
+		r[i] = dnsproviders.Get(provider)
+		r[i].Inputs = r[i].Inputs.Clone()
+	}
+	return r
 }

@@ -1,4 +1,4 @@
-<div class="form-group">
+{{Strip}}<div class="form-group">
     <label class="col-sm-2 control-label">{{"路径"|$.T}}</label>
     <div class="col-sm-4">
        <input type="text" class="form-control" value="{{$.Form `prometheus_path` `/`}}" name="prometheus_path" required="required" placeholder="">
@@ -60,3 +60,4 @@
        <div class="help-block">{{"与caddy使用相同的端口和地址。选中此项后，将忽略“监听地址”设置"|$.T}}</div>
     </div>
   </div>
+{{/Strip}}

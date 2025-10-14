@@ -175,8 +175,16 @@
     {{if $v.IsEnabled "tls"}}
         {{if and ($v.Get "tls_cert") ($v.Get "tls_key")}}
     tls "{{$v.Get "tls_cert"|$v.AddSlashes|ToHTML}}" "{{$v.Get "tls_key"|$v.AddSlashes|ToHTML}}"
-        {{else if $v.Get "tls_email"|ToHTML}}
-    tls {{$v.Get "tls_email"|ToHTML}}
+        {{else if $v.Get "tls_email"}}
+    tls {{$v.Get "tls_email"|ToHTML}}{{if $v.Get "tls_acme_dns_provider"}} {
+        {{$dnsProvider := $v.Get "tls_acme_dns_provider"}}
+        {{$lines := $v.DNSProvider $dnsProvider}}
+        dns {{$dnsProvider}}{{if $lines}} {
+            {{range $kk,$vv:=$lines}}
+            {{$vv}}
+            {{end}}
+        }{{end}}
+    }{{end}}
         {{end}}
     {{else}}
     tls off

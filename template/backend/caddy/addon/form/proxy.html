@@ -1,4 +1,4 @@
-<div class="form-group">
+{{Strip}}<div class="form-group">
                           <label class="col-sm-2 control-label">{{"访问路径"|$.T}}</label>
                           <div class="col-sm-10">
                              <input type="text" class="form-control" name="{{call $.Func.Key `proxy_from`}}" value="{{call $.Func.Val `proxy_from` `/`}}" required="required">
@@ -231,3 +231,4 @@ header_upstream X-Forwarded-Proto {scheme}</pre></p>
                           </div>
                         </div>
                       </div>
+{{/Strip}}

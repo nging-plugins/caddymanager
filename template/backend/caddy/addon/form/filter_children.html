@@ -1,4 +1,4 @@
-{{- $index := $.Get `filterIndex` -}}
+{{Strip}}{{- $index := $.Get `filterIndex` -}}
 <div class="fieldset bg-fc spacer-bottom-xs">
     {{- if gt $index 0 -}}
     <a href="javascript:;" class="label label-danger extra-page-remove" onclick="removeFormHTML(this);" data-toggle="tooltip" title="{{`删除`|$.T}}"><i class="fa fa-times"></i></a>
@@ -52,3 +52,4 @@
         </div>
     </div>
 </div>
+{{/Strip}}

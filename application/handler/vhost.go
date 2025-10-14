@@ -23,6 +23,7 @@ import (
 	"html/template"
 	"net/url"
 
+	"github.com/admpub/caddy/dnsproviders"
 	dbschemaNG "github.com/coscms/webcore/dbschema"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
@@ -173,6 +174,24 @@ func setVhostForm(ctx echo.Context) {
 	ctx.SetFunc(`ListS3Accounts`, func() []*dbschemaNG.NgingCloudStorage {
 		return listS3Accounts(ctx)
 	})
+	dnsProvider := ctx.Form(`tls_acme_dns_provider`)
+	if len(dnsProvider) > 0 {
+		dnsProviders := dnsProvidersInputs()
+		for i, v := range dnsProviders {
+			if v.Provider == dnsProvider {
+				for ii, vv := range v.Inputs {
+					v.Inputs[ii].Value = ctx.Form(`tls_acme_dns_` + vv.Name)
+				}
+				dnsProviders[i] = v
+				break
+			}
+		}
+		ctx.SetFunc(`ListDNSProviders`, func() []dnsproviders.Provider {
+			return dnsProviders
+		})
+	} else {
+		ctx.SetFunc(`ListDNSProviders`, dnsProvidersInputs)
+	}
 }
 
 func VhostDelete(ctx echo.Context) error {

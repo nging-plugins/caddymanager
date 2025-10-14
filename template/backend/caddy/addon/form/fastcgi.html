@@ -1,4 +1,4 @@
-<div class="form-group">
+{{Strip}}<div class="form-group">
                           <label class="col-sm-2 control-label">{{"网址路径"|$.T}}</label>
                           <div class="col-sm-10">
                              <input type="text" class="form-control" name="{{call $.Func.Key `fastcgi_path`}}" value="{{call $.Func.Val `fastcgi_path` `/`}}">
@@ -109,4 +109,4 @@
                              <div class="help-block">{{"基于此路径的网址请求将不会发送。如有多个，用空格隔开"|$.T}}</div>
                           </div>
                         </div>
-                        
+{{/Strip}}

@@ -6,7 +6,7 @@ go 1.25.1
 
 require (
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
-	github.com/admpub/caddy v1.3.0
+	github.com/admpub/caddy v1.3.1-0.20251014111112-3d31524818fd
 	github.com/admpub/go-download/v2 v2.2.0
 	github.com/admpub/goth v0.0.4
 	github.com/admpub/log v1.4.0
@@ -151,7 +151,11 @@ require (
 	github.com/klauspost/cpuid v1.3.1 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
+	github.com/libdns/acmedns v0.5.0 // indirect
+	github.com/libdns/cloudflare v0.2.1 // indirect
 	github.com/libdns/libdns v1.1.1 // indirect
+	github.com/libdns/rfc2136 v1.0.1 // indirect
+	github.com/libdns/tencentcloud v1.4.2 // indirect
 	github.com/lufia/plan9stats v0.0.0-20250827001030-24949be3fa54 // indirect
 	github.com/maruel/rs v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect

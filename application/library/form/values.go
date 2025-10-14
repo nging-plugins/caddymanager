@@ -25,6 +25,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/admpub/caddy/dnsproviders"
 	"github.com/admpub/log"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
@@ -436,4 +437,12 @@ func (v Values) ParseHost(urlStr string) string {
 		return ``
 	}
 	return u.Host
+}
+
+func (v Values) DNSProvider(provider string) []string {
+	inputs := dnsproviders.GetInputs(provider).Clone()
+	for i, input := range inputs {
+		inputs[i].Value = v.Values.Get(`tls_acme_dns_` + input.Name)
+	}
+	return inputs.RenderCaddyfile()
 }

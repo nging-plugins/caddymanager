@@ -188,4 +188,22 @@ $('#serverIdent').on('change',function(){
   showEngineElements($form);
 }).trigger('change');
 App.searchFS('#www-root-path',20,'dir');
+$('#vhostForm').on('change','#tls_acme_dns_provider',function(){
+  var provider=$(this).val(),$inputs=$('#tls-dns-provider-inputs');
+  if(!provider){
+    $inputs.empty();
+    return;
+  }
+  var dataInputs=$(this).children('option:selected').data('inputs');
+  var params=[];
+  for(var i=0;i<dataInputs.length;i++){
+    var input=dataInputs[i];
+    params.push({Label:App.t(input.Label),Input:input.Input,Help:input.Help})
+  }
+  if($inputs.length<1){
+    $inputs=$('<div id="tls-dns-provider-inputs"></div>');
+    $(this).closest('.form-group').after($inputs);
+  }
+  $inputs.html(template('tpl-tls-dns-provider-input',{inputs:params}));
+}).trigger('change');
 });
