@@ -33,10 +33,10 @@ import (
 	"strings"
 	"time"
 
-	"gitee.com/admpub/certmagic"
 	"github.com/admpub/caddy"
 	_ "github.com/admpub/caddy/caddyhttp"
 	"github.com/admpub/caddy/caddytls"
+	"github.com/caddyserver/certmagic"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
@@ -51,10 +51,10 @@ const UnsupportedPathInfo = `unsupported-nging-default-webserver-config`
 var (
 	DefaultConfig = &Config{
 		Agreed:                  true,
-		CAUrl:                   certmagic.Default.CA,
+		CAUrl:                   certmagic.DefaultACME.CA,
 		CATimeout:               int64(certmagic.HTTPTimeout.Seconds()),
-		DisableHTTPChallenge:    certmagic.Default.DisableHTTPChallenge,
-		DisableTLSALPNChallenge: certmagic.Default.DisableTLSALPNChallenge,
+		DisableHTTPChallenge:    certmagic.DefaultACME.DisableHTTPChallenge,
+		DisableTLSALPNChallenge: certmagic.DefaultACME.DisableTLSALPNChallenge,
 		ServerType:              `http`,
 		CPU:                     `80%`,
 		PidFile:                 `./caddy.pid`,
@@ -365,11 +365,11 @@ func (c *Config) Stop() error {
 }
 
 func (c *Config) Init() *Config {
-	certmagic.Default.Agreed = c.Agreed
-	certmagic.Default.CA = c.CAUrl
-	certmagic.Default.DisableHTTPChallenge = c.DisableHTTPChallenge
-	certmagic.Default.DisableTLSALPNChallenge = c.DisableTLSALPNChallenge
-	certmagic.Default.Email = c.CAEmail
+	certmagic.DefaultACME.Agreed = c.Agreed
+	certmagic.DefaultACME.CA = c.CAUrl
+	certmagic.DefaultACME.DisableHTTPChallenge = c.DisableHTTPChallenge
+	certmagic.DefaultACME.DisableTLSALPNChallenge = c.DisableTLSALPNChallenge
+	certmagic.DefaultACME.Email = c.CAEmail
 	certmagic.HTTPTimeout = time.Duration(c.CATimeout) * time.Second
 
 	caddy.PidFile = c.PidFile
@@ -404,7 +404,7 @@ func (c *Config) Init() *Config {
 	if len(c.Revoke) > 0 {
 		err := caddytls.Revoke(c.Revoke)
 		if err != nil {
-			mustLogFatalf(err.Error())
+			mustLogFatalf(`%v`, err)
 		}
 		fmt.Printf("Revoked certificate for %s\n", c.Revoke)
 		os.Exit(0)
@@ -421,7 +421,7 @@ func (c *Config) Init() *Config {
 	// Set CPU cap
 	err := setCPU(c.CPU)
 	if err != nil {
-		mustLogFatalf(err.Error())
+		mustLogFatalf(`%v`, err)
 	}
 	return c
 }
