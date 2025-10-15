@@ -22,10 +22,10 @@
         placeholder="{{`例如: `|$.T}}boy@admpub.com">
       <span class="input-group-addon">{{"签发机构"|$.T}}</span>
       {{- $caName := $.Form `tls_ca_name` -}}
-      <select class="form-control" name="tls_ca_name">
+      <select class="form-control" name="tls_ca_name" id="tls_ca_name">
         <option value="">{{"默认"|$.T}}</option>
         {{- range $k,$v:=$.Stored.caList -}}
-        <option value="{{$v.K}}"{{if eq $caName $v.K}} selected{{end}}>{{$v.V|$.T}}</option>
+        <option value="{{$v.K}}"{{if eq $caName $v.K}} selected{{end}}{{if $v.H.NeedEAB}} data-need-eab="1"{{end}}{{if $v.H.NeedToken}} data-need-token="1"{{end}}>{{$v.V|$.T}}</option>
         {{- end -}}
       </select>
     </span>
@@ -44,6 +44,18 @@
   </div>
 </div>
 
+{{- if $caName -}}
+  {{- range $k,$v:=$.Stored.caList -}}
+    {{- if eq $caName $v.K -}}
+    {{- if or $v.H.NeedEAB $v.H.NeedToken -}}
+<div id="tls-ca-inputs">
+    {{- if $v.H.NeedEAB -}}{{Include "caddy/addon/form/tls_ca_eab" $}}{{else}}{{Include "caddy/addon/form/tls_ca_token" $}}{{- end -}}
+</div>
+    {{- end -}}
+    {{break}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
 
 <div class="engine-hide-nginx form-group">
   <label class="col-sm-2 control-label">{{"DNS认证"|$.T}}</label>
@@ -85,5 +97,9 @@
   </div>
 </div>
 {{TemplateTag "/each"}}
+</script><script type="text/html" id="tpl-tls-ca-eab">
+{{Include "caddy/addon/form/tls_ca_eab" $}}
+</script><script type="text/html" id="tpl-tls-ca-token">
+{{Include "caddy/addon/form/tls_ca_token" $}}
 </script>
 {{/Strip}}

@@ -172,25 +172,9 @@
     }
     {{end}}
 
+
     {{if $v.IsEnabled "tls"}}
-        {{if and ($v.Get "tls_cert") ($v.Get "tls_key")}}
-    tls "{{$v.Get "tls_cert"|$v.AddSlashes|ToHTML}}" "{{$v.Get "tls_key"|$v.AddSlashes|ToHTML}}"
-        {{else if $v.Get "tls_email"}}
-        {{$tlsCAName := $v.Get "tls_ca_name"}}
-        {{$dnsProvider := $v.Get "tls_acme_dns_provider"}}
-    tls {{$v.Get "tls_email"|ToHTML}}{{if or $tlsCAName $dnsProvider}} {
-        {{$ca := $v.CA $tlsCAName}}
-        {{if $ca}}
-        ca {{$ca.X}}
-        {{end}}
-        {{$lines := $v.DNSProvider $dnsProvider}}
-        dns {{$dnsProvider}}{{if $lines}} {
-            {{range $kk,$vv:=$lines}}
-            {{$vv}}
-            {{end}}
-        }{{end}}
-    }{{end}}
-        {{end}}
+    {{Include "caddy/makeconfig/caddy2/tls" $}}<!-- 目前实现的部分可以与caddy2共用 -->
     {{else}}
     tls off
     {{end}}

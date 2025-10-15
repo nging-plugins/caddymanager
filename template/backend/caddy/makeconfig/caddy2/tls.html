@@ -1,0 +1,37 @@
+{{$v := $.Get `values`}}
+    {{$hasCert := and ($v.Get "tls_cert") ($v.Get "tls_key")}}
+    {{$email := $v.Get "tls_email"}}
+    {{if or $email $hasCert}}
+        {{$tlsCAName := $v.Get "tls_ca_name"}}
+        {{$dnsProvider := $v.Get "tls_acme_dns_provider"}}
+    tls {{if $hasCert}}"{{$v.Get "tls_cert"|$v.AddSlashes|ToHTML}}" "{{$v.Get "tls_key"|$v.AddSlashes|ToHTML}}"{{else}}"{{$email|ToHTML}}"{{if or $tlsCAName $dnsProvider}} {
+        {{$ca := $v.CA $tlsCAName}}
+        {{$dnsLines := $v.DNSProvider $dnsProvider}}
+
+        {{if $ca}}{{if or $ca.H.NeedToken $ca.H.NeedEAB}}
+        issuer {{$ca.H.Issuer}} {{if eq $ca.H.Issuer `acme`}}{{$ca.X}}{{else if $ca.H.NeedToken}}"{{$v.Get "tls_ca_token"|$v.AddSlashes|ToHTML}}"{{end}}{{if or $dnsProvider $ca.H.NeedEAB}} {
+            {{if $dnsProvider}}
+            dns {{$dnsProvider}}{{if $dnsLines}} {
+                {{range $kk,$vv:=$dnsLines}}
+                {{$vv}}
+                {{end}}
+            }{{end}}
+            {{end}}
+            {{if $ca.H.NeedEAB}}
+            eab "{{$v.Get "tls_ca_eab_key_id"|$v.AddSlashes|ToHTML}}" "{{$v.Get "tls_ca_eab_mac_key"|$v.AddSlashes|ToHTML}}"
+            {{end}}
+        }{{end}}
+        {{else}}
+        ca {{$ca.X}}
+        {{end}}{{end}}
+
+        {{if and $dnsProvider (or (not $ca) (and (not $ca.H.NeedEAB) (not $ca.H.NeedToken)))}}
+        dns {{$dnsProvider}}{{if $dnsLines}} {
+            {{range $kk,$vv:=$dnsLines}}
+            {{$vv}}
+            {{end}}
+        }{{end}}
+        {{end}}
+
+    }{{end}}{{end}}
+    {{end}}

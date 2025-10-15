@@ -206,4 +206,20 @@ $('#vhostForm').on('change','#tls_acme_dns_provider',function(){
   }
   $inputs.html(template('tpl-tls-dns-provider-input',{inputs:params}));
 }).trigger('change');
+$('#vhostForm').on('change','#tls_ca_name',function(){
+  var ca=$(this).val(),$inputs=$('#tls-ca-inputs');
+  if(!ca){
+    $inputs.empty();
+    return;
+  }
+  var $sel=$(this).children('option:selected'),needEAB=$sel.data('need-eab'),needToken=$sel.data('need-token');
+  if($inputs.length<1){
+    $inputs=$('<div id="tls-ca-inputs"></div>');
+    $(this).closest('.form-group').after($inputs);
+  }else{
+    $inputs.empty();
+  }
+  if(needEAB) $inputs.append(template('tpl-tls-ca-eab',{}));
+  if(needToken) $inputs.append(template('tpl-tls-ca-token',{}));
+}).trigger('change');
 });
