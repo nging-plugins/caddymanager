@@ -446,3 +446,7 @@ func (v Values) DNSProvider(provider string) []string {
 	}
 	return inputs.RenderCaddyfile()
 }
+
+func (v Values) CA(name string) *echo.KV {
+	return CAList.GetItem(name)
+}

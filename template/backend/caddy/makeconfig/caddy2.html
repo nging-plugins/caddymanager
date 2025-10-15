@@ -100,8 +100,13 @@
     {{$hasCert := and ($v.Get "tls_cert") ($v.Get "tls_key")}}
     {{$email := $v.Get "tls_email"}}
     {{if or $email $hasCert}}
-    tls {{if $hasCert}}"{{$v.Get "tls_cert"|$v.AddSlashes|ToHTML}}" "{{$v.Get "tls_key"|$v.AddSlashes|ToHTML}}"{{else}}{{$email|ToHTML}}{{if $v.Get "tls_acme_dns_provider"}} {
+        {{$tlsCAName := $v.Get "tls_ca_name"}}
         {{$dnsProvider := $v.Get "tls_acme_dns_provider"}}
+    tls {{if $hasCert}}"{{$v.Get "tls_cert"|$v.AddSlashes|ToHTML}}" "{{$v.Get "tls_key"|$v.AddSlashes|ToHTML}}"{{else}}{{$email|ToHTML}}{{if or $tlsCAName $dnsProvider}} {
+        {{$ca := $v.CA $tlsCAName}}
+        {{if $ca}}
+        ca {{$ca.X}}
+        {{end}}
         {{$lines := $v.DNSProvider $dnsProvider}}
         dns {{$dnsProvider}}{{if $lines}} {
             {{range $kk,$vv:=$lines}}

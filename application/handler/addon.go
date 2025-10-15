@@ -28,6 +28,8 @@ import (
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
+
+	"github.com/nging-plugins/caddymanager/application/library/form"
 )
 
 func ValidAddonName(addon string) bool {
@@ -56,6 +58,7 @@ func AddonForm(ctx echo.Context) error {
 		return listS3Accounts(ctx)
 	})
 	ctx.SetFunc(`ListDNSProviders`, dnsProvidersInputs)
+	ctx.Set(`caList`, form.CAList.Slice())
 	index := ctx.Queryx(`index`, `0`).Int()
 	return ctx.Render(`caddy/addon/form/`+addon, index)
 }

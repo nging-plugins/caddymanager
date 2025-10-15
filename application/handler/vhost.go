@@ -171,6 +171,7 @@ func setVhostForm(ctx echo.Context) {
 	svr.ListByOffset(nil, nil, 0, -1, db.Cond{`disabled`: common.BoolN})
 	ctx.Set(`serverList`, svr.Objects())
 	ctx.Set(`moduleList`, mconfig.VhostModules.Slice())
+	ctx.Set(`caList`, form.CAList.Slice())
 	ctx.SetFunc(`ListS3Accounts`, func() []*dbschemaNG.NgingCloudStorage {
 		return listS3Accounts(ctx)
 	})
