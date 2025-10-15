@@ -175,7 +175,7 @@
 
     {{$hasCert := and ($v.Get "tls_cert") ($v.Get "tls_key")}}
     {{$email := $v.Get "tls_email"}}
-    {{if and ($v.IsEnabled "tls") $hasCert $email}}
+    {{if and ($v.IsEnabled "tls") (or $hasCert $email)}}
     {{Include "caddy/makeconfig/caddy2/tls" $}}<!-- 目前实现的部分可以与caddy2共用 -->
     {{else}}
     tls off
