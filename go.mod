@@ -6,7 +6,7 @@ go 1.25.1
 
 require (
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
-	github.com/admpub/caddy v1.3.1-0.20251015045732-57cd5fd08c15
+	github.com/admpub/caddy v1.3.1-0.20251015061853-b6a25cce25c5
 	github.com/admpub/go-download/v2 v2.2.0
 	github.com/admpub/goth v0.0.4
 	github.com/admpub/log v1.4.0
@@ -35,6 +35,7 @@ require (
 	github.com/webx-top/db v1.28.9
 	github.com/webx-top/echo v1.22.4
 	github.com/webx-top/restyclient v0.0.6
+	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.43.0
 	golang.org/x/net v0.46.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
@@ -214,7 +215,6 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	github.com/zeebo/blake3 v0.2.4 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.27.0 // indirect
 	go.uber.org/zap/exp v0.3.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	golang.org/x/image v0.31.0 // indirect
