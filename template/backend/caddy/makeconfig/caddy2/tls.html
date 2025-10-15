@@ -22,7 +22,7 @@
             {{end}}
         }{{end}}
         {{else}}
-        ca $ca.X
+        ca {{$ca.X}}
         {{end}}{{end}}
 
         {{if and $dnsProvider (or (not $ca) (and (not $ca.H.NeedEAB) (not $ca.H.NeedToken)))}}
