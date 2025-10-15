@@ -6,7 +6,7 @@ go 1.25.1
 
 require (
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
-	github.com/admpub/caddy v1.3.1-0.20251015093952-86a17d41de5f
+	github.com/admpub/caddy v1.3.1-0.20251015101223-f50f7beaa88c
 	github.com/admpub/go-download/v2 v2.2.0
 	github.com/admpub/goth v0.0.4
 	github.com/admpub/log v1.4.0
@@ -28,7 +28,6 @@ require (
 	github.com/caddy-plugins/nobots v0.2.1
 	github.com/caddy-plugins/webdav v1.3.4
 	github.com/caddyserver/certmagic v0.25.0
-	github.com/coscms/forms v1.13.11
 	github.com/coscms/webcore v0.13.3-0.20251014063818-6d89394ac78c
 	github.com/spf13/cobra v1.10.1
 	github.com/stretchr/testify v1.11.1
@@ -111,6 +110,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/coscms/captcha v0.2.3 // indirect
+	github.com/coscms/forms v1.13.11 // indirect
 	github.com/coscms/oauth2s v0.4.3 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dsoprea/go-logging v0.0.0-20200710184922-b02d349568dd // indirect
