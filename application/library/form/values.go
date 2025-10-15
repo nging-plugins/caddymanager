@@ -441,10 +441,19 @@ func (v Values) ParseHost(urlStr string) string {
 
 func (v Values) DNSProvider(provider string) []string {
 	inputs := dnsproviders.GetInputs(provider).Clone()
-	for i, input := range inputs {
-		inputs[i].Value = v.Values.Get(`tls_acme_dns_` + input.Name)
+	results := make([]string, 0, len(inputs))
+	for _, input := range inputs {
+		input.Value = v.Values.Get(`tls_acme_dns_` + input.Name)
+		value := input.Value
+		if len(value) == 0 && len(input.Default) > 0 {
+			value = input.Default
+		}
+		if len(value) == 0 {
+			continue
+		}
+		results = append(results, input.Name+` "`+v.AddSlashes(value)+`"`)
 	}
-	return inputs.RenderCaddyfile()
+	return results
 }
 
 func (v Values) CA(name string) *echo.KV {

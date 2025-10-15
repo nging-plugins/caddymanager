@@ -13,7 +13,7 @@
             {{if $dnsProvider}}
             dns {{$dnsProvider}}{{if $dnsLines}} {
                 {{range $kk,$vv:=$dnsLines}}
-                {{$vv}}
+                {{$vv|ToHTML}}
                 {{end}}
             }{{end}}
             {{end}}
@@ -22,13 +22,13 @@
             {{end}}
         }{{end}}
         {{else}}
-        ca {{$ca.X}}
+        ca $ca.X
         {{end}}{{end}}
 
         {{if and $dnsProvider (or (not $ca) (and (not $ca.H.NeedEAB) (not $ca.H.NeedToken)))}}
         dns {{$dnsProvider}}{{if $dnsLines}} {
             {{range $kk,$vv:=$dnsLines}}
-            {{$vv}}
+            {{$vv|ToHTML}}
             {{end}}
         }{{end}}
         {{end}}
