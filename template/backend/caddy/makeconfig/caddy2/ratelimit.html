@@ -1,0 +1,46 @@
+{{$v := $.Get `values`}}<!-- package:github.com/mholt/caddy-ratelimit --><!-- https://caddyserver.com/docs/caddyfile/concepts#placeholders -->
+    {{if $v.IsEnabled "ratelimit"}}
+    rate_limit {
+        distributed
+        zone default {
+            match {
+                method {{$v.GetAttrVal "ratelimit" "methods"}}
+                {{$v.Caddy2PathMatcher ($v.GetValueList "ratelimit" "resources") `                `}}
+                {{$whitelistIP := $v.GetAttrVal "ratelimit" "whitelist"}}
+                {{if $whitelistIP}}
+                not client_ip {{Replace $whitelistIP "," " " -1}}
+                {{end}}
+            }
+            {{$limitByKey := $v.GetAttrVal "ratelimit" "limit_by_header"}}
+            {{if $limitByKey}}
+            key {header.{{$limitByKey}}}
+            {{else}}
+            key {remote_host}
+            {{end}}
+            events {{$v.GetAttrVal "ratelimit" "rate"}}
+            {{$unit := $v.GetAttrVal "ratelimit" "unit"}}
+            {{if eq $unit "second"}}
+            window 1s
+            {{else if eq $unit "minute"}}
+            window 1m
+            {{else if eq $unit "hour"}}
+            window 1h
+            {{else if eq $unit "day"}}
+            window 24h
+            {{else if eq $unit "week"}}
+            window 7d
+            {{end}}
+        }
+
+        {{$burst := $v.GetAttrVal "ratelimit" "burst"}}
+        {{if $burst}}
+        {{$burstFloat := Float64 $burst}}
+        {{$rateFloat := Float64 ($v.GetAttrVal "ratelimit" "rate")}}
+        {{$ft := Sub $burstFloat $rateFloat}}
+        {{if gt $ft (Float64 0)}}
+        jitter {{Mul $ft 100}}
+        {{end}}
+        {{end}}
+        <!-- {{$v.AddonAttr "ratelimit" "status"}} -->
+    }
+    {{end}}

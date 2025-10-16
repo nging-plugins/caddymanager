@@ -1,6 +1,12 @@
 {{$v := $.Get `values`}}
-
+<!-- {
+	{{if $v.IsEnabled "ratelimit"}}order rate_limit after basic_auth{{end}}
+	{{if $v.IsEnabled "filter"}}order filter after encode{{end}}
+} -->
 {{Join $v.GetDomainList `, `}} {
+    {{/*Include "caddy/makeconfig/caddy2/ratelimit" $*/}}
+    {{/*Include "caddy/makeconfig/caddy2/filter" $*/}}
+
     {{$root := $v.Get "root"}}
     {{if $root}}
     root * "{{$root|$v.AddSlashes|ToHTML}}"

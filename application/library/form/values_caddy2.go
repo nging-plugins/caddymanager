@@ -82,3 +82,23 @@ func (v Values) AddonAttrFullKey(fullKey string, item string, defaults ...string
 	}
 	return item + `   ` + val
 }
+
+func (v Values) Caddy2PathMatcher(paths []string, prefix string) string {
+	var notPaths []string
+	var mchPaths []string
+	for _, path := range paths {
+		if strings.HasPrefix(path, `^`) {
+			notPaths = append(notPaths, v.AddPathWildcardSuffix(path[1:]))
+		} else {
+			mchPaths = append(mchPaths, v.AddPathWildcardSuffix(path))
+		}
+	}
+	var result string
+	if len(notPaths) > 0 {
+		result += prefix + `not path ` + strings.Join(notPaths, ` `) + "\n"
+	}
+	if len(mchPaths) > 0 {
+		result += prefix + `path ` + strings.Join(mchPaths, ` `)
+	}
+	return result
+}

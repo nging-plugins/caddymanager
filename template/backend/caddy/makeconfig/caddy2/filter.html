@@ -1,10 +1,10 @@
-{{$v := $.Get `values`}}<!-- package:https://github.com/sjtug/caddy2-filter -->
+{{$v := $.Get `values`}}<!-- package:github.com/sjtug/caddy2-filter -->
     {{if $v.IsEnabled "filter"}}
     {{range $index, $searchPattern := $v.GetSlice "filter_search_pattern"}}
     {{$filterPath := ($v.GetSlice "filter_path").GetByIndex $index}}
     {{$filterContentType := ($v.GetSlice "filter_content_type").GetByIndex $index}}
     {{if or $filterPath $filterContentType}}
-    filter  {
+    filter {
         {{if $filterPath}}
         path                          "{{$filterPath|$v.AddSlashes|ToHTML}}"
         {{end}}
