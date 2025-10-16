@@ -69,7 +69,7 @@
       <option value="{{$v.Provider}}"{{if eq $provider $v.Provider}} selected{{end}} data-inputs="{{$v.Inputs.RenderHTMLs `tls_acme_dns_`|JSONEncode}}">{{$v.Title}}</option>
       {{- end -}}
     </select>
-    <div class="help-block">{{"用于自动化管理 Let's encrypt 证书时的DNS认证。关闭时采用HTTP-01认证"|$.T}}</div>
+    <div class="help-block">{{"用于自动化管理HTTPS证书时的DNS认证。关闭时采用HTTP-01认证"|$.T}}</div>
   </div>
 </div>
 {{- if $provider -}}
