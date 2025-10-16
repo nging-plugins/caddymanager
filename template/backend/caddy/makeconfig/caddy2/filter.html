@@ -1,0 +1,27 @@
+{{$v := $.Get `values`}}<!-- package:https://github.com/sjtug/caddy2-filter -->
+    {{if $v.IsEnabled "filter"}}
+    {{range $index, $searchPattern := $v.GetSlice "filter_search_pattern"}}
+    {{$filterPath := ($v.GetSlice "filter_path").GetByIndex $index}}
+    {{$filterContentType := ($v.GetSlice "filter_content_type").GetByIndex $index}}
+    {{if or $filterPath $filterContentType}}
+    filter  {
+        {{if $filterPath}}
+        path                          "{{$filterPath|$v.AddSlashes|ToHTML}}"
+        {{end}}
+        {{if $filterContentType}}
+        content_type                  "{{$filterContentType|$v.AddSlashes|ToHTML}}"
+        {{end}}
+        {{if and $filterPath $filterContentType}}
+        path_content_type_combination "{{($v.GetSlice "filter_path_content_type_combination").GetByIndex $index|ToHTML}}"
+        {{end}}
+        search_pattern                "{{$searchPattern|$v.AddSlashes|ToHTML}}"
+        replacement                   "{{($v.GetSlice "filter_replacement").GetByIndex $index|$v.AddSlashes|ToHTML}}"
+
+        {{$filterMaxBufferSize := Int ($v.Get "filter_max_buffer_size")}}
+        {{if gt $filterMaxBufferSize 0}}
+        max_size {{$filterMaxBufferSize}}
+        {{end}}
+    }
+    {{end}}
+    {{end}}
+    {{end}}
