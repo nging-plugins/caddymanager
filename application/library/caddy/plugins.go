@@ -36,14 +36,6 @@ import (
 	_ "github.com/caddy-plugins/nobots"
 	_ "github.com/caddy-plugins/webdav"
 
-	// TLS DNS providers
-	_ "github.com/admpub/caddy/dnsproviders/acmedns"
-	//_ "github.com/admpub/caddy/dnsproviders/alidns"
-	_ "github.com/admpub/caddy/dnsproviders/cloudflare"
-	//_ "github.com/admpub/caddy/dnsproviders/dnspod"
-	_ "github.com/admpub/caddy/dnsproviders/rfc2136"
-	_ "github.com/admpub/caddy/dnsproviders/tencentcloud"
-
 	//_ "github.com/caddy-plugins/caddy-iplimit/iplimit"
 
 	"github.com/admpub/goth"
@@ -51,6 +43,16 @@ import (
 	"github.com/coscms/webcore/library/backend/oauth2nging"
 	"github.com/coscms/webcore/model"
 	"github.com/webx-top/echo/defaults"
+
+	// TLS DNS providers
+	_ "github.com/admpub/caddy/dnsproviders/acmedns"
+	//_ "github.com/admpub/caddy/dnsproviders/alidns"
+	_ "github.com/admpub/caddy/dnsproviders/cloudflare"
+	//_ "github.com/admpub/caddy/dnsproviders/dnspod"
+	_ "github.com/admpub/caddy/dnsproviders/edgeone"
+	_ "github.com/admpub/caddy/dnsproviders/he"
+	_ "github.com/admpub/caddy/dnsproviders/rfc2136"
+	_ "github.com/admpub/caddy/dnsproviders/tencentcloud"
 )
 
 func init() {
