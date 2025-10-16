@@ -82,12 +82,8 @@
     {{$except := $v.Get "log_except"}}
     {{if $except}}
     @skip_log_matcher path_regexp {{$except}}
-    skip_log @skip_log_matcher
+    log_skip @skip_log_matcher
     {{end}}
-    {{end}}
-
-    {{if $v.Get "index"}}
-    index {{$v.Get "index"}}
     {{end}}
 
     {{if and (ne ($v.Get "header") `0`) ($v.Get "header_path")}}
@@ -195,12 +191,18 @@
 
     {{if $v.IsEnabled "browse"}}
     {{range $kk,$vv := $v.GetExtraList `browse`}}
-    file_server {{$vv.Get "path"|$v.AddPathWildcardSuffix}} {{$vv.Get "tmpl"|Default `browse`}} {
+    file_server {{$vv.Get "path"|$v.AddPathWildcardSuffix}} browse {
         {{$root := $v.Get `root`}}
         {{if $root}}
         root "{{$root|$v.AddSlashes|ToHTML}}"
         {{end}}
         hide .git
+        {{if $v.Get "index"}}
+        index {{$v.Get "index"}}
+        {{end}}
+        {{if $vv.Get "tmpl"}}
+        browse "{{$vv.Get "tmpl"|$v.AddSlashes|ToHTML}}"
+        {{end}}
     }
     {{end}}
     {{end}}
