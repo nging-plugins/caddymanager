@@ -40,6 +40,11 @@ import (
 
 	"github.com/admpub/goth"
 	"github.com/caddy-plugins/loginsrv/oauth2"
+	_ "github.com/caddy-plugins/loginsrv/oauth2/register/gitea"
+	_ "github.com/caddy-plugins/loginsrv/oauth2/register/github"
+	_ "github.com/caddy-plugins/loginsrv/oauth2/register/gitlab"
+	_ "github.com/caddy-plugins/loginsrv/oauth2/register/google"
+	_ "github.com/caddy-plugins/loginsrv/oauth2/register/wechat"
 	"github.com/coscms/webcore/library/backend/oauth2nging"
 	"github.com/coscms/webcore/model"
 	"github.com/webx-top/echo/defaults"
