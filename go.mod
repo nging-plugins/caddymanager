@@ -6,7 +6,7 @@ go 1.25.1
 
 require (
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
-	github.com/admpub/caddy v1.3.1-0.20251016030504-dc756ee23dd0
+	github.com/admpub/caddy v1.3.1-0.20251019083840-3f976d1025c7
 	github.com/admpub/go-download/v2 v2.2.0
 	github.com/admpub/goth v0.0.4
 	github.com/admpub/log v1.4.0
