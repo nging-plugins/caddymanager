@@ -88,7 +88,7 @@
                                 <a class="pull-right" href="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&inline=1&path={{if $path}}{{$path}}/{{end}}{{$v.Name}}" target="_blank"><img src="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&inline=1&path={{if $path}}{{$path}}/{{end}}{{$v.Name}}" style="max-width:100px;max-height:30px;" class="previewable" /></a>
                                 {{end}}
                                 {{end}}
-                                <a href="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&path={{if $path}}{{$path}}/{{end}}{{$v.Name}}">{{$v.Name}}</a>
+                                <a class="text-sm" href="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&path={{if $path}}{{$path}}/{{end}}{{$v.Name}}">{{$v.Name}}</a>
                                 &nbsp;
                                 <a href="javascript:;" title="{{`重命名`|$.T}}" data-url="{{BackendURL}}/caddy/vhost_file?id={{$.Stored.data.Id}}&do=rename&path={{if $path}}{{$path}}/{{end}}{{$v.Name}}" onclick="fileRename(this,'{{$v.Name}}',{{if $v.IsDir}}true{{else}}false{{end}})" data-toggle="tooltip">
                                 <i class="fa fa-pencil"></i>
