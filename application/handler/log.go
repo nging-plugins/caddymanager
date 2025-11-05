@@ -71,7 +71,7 @@ func ParseTailLine(line *tail.Line) (interface{}, error) {
 		realIP = logM.XRealIp
 	}
 	if ipInfo, _err := ip2region.IPInfo(realIP); _err == nil {
-		res.Region = ipInfo.Country + " - " + ipInfo.Region + " - " + ipInfo.Province + " - " + ipInfo.City + " " + ipInfo.ISP + " (" + realIP + ")"
+		res.Region = ipInfo.Country + " - " + ipInfo.Province + " - " + ipInfo.City + " " + ipInfo.ISP + " (" + realIP + ")"
 	} else {
 		res.Region = realIP
 	}
