@@ -20,6 +20,7 @@ package caddy
 
 import (
 	"fmt"
+	"net"
 	"strconv"
 	"strings"
 
@@ -31,7 +32,7 @@ import (
 	_ "github.com/caddy-plugins/caddy-rate-limit"
 	s3browser "github.com/caddy-plugins/caddy-s3browser"
 	_ "github.com/caddy-plugins/cors/caddy"
-	_ "github.com/caddy-plugins/ipfilter"
+	caddyIPfilter "github.com/caddy-plugins/ipfilter"
 	_ "github.com/caddy-plugins/loginsrv/caddy"
 	_ "github.com/caddy-plugins/nobots"
 	_ "github.com/caddy-plugins/webdav"
@@ -47,6 +48,7 @@ import (
 	_ "github.com/caddy-plugins/loginsrv/oauth2/register/wechat"
 	"github.com/coscms/webcore/library/backend/oauth2nging"
 	"github.com/coscms/webcore/model"
+	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
 
 	// TLS DNS providers
@@ -69,6 +71,20 @@ func init() {
 		return oauth2nging.New(cfg.ClientID, cfg.ClientSecret, cfg.GetRedirectURI(), hostURL, `profile`)
 	})
 	s3browser.AccountGetter = getS3Account
+	caddyIPfilter.GetCountryCode = func(c caddyIPfilter.IPFConfig, clientIP net.IP) (string, error) {
+		if c.DBHandler == nil {
+			if f, y := echo.Get(`IP2CountyISOCode`).(func(net.IP) string); y && f != nil {
+				return f(clientIP), nil
+			}
+			return ``, caddyIPfilter.ErrIPDatabaseRequired
+		}
+		// do the lookup.
+		var result caddyIPfilter.OnlyCountry
+		err := c.DBHandler.Lookup(clientIP, &result)
+
+		// get only the ISOCode out of the lookup results.
+		return result.Country.ISOCode, err
+	}
 }
 
 func getS3Account(arg string) (s3browser.Account, error) {
