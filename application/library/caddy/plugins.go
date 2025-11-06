@@ -71,20 +71,22 @@ func init() {
 		return oauth2nging.New(cfg.ClientID, cfg.ClientSecret, cfg.GetRedirectURI(), hostURL, `profile`)
 	})
 	s3browser.AccountGetter = getS3Account
-	caddyIPfilter.GetCountryCode = func(c caddyIPfilter.IPFConfig, clientIP net.IP) (string, error) {
-		if c.DBHandler == nil {
-			if f, y := echo.Get(`IP2CountyISOCode`).(func(net.IP) string); y && f != nil {
-				return f(clientIP), nil
-			}
-			return ``, caddyIPfilter.ErrIPDatabaseRequired
-		}
-		// do the lookup.
-		var result caddyIPfilter.OnlyCountry
-		err := c.DBHandler.Lookup(clientIP, &result)
+	caddyIPfilter.GetCountryCode = getCountryCode
+}
 
-		// get only the ISOCode out of the lookup results.
-		return result.Country.ISOCode, err
+func getCountryCode(c caddyIPfilter.IPFConfig, clientIP net.IP) (string, error) {
+	if c.DBHandler == nil {
+		if f, y := echo.Get(`IP2CountyISOCode`).(func(net.IP) string); y && f != nil {
+			return f(clientIP), nil
+		}
+		return ``, caddyIPfilter.ErrIPDatabaseRequired
 	}
+	// do the lookup.
+	var result caddyIPfilter.OnlyCountry
+	err := c.DBHandler.Lookup(clientIP, &result)
+
+	// get only the ISOCode out of the lookup results.
+	return result.Country.ISOCode, err
 }
 
 func getS3Account(arg string) (s3browser.Account, error) {
