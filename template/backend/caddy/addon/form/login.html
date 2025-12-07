@@ -184,13 +184,13 @@
    <label class="col-sm-2 control-label">{{"oAuth2认证"|$.T}}</label>
    <div class="col-sm-10">
       {{- $v := $.Form `login_oauth_type` -}}
-      <select name="login_oauth_type" class="form-control" style="margin-bottom:2px" onchange="if(!this.value){$('#login-oauth-setting').addClass('hide');}else{$('#login-oauth-setting').removeClass('hide');if(this.value=='nging'){$('.login-oauth-nging').removeClass('hide');}else{$('.login-oauth-nging').addClass('hide');}}">
+      <select name="login_oauth_type" class="form-control" style="margin-bottom:2px" onchange="if(!this.value){$('#login-oauth-setting').addClass('hide');}else{$('#login-oauth-setting').removeClass('hide');if(this.value=='nging'||this.value=='gitlab'||this.value=='gitea'){$('.login-oauth-custom-server').removeClass('hide').children('label.control-label').html($(this).find('option:selected').data('custom-server-title'));}else{$('.login-oauth-custom-server').addClass('hide').find('input[name=login_oauth_host_url]').val('');}}">
          <option value="">- {{`未选择`|$.T}} -</option>
-         <option value="nging"{{if eq $v `nging`}} selected{{end}}>Nging</option>
+         <option value="nging"{{if eq $v `nging`}} selected{{end}} data-custom-server-title="{{- `Nging后台网址`|$.T -}}">Nging</option>
          <option value="github"{{if eq $v `github`}} selected{{end}}>Github</option>
          <option value="google"{{if eq $v `google`}} selected{{end}}>Google</option>
-         <option value="gitlab"{{if eq $v `gitlab`}} selected{{end}}>Gitlab</option>
-         <option value="gitea"{{if eq $v `gitea`}} selected{{end}}>Gitea</option>
+         <option value="gitlab"{{if eq $v `gitlab`}} selected{{end}} data-custom-server-title="{{- `GitLab网址`|$.T -}}">Gitlab</option>
+         <option value="gitea"{{if eq $v `gitea`}} selected{{end}} data-custom-server-title="{{- `Gitea网址`|$.T -}}">Gitea</option>
          <option value="wechat"{{if eq $v `wechat`}} selected{{end}}>Wechat</option>
       </select>
       <div class="fieldset bg-fc{{if not $v}} hide{{end}}" id="login-oauth-setting">
@@ -214,8 +214,16 @@
                </span>
             </div>
          </div>
-         <div class="form-group login-oauth-nging{{if ne $v `nging`}} hide{{end}}">
-            <label class="col-sm-2 control-label">{{"Nging后台网址"|$.T}}</label>
+         <div class="form-group login-oauth-custom-server{{if and (ne $v `nging`) (ne $v `gitlab`) (ne $v `gitea`)}} hide{{end}}">
+            <label class="col-sm-2 control-label">
+               {{- if eq $v `nging` -}}
+               {{- `Nging后台网址`|$.T -}}
+               {{- else if eq $v `gitlab` -}}
+               {{- `GitLab网址`|$.T -}}
+               {{- else if eq $v `gitea` -}}
+               {{- `Gitea网址`|$.T -}}
+               {{- end -}}
+            </label>
             <div class="col-sm-10">
                <input type="url" name="login_oauth_host_url" class="form-control" value="{{$.Form `login_oauth_host_url`}}">
             </div>
