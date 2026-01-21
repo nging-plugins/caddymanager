@@ -257,20 +257,27 @@ func (c *Config) fixedCaddyfile() error {
 	return err
 }
 
+func newZapLogEncoderConfig() zapcore.EncoderConfig {
+	zapEncoderCfg := zap.NewProductionEncoderConfig()
+	zapEncoderCfg.EncodeTime = zapcore.RFC3339TimeEncoder
+	return zapEncoderCfg
+}
+
+func initCertMagicLog() {
+	zapEncoderCfg := newZapLogEncoderConfig() //zap.NewDevelopmentEncoderConfig()
+	certmagic.Default.Logger = zap.New(zapcore.NewCore(
+		zapcore.NewConsoleEncoder(zapEncoderCfg),
+		os.Stderr,
+		zap.InfoLevel,
+	))
+}
+
 func (c *Config) Start() error {
 	if err := c.fixedCaddyfile(); err != nil {
 		return err
 	}
 	caddy.AppName = c.AppName
 	caddy.AppVersion = c.AppVersion
-
-	zapEncoderCfg := zap.NewProductionEncoderConfig()
-	zapEncoderCfg.EncodeTime = zapcore.RFC3339TimeEncoder
-	certmagic.Default.Logger = zap.New(zapcore.NewCore(
-		zapcore.NewConsoleEncoder(zapEncoderCfg),
-		os.Stderr,
-		zap.InfoLevel,
-	))
 
 	caddy.OnProcessExit = append(caddy.OnProcessExit, func() {
 		certmagic.CleanUpOwnLocks(context.TODO(), certmagic.Default.Logger)

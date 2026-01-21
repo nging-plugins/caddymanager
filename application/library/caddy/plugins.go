@@ -63,6 +63,7 @@ import (
 )
 
 func init() {
+	initCertMagicLog()
 	oauth2.Register(`nging`, func(cfg *oauth2.Config) goth.Provider {
 		hostURL := cfg.Extra[`host_url`]
 		if len(hostURL) > 0 {
