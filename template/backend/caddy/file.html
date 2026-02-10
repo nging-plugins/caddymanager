@@ -44,15 +44,15 @@
 				</div>
 			</div>
 			<div class="content">
-				<div class="table-responsive">
+				<div class="table-responsive" data-pattern="priority-columns">
 				<table class="table no-border hover">
 					<thead class="no-border">
 						<tr>
 							<th><strong>{{"名称"|$.T}}</strong></th>
-							<th style="width:130px"><strong>{{"修改日期"|$.T}}</strong></th>
-							<th style="width:80px"><strong>{{"类型"|$.T}}</strong></th>
-							<th style="width:80px"><strong>{{"大小"|$.T}}</strong></th>
-							<th style="width:85px"><strong>{{"权限"|$.T}}</strong></th>
+							<th data-priority="1" style="width:130px"><strong>{{"修改日期"|$.T}}</strong></th>
+							<th data-priority="1" style="width:80px"><strong>{{"类型"|$.T}}</strong></th>
+							<th data-priority="1" style="width:80px"><strong>{{"大小"|$.T}}</strong></th>
+							<th data-priority="6" style="width:85px"><strong>{{"权限"|$.T}}</strong></th>
 							<th style="width:80px"><strong>{{"操作"|$.T}}</strong></th>
 						</tr>
 					</thead>
@@ -126,10 +126,10 @@
 						</tr>
                         {{- end -}}
 					</tbody>
-				</table>		
+				</table>
 				</div>
 			</div>
-		</div>				
+		</div>
 	</div>
 </div>
 {{/Block}}

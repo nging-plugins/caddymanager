@@ -16,13 +16,13 @@
 				<h3>{{"网站分组"|$.T}}</h3>
 			</div>
 			<div class="content">
-				<div class="table-responsive">
+				<div class="table-responsive" data-pattern="priority-columns">
 				<table class="table no-border hover">
 					<thead class="no-border">
 						<tr>
 							<th style="width:55px"><strong>ID</strong></th>
 							<th><strong>{{"组名称"|$.T}}</strong></th>
-							<th><strong>{{"描述"|$.T}}</strong></th>
+							<th data-priority="3"><strong>{{"描述"|$.T}}</strong></th>
 							<th style="width:80px" class="text-center"><strong>{{"操作"|$.T}}</strong></th>
 						</tr>
 					</thead>
@@ -33,17 +33,17 @@
 							<td>{{$v.Name}}</td>
 							<td>{{$v.Description}}</td>
 							<td class="text-center">
-							<a class="label label-success" href="{{BackendURL}}/caddy/group_edit?id={{$v.Id}}"><i class="fa fa-pencil" data-toggle="tooltip" title="{{`编辑`|$.T}}"></i></a> 
+							<a class="label label-success" href="{{BackendURL}}/caddy/group_edit?id={{$v.Id}}"><i class="fa fa-pencil" data-toggle="tooltip" title="{{`编辑`|$.T}}"></i></a>
 							<a class="label label-danger" href="{{BackendURL}}/caddy/group_delete?id={{$v.Id}}" onclick="return confirm('{{`真的要删除吗？`|$.T}}');" data-toggle="tooltip" title="{{`删除`|$.T}}"><i class="fa fa-times"></i></a>
 							</td>
 						</tr>
                         {{- end -}}
 					</tbody>
-				</table>		
+				</table>
 				</div>
 				{{$.Stored.pagination.Render}}
 			</div>
-		</div>				
+		</div>
 	</div>
 </div>
 {{/Block}}
