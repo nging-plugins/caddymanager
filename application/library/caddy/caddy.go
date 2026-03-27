@@ -270,6 +270,7 @@ func initCertMagicLog() {
 		os.Stderr,
 		zap.InfoLevel,
 	))
+	certmagic.DefaultACME.Logger = certmagic.Default.Logger
 }
 
 func (c *Config) Start() error {

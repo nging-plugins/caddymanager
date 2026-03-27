@@ -48,6 +48,7 @@ import (
 	_ "github.com/caddy-plugins/loginsrv/oauth2/register/wechat"
 	"github.com/coscms/webcore/library/backend/oauth2nging"
 	"github.com/coscms/webcore/model"
+	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
 
@@ -82,9 +83,10 @@ func getCountryCode(c caddyIPfilter.IPFConfig, clientIP net.IP) (string, error) 
 		}
 		return ``, caddyIPfilter.ErrIPDatabaseRequired
 	}
+	addr, _ := com.ToNetipAddr(clientIP)
 	// do the lookup.
 	var result caddyIPfilter.OnlyCountry
-	err := c.DBHandler.Lookup(clientIP, &result)
+	err := c.DBHandler.Lookup(addr).Decode(&result)
 
 	// get only the ISOCode out of the lookup results.
 	return result.Country.ISOCode, err
