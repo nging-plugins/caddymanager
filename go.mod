@@ -2,7 +2,7 @@ module github.com/nging-plugins/caddymanager
 
 go 1.26.1
 
-replace github.com/coscms/webcore => ../../coscms/webcore
+// replace github.com/coscms/webcore => ../../coscms/webcore
 
 require (
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
@@ -28,7 +28,7 @@ require (
 	github.com/caddy-plugins/nobots v0.2.1
 	github.com/caddy-plugins/webdav v1.3.4
 	github.com/caddyserver/certmagic v0.25.2
-	github.com/coscms/webcore v0.13.3-0.20260423060547-02bb993877bd
+	github.com/coscms/webcore v0.13.3-0.20260423063358-a0df92f1a5cf
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.11.1
 	github.com/webx-top/com v1.5.1
