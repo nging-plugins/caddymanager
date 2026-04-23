@@ -60,7 +60,7 @@ func VhostLog(ctx echo.Context) error {
 	return nlog.LogShow(ctx, logFile, echo.H{`title`: m.Name})
 }
 
-func ParseTailLine(line *tail.Line) (interface{}, error) {
+func ParseTailLine(ctx echo.Context, line *tail.Line) (interface{}, error) {
 	logM := model.NewAccessLog(nil)
 	err := logM.Parse(line.Text)
 	res := logM.ToLite()
@@ -70,7 +70,7 @@ func ParseTailLine(line *tail.Line) (interface{}, error) {
 	} else if len(logM.XRealIp) > 0 {
 		realIP = logM.XRealIp
 	}
-	if ipInfo, _err := ip2region.IPInfo(realIP); _err == nil {
+	if ipInfo, _err := ip2region.IPInfo(nil, realIP); _err == nil {
 		res.Region = ipInfo.Country + " - " + ipInfo.Province + " - " + ipInfo.City + " " + ipInfo.ISP + " (" + realIP + ")"
 	} else {
 		res.Region = realIP
