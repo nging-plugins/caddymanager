@@ -10,7 +10,6 @@ require (
 	github.com/admpub/go-download/v2 v2.2.0
 	github.com/admpub/goth v0.0.4
 	github.com/admpub/log v1.5.2
-	github.com/admpub/nging/v5 v5.3.5
 	github.com/admpub/null v8.0.5+incompatible
 	github.com/admpub/once v0.0.2
 	github.com/admpub/resty/v2 v2.7.3
@@ -43,8 +42,6 @@ require (
 )
 
 require (
-	github.com/admpub/dgoogauth v0.0.1 // indirect
-	github.com/admpub/websocket v1.0.4 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager v0.2.10 // indirect
 	github.com/zeebo/xxh3 v1.1.0 // indirect
 	gopkg.in/ini.v1 v1.67.3 // indirect
