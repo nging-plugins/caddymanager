@@ -30,6 +30,7 @@ import (
 	"github.com/coscms/webcore/library/cron"
 	"github.com/coscms/webcore/library/module"
 	"github.com/coscms/webcore/library/nerrors"
+	"github.com/coscms/webcore/library/role"
 	routeRegistry "github.com/coscms/webcore/registry/route"
 	"github.com/nging-plugins/caddymanager/application/library/engine"
 	"github.com/nging-plugins/caddymanager/application/model"
@@ -71,6 +72,10 @@ func registerRoute(g echo.RouteRegister) {
 
 func init() {
 	cron.Register(`renewVhostCert`, renewVhostCertJob, `>renewVhostCert:1`, `更新虚拟机SSL证书`)
+	role.RegisterAuthDependency(
+		`user/autocomplete_path`,
+		`caddy/vhost_add`, `caddy/vhost_edit`,
+	)
 }
 
 // renewVhostCertJob 更新虚拟机SSL证书
